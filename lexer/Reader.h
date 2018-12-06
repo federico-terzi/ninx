@@ -29,13 +29,23 @@ SOFTWARE.
 
 #include <string>
 #include <iostream>
+#include <vector>
 
 namespace ninx {
     namespace lexer {
+        const int READER_BUFFER_INITIAL_SIZE = 500;
+
+        // Chars that have a special meaning, such ascan be used in operator definition and the @ keyword prefix.
+        // NOTE: place them based on the priority and on probability of occurrence.
+        //       The first ones are the most used.
+        const char LIMITER_CHARS[] = {'@', '{', '}', '#'};
+
         class Reader {
         private:
             std::istream &stream;
             std::string origin;
+
+            std::vector<char> buffer;
 
             int line_number = 1;
 
@@ -46,7 +56,10 @@ namespace ninx {
             int get_line_number() const;
 
             void ignore_spaces();
-            std::string read_until(char c);
+
+            int get_next_limiter();
+            std::string read_until_limiter();
+            std::string read_identifier();
         };
     }
 }

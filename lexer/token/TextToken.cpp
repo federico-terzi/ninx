@@ -26,7 +26,7 @@ SOFTWARE.
 #include "TextToken.h"
 
 ninx::lexer::token::TextToken::TextToken(Reader &reader) : BaseToken(reader) {
-    _text = reader.read_until('@');
+
 }
 
 const std::string &ninx::lexer::token::TextToken::get_text() const {

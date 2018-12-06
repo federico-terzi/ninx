@@ -33,8 +33,22 @@ ninx::lexer::Lexer::Lexer(std::istream &stream) : Lexer(stream, "unknown_origin"
 ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{stream}, origin{std::move(origin)},
                                                                       reader{Reader{stream, origin}} {
 
-    TextToken token (this->reader);
-    std::cout << token.get_text() << std::endl;
-    std::cout << this->reader.get_line_number() << std::endl;
+    while(true) {
+        int next_limiter = reader.get_next_limiter();
+        if (next_limiter == -1) {  // EOF
+            break;
+        }
 
+        if (next_limiter > 0) {  // A limiter was found
+            switch (next_limiter) {
+                case '@':  // Keyword beginning
+                    std::cout << "Keyword found: '" << reader.read_identifier() << "'" << std::endl;
+                    break;
+                default:   // Other limiters, mark them as generic limiters
+                    std::cout << "Limiter found: '" << static_cast<char>(next_limiter) << "'" << std::endl;
+            }
+        }else{  // A limiter was not found, it is a simple text
+            std::cout << "Text found: '" << reader.read_until_limiter() << "'" << std::endl;
+        }
+    }
 }
