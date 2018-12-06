@@ -24,14 +24,42 @@ SOFTWARE.
 */
 
 
-#include "Context.h"
+#include "Reader.h"
+#include <vector>
 
-int ninx::lexer::Context::get_line_number() const {
+int ninx::lexer::Reader::get_line_number() const {
     return line_number;
 }
 
-void ninx::lexer::Context::increment_line() {
+void ninx::lexer::Reader::increment_line() {
     this->line_number++;
 }
 
-ninx::lexer::Context::Context(std::string &filename) : filename{filename}{}
+ninx::lexer::Reader::Reader(std::istream &stream, std::string &origin) : stream{stream}, origin{origin}{}
+
+void ninx::lexer::Reader::ignore_spaces() {
+    while(isspace(this->stream.peek())) {
+        int current = this->stream.get();
+        if (current == '\n') { // Increment the line count if a newline was found
+            this->increment_line();
+        }
+    }
+}
+
+std::string ninx::lexer::Reader::read_until(char c) {
+    std::vector<char> buffer;  // TODO levare
+    buffer.reserve(100);
+
+    while(stream && stream.peek() != c) {
+        char current = static_cast<char>(stream.get());
+        if (current == '\n') { // Increment the line count if a newline was found
+            this->increment_line();
+        }
+
+        buffer.push_back(current);
+    }
+
+    buffer.push_back(0);
+
+    return std::move(std::string {buffer.data()});
+}

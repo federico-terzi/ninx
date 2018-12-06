@@ -24,7 +24,17 @@ SOFTWARE.
 */
 
 #include "Lexer.h"
+#include "token/TextToken.h"
+
+using namespace ninx::lexer::token;
 
 ninx::lexer::Lexer::Lexer(std::istream &stream) : Lexer(stream, "unknown_origin") {}
 
-ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin): stream{stream}, origin{std::move(origin)} {}
+ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{stream}, origin{std::move(origin)},
+                                                                      reader{Reader{stream, origin}} {
+
+    TextToken token (this->reader);
+    std::cout << token.get_text() << std::endl;
+    std::cout << this->reader.get_line_number() << std::endl;
+
+}

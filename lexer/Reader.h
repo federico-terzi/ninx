@@ -24,28 +24,31 @@ SOFTWARE.
 */
 
 
-#ifndef NINX_TEXTTOKEN_H
-#define NINX_TEXTTOKEN_H
+#ifndef NINX_CONTEXT_H
+#define NINX_CONTEXT_H
 
 #include <string>
-#include "BaseToken.h"
+#include <iostream>
 
 namespace ninx {
     namespace lexer {
-        namespace token {
-            class TextToken : public BaseToken {
-            private:
-                std::string _text;
-            public:
-                const std::string &get_text() const;
+        class Reader {
+        private:
+            std::istream &stream;
+            std::string origin;
 
-                void set_text(const std::string &_text);
+            int line_number = 1;
 
-                explicit TextToken(Reader &reader);
-            };
-        }
+            void increment_line();
+        public:
+            explicit Reader(std::istream &stream, std::string &filename);
+
+            int get_line_number() const;
+
+            void ignore_spaces();
+            std::string read_until(char c);
+        };
     }
 }
 
-
-#endif //NINX_TEXTTOKEN_H
+#endif //NINX_CONTEXT_H

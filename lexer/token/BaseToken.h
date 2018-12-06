@@ -27,11 +27,18 @@ SOFTWARE.
 #ifndef NINX_BASETOKEN_H
 #define NINX_BASETOKEN_H
 
+#include <iostream>
+#include "../Reader.h"
+
 namespace ninx {
     namespace lexer {
         namespace token {
             class BaseToken {
+            protected:
+                Reader &reader;
             public:
+                explicit BaseToken(Reader &reader);
+
                 virtual ~BaseToken() = default;
             };
         }

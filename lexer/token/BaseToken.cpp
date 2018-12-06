@@ -24,25 +24,7 @@ SOFTWARE.
 */
 
 
-#ifndef NINX_CONTEXT_H
-#define NINX_CONTEXT_H
+#include "BaseToken.h"
 
-#include <string>
 
-namespace ninx {
-    namespace lexer {
-        class Context {
-        private:
-            std::string filename;
-
-            int line_number = 0;
-        public:
-            explicit Context(std::string &filename);
-
-            int get_line_number() const;
-            void increment_line();
-        };
-    }
-}
-
-#endif //NINX_CONTEXT_H
+ninx::lexer::token::BaseToken::BaseToken(Reader &reader): reader{reader}{}

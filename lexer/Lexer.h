@@ -28,6 +28,7 @@ SOFTWARE.
 #define NINX_LEXER_H
 
 #include <iostream>
+#include "Reader.h"
 
 namespace ninx {
     namespace lexer {
@@ -35,6 +36,8 @@ namespace ninx {
         private:
             std::istream &stream;
             std::string origin;
+
+            Reader reader;
         public:
             explicit Lexer(std::istream &stream, std::string origin);
             explicit Lexer(std::istream &stream);

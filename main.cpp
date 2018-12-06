@@ -12,7 +12,7 @@ using namespace std;
 int main() {
     std::ifstream source{R"(test/data/test.txt)", std::ios_base::binary};
 
-    Lexer lexer {source};
+    Lexer lexer {source, "test"};
 
     return 0;
 }

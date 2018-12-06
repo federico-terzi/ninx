@@ -23,10 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 #include "TextToken.h"
 
-ninx::lexer::token::TextToken::TextToken(const std::string &_text) : _text(_text) {}
+ninx::lexer::token::TextToken::TextToken(Reader &reader) : BaseToken(reader) {
+    _text = reader.read_until('@');
+}
 
 const std::string &ninx::lexer::token::TextToken::get_text() const {
     return _text;
@@ -35,3 +36,5 @@ const std::string &ninx::lexer::token::TextToken::get_text() const {
 void ninx::lexer::token::TextToken::set_text(const std::string &_text) {
     TextToken::_text = _text;
 }
+
+
