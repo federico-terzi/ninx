@@ -23,8 +23,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "Lexer.h"
 
-ninx::lexer::Lexer::Lexer(std::istream &stream) : Lexer(stream, "unknown_origin") {}
+#ifndef NINX_CONTEXT_H
+#define NINX_CONTEXT_H
 
-ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin): stream{stream}, origin{std::move(origin)} {}
+#include <string>
+
+namespace ninx {
+    namespace lexer {
+        class Context {
+        private:
+            std::string filename;
+
+            int line_number = 0;
+        public:
+            explicit Context(std::string &filename);
+
+            int get_line_number() const;
+            void increment_line();
+        };
+    }
+}
+
+#endif //NINX_CONTEXT_H

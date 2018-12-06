@@ -34,10 +34,9 @@ namespace ninx {
         class Lexer {
         private:
             std::istream &stream;
-
-            int line_number = 0;
-
+            std::string origin;
         public:
+            explicit Lexer(std::istream &stream, std::string origin);
             explicit Lexer(std::istream &stream);
         };
     }
