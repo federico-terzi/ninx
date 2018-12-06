@@ -25,4 +25,6 @@ SOFTWARE.
 
 #include "Lexer.h"
 
-
+ninx::lexer::Lexer::Lexer(std::istream &stream) : stream{stream} {
+    std::cout << this->stream.get() << std::endl;
+}

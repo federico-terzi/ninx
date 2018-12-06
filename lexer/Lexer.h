@@ -27,10 +27,18 @@ SOFTWARE.
 #ifndef NINX_LEXER_H
 #define NINX_LEXER_H
 
+#include <iostream>
+
 namespace ninx {
     namespace lexer {
         class Lexer {
+        private:
+            std::istream &stream;
 
+            int line_number = 0;
+
+        public:
+            explicit Lexer(std::istream &stream);
         };
     }
 }

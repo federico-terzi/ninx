@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include "lexer/Lexer.h"
 #include "lexer/token/BaseToken.h"
@@ -9,13 +10,9 @@ using namespace ninx::lexer::token;
 using namespace std;
 
 int main() {
-    Lexer lexer;
+    std::ifstream source{R"(test/data/test.txt)", std::ios_base::binary};
 
-    unique_ptr<token::BaseToken> token { make_unique<token::TextToken>("Bella raga") };
-
-    auto t { dynamic_cast<TextToken*>(token.get()) };
-
-    cout << t->get_text();
+    Lexer lexer {source};
 
     return 0;
 }
