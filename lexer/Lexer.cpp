@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 #include "Lexer.h"
-#include "token/TextToken.h"
+#include "token/Text.h"
 
 using namespace ninx::lexer::token;
 
@@ -44,11 +44,20 @@ ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{str
                 case '@':  // Keyword beginning
                     std::cout << "Keyword found: '" << reader.read_identifier() << "'" << std::endl;
                     break;
+                case '$':  // Variable beginning
+                    std::cout << "Variable found: '" << reader.read_identifier() << "'" << std::endl;
+                    break;
                 default:   // Other limiters, mark them as generic limiters
                     std::cout << "Limiter found: '" << static_cast<char>(next_limiter) << "'" << std::endl;
             }
         }else{  // A limiter was not found, it is a simple text
-            std::cout << "Text found: '" << reader.read_until_limiter() << "'" << std::endl;
+            auto token = std::make_unique<Text>(reader.read_until_limiter());
+            this->tokens.push_back(std::move(token));
+            //std::cout << "Text found: '" <<  << "'" << std::endl;
         }
+    }
+
+    for (auto& token : this->tokens ) {
+        std::cout << *token << std::endl;
     }
 }

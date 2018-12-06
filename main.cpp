@@ -2,8 +2,6 @@
 #include <fstream>
 #include <memory>
 #include "lexer/Lexer.h"
-#include "lexer/token/BaseToken.h"
-#include "lexer/token/TextToken.h"
 
 using namespace ninx::lexer;
 using namespace ninx::lexer::token;

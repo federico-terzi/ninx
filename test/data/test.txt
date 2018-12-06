@@ -1,6 +1,7 @@
-Hello #guys
-yeah
-@hello
-how are you?
+Hello *guys*, today I'm going to show you _ninx_.
 
-I'm @hello fine.
+@func sayHello() {
+    Hello world!
+}
+
+@sayHello

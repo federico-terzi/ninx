@@ -23,18 +23,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "TextToken.h"
 
-ninx::lexer::token::TextToken::TextToken(Reader &reader) : BaseToken(reader) {
+#ifndef NINX_BASETOKEN_H
+#define NINX_BASETOKEN_H
 
+#include <iostream>
+#include "../Reader.h"
+#include "Type.h"
+
+namespace ninx {
+    namespace lexer {
+        namespace token {
+            class Token {
+            public:
+                virtual ~Token() = default;
+
+                virtual Type get_type() = 0;
+
+                virtual std::string dump() const = 0;
+
+                friend std::ostream& operator<<(std::ostream &strm, const Token &a) {
+                    return strm << a.dump();
+                }
+            };
+        }
+    }
 }
 
-const std::string &ninx::lexer::token::TextToken::get_text() const {
-    return _text;
-}
-
-void ninx::lexer::token::TextToken::set_text(const std::string &_text) {
-    TextToken::_text = _text;
-}
-
-
+#endif //NINX_BASETOKEN_H

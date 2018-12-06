@@ -28,7 +28,11 @@ SOFTWARE.
 #define NINX_LEXER_H
 
 #include <iostream>
+#include <memory>
 #include "Reader.h"
+#include "token/Token.h"
+
+using namespace ninx::lexer::token;
 
 namespace ninx {
     namespace lexer {
@@ -38,6 +42,8 @@ namespace ninx {
             std::string origin;
 
             Reader reader;
+
+            std::vector<std::unique_ptr<Token>> tokens;
         public:
             explicit Lexer(std::istream &stream, std::string origin);
             explicit Lexer(std::istream &stream);

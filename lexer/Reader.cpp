@@ -33,11 +33,10 @@ ninx::lexer::Reader::Reader(std::istream &stream, std::string &origin) : stream{
 }
 
 void ninx::lexer::Reader::ignore_spaces() {
-    while (isspace(this->stream.peek())) {
-        int current = this->stream.get();
-        if (current == '\n') { // Increment the line count if a newline was found
-            this->increment_line();
-        }
+    int current;
+    // Skip all the spaces except the newline
+    while (isspace(current = this->stream.peek()) && current != '\n') {
+        this->stream.get();
     }
 }
 
@@ -59,6 +58,9 @@ int ninx::lexer::Reader::get_next_limiter() {
         if (is_limiter(static_cast<char>(next_char))) {
             // If the char is a limiter, consume it
             this->stream.get();
+
+            // Also ignore the trailing spaces
+            this->ignore_spaces();
 
             return next_char;
         }else{
@@ -116,6 +118,9 @@ std::string ninx::lexer::Reader::read_identifier() {
     }
 
     this->buffer.push_back(0);
+
+    // Eat all the following spaces
+    this->ignore_spaces();
 
     return std::move(std::string{buffer.data()});
 }
