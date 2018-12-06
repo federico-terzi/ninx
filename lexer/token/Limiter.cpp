@@ -23,30 +23,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_TEXT_H
-#define NINX_TEXT_H
+#include "Limiter.h"
 
-#include "Token.h"
+ninx::lexer::token::Limiter::Limiter(char limiter) : limiter(limiter) {}
 
-namespace ninx {
-    namespace lexer {
-        namespace token {
-            class Text : public Token {
-            private:
-                std::string text;
-            public:
-                explicit Text(const std::string &text);
-
-                Type get_type() override;
-
-                std::string dump() const override;
-
-                const std::string &get_text() const;
-            };
-        }
-    }
+char ninx::lexer::token::Limiter::get_limiter() const {
+    return limiter;
 }
 
+ninx::lexer::token::Type ninx::lexer::token::Limiter::get_type() {
+    return Type::LIMITER;
+}
 
+std::string ninx::lexer::token::Limiter::dump() const {
+    return "LIMITER: '" + std::string{ this->limiter } + "'";
+}
 
-#endif //NINX_TEXT_H

@@ -23,30 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_TEXT_H
-#define NINX_TEXT_H
+#include "Variable.h"
 
-#include "Token.h"
+ninx::lexer::token::Variable::Variable(const std::string &name) : name(name) {}
 
-namespace ninx {
-    namespace lexer {
-        namespace token {
-            class Text : public Token {
-            private:
-                std::string text;
-            public:
-                explicit Text(const std::string &text);
-
-                Type get_type() override;
-
-                std::string dump() const override;
-
-                const std::string &get_text() const;
-            };
-        }
-    }
+ninx::lexer::token::Type ninx::lexer::token::Variable::get_type() {
+    return Type::VARIABLE;
 }
 
+std::string ninx::lexer::token::Variable::dump() const {
+    return "VARIABLE: '" + this->name + "'";
+}
 
-
-#endif //NINX_TEXT_H
+const std::string &ninx::lexer::token::Variable::get_name() const {
+    return name;
+}

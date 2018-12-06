@@ -25,6 +25,9 @@ SOFTWARE.
 
 #include "Lexer.h"
 #include "token/Text.h"
+#include "token/Limiter.h"
+#include "token/Keyword.h"
+#include "token/Variable.h"
 
 using namespace ninx::lexer::token;
 
@@ -42,18 +45,26 @@ ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{str
         if (next_limiter > 0) {  // A limiter was found
             switch (next_limiter) {
                 case '@':  // Keyword beginning
-                    std::cout << "Keyword found: '" << reader.read_identifier() << "'" << std::endl;
+                {
+                    auto keywordToken = std::make_unique<Keyword>(reader.read_identifier());
+                    this->tokens.push_back(std::move(keywordToken));
                     break;
+                }
                 case '$':  // Variable beginning
-                    std::cout << "Variable found: '" << reader.read_identifier() << "'" << std::endl;
+                {
+                    auto variableToken = std::make_unique<Variable>(reader.read_identifier());
+                    this->tokens.push_back(std::move(variableToken));
                     break;
+                }
                 default:   // Other limiters, mark them as generic limiters
-                    std::cout << "Limiter found: '" << static_cast<char>(next_limiter) << "'" << std::endl;
+                {
+                    auto limiterToken = std::make_unique<Limiter>(static_cast<char>(next_limiter));
+                    this->tokens.push_back(std::move(limiterToken));
+                }
             }
         }else{  // A limiter was not found, it is a simple text
             auto token = std::make_unique<Text>(reader.read_until_limiter());
             this->tokens.push_back(std::move(token));
-            //std::cout << "Text found: '" <<  << "'" << std::endl;
         }
     }
 
