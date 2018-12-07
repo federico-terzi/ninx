@@ -53,7 +53,7 @@ namespace ninx {
 
             void increment_line();
         public:
-            explicit Reader(std::istream &stream, std::string &filename);
+            explicit Reader(std::istream &stream, std::string &origin);
 
             int get_line_number() const;
 

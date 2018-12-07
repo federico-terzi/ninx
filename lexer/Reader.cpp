@@ -131,7 +131,8 @@ std::string ninx::lexer::Reader::read_identifier() {
 
         // If the current char is not alphanumeric, raise an exception
         if (isalpha(current) == 0 && isdigit(current) == 0) {
-            throw LexerException(this->line_number, "Identifier can only contain alphanumeric characters.");
+            throw LexerException(this->line_number, this->origin,
+                                 "Identifier can only contain alphanumeric characters.");
         }
 
         this->buffer.push_back(current);

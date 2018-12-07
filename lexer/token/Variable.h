@@ -36,7 +36,7 @@ namespace ninx {
                 std::string name;
 
             public:
-                explicit Variable(const std::string &name);
+                explicit Variable(int line_number, const std::string &name);
 
                 Type get_type() override;
 

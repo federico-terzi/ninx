@@ -29,7 +29,7 @@ ninx::lexer::token::Type ninx::lexer::token::Text::get_type() {
     return Type::TEXT;
 }
 
-ninx::lexer::token::Text::Text(const std::string &text) : text(text) {}
+ninx::lexer::token::Text::Text(int line_number, const std::string &text) : Token(line_number), text(text) {}
 
 const std::string &ninx::lexer::token::Text::get_text() const {
     return text;

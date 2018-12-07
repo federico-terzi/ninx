@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include "Limiter.h"
 
-ninx::lexer::token::Limiter::Limiter(char limiter) : limiter(limiter) {}
+ninx::lexer::token::Limiter::Limiter(int line_number, char limiter) : Token(line_number), limiter(limiter) {}
 
 char ninx::lexer::token::Limiter::get_limiter() const {
     return limiter;

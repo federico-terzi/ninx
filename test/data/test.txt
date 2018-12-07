@@ -8,4 +8,4 @@ Hello *guys*, today I'm going to show you _ninx_.
 
 $e = @sayHello
 
-I may repeat $e
+I may repeat $e to all of you!

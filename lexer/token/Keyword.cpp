@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include "Keyword.h"
 
-ninx::lexer::token::Keyword::Keyword(const std::string &keyword) : keyword(keyword) {}
+ninx::lexer::token::Keyword::Keyword(int line_number, const std::string &keyword) : Token(line_number), keyword(keyword) {}
 
 ninx::lexer::token::Type ninx::lexer::token::Keyword::get_type() {
     return Type::KEYWORD;

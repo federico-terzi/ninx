@@ -33,8 +33,12 @@ using namespace ninx::lexer::token;
 
 ninx::lexer::Lexer::Lexer(std::istream &stream) : Lexer(stream, "unknown_origin") {}
 
-ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{stream}, origin{std::move(origin)},
+ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{stream}, origin{origin},
                                                                       reader{Reader{stream, origin}} {
+}
+
+std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
+    std::vector<std::unique_ptr<Token>> tokens;
 
     while(true) {
         int next_limiter = reader.get_next_limiter();
@@ -46,29 +50,31 @@ ninx::lexer::Lexer::Lexer(std::istream &stream, std::string origin) : stream{str
             switch (next_limiter) {
                 case '@':  // Keyword beginning
                 {
-                    auto keywordToken = std::make_unique<Keyword>(reader.read_identifier());
-                    this->tokens.push_back(std::move(keywordToken));
+                    auto keywordToken = std::make_unique<Keyword>(reader.get_line_number(), reader.read_identifier());
+                    tokens.push_back(std::move(keywordToken));
                     break;
                 }
                 case '$':  // Variable beginning
                 {
-                    auto variableToken = std::make_unique<Variable>(reader.read_identifier());
-                    this->tokens.push_back(std::move(variableToken));
+                    auto variableToken = std::make_unique<Variable>(reader.get_line_number(), reader.read_identifier());
+                    tokens.push_back(std::move(variableToken));
                     break;
                 }
                 default:   // Other limiters, mark them as generic limiters
                 {
-                    auto limiterToken = std::make_unique<Limiter>(static_cast<char>(next_limiter));
-                    this->tokens.push_back(std::move(limiterToken));
+                    auto limiterToken = std::make_unique<Limiter>(reader.get_line_number(), static_cast<char>(next_limiter));
+                    tokens.push_back(std::move(limiterToken));
                 }
             }
         }else{  // A limiter was not found, it is a simple text
-            auto token = std::make_unique<Text>(reader.read_until_limiter());
-            this->tokens.push_back(std::move(token));
+            auto token = std::make_unique<Text>(reader.get_line_number(), reader.read_until_limiter());
+            tokens.push_back(std::move(token));
         }
     }
 
-    for (auto& token : this->tokens ) {
+    for (auto& token : tokens ) {
         std::cout << *token << std::endl;
     }
+
+    return std::move(tokens);
 }

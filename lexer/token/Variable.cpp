@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include "Variable.h"
 
-ninx::lexer::token::Variable::Variable(const std::string &name) : name(name) {}
+ninx::lexer::token::Variable::Variable(int line_number, const std::string &name) : Token(line_number), name(name) {}
 
 ninx::lexer::token::Type ninx::lexer::token::Variable::get_type() {
     return Type::VARIABLE;

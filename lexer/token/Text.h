@@ -35,7 +35,7 @@ namespace ninx {
             private:
                 std::string text;
             public:
-                explicit Text(const std::string &text);
+                explicit Text(int line_number, const std::string &text);
 
                 Type get_type() override;
 

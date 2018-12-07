@@ -12,5 +12,7 @@ int main() {
 
     Lexer lexer {source, "test"};
 
+    auto tokens = lexer.generate();
+
     return 0;
 }

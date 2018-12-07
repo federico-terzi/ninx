@@ -42,11 +42,11 @@ namespace ninx {
             std::string origin;
 
             Reader reader;
-
-            std::vector<std::unique_ptr<Token>> tokens;
         public:
             explicit Lexer(std::istream &stream, std::string origin);
             explicit Lexer(std::istream &stream);
+
+            std::vector<std::unique_ptr<Token>> generate();
         };
     }
 }

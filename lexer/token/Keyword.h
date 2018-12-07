@@ -35,7 +35,7 @@ namespace ninx {
             private:
                 std::string keyword;
             public:
-                explicit Keyword(const std::string &keyword);
+                explicit Keyword(int line_number, const std::string &keyword);
 
                 Type get_type() override;
 

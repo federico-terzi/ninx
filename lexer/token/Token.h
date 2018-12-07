@@ -35,8 +35,10 @@ namespace ninx {
     namespace lexer {
         namespace token {
             class Token {
+            protected:
+                int line_number = 0;
             public:
-                virtual ~Token() = default;
+                explicit Token(int line_number) : line_number(line_number) {}
 
                 virtual Type get_type() = 0;
 
@@ -44,6 +46,10 @@ namespace ninx {
 
                 friend std::ostream& operator<<(std::ostream &strm, const Token &a) {
                     return strm << a.dump();
+                }
+
+                int get_line_number() const {
+                    return line_number;
                 }
             };
         }

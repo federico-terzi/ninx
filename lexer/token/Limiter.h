@@ -35,7 +35,7 @@ namespace ninx {
             private:
                 char limiter;
             public:
-                explicit Limiter(char limiter);
+                explicit Limiter(int line_number, char limiter);
 
                 Type get_type() override;
 
