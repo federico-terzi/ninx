@@ -5,3 +5,7 @@ Hello *guys*, today I'm going to show you _ninx_.
 }
 
 @sayHello
+
+$e = @sayHello
+
+I may repeat $e

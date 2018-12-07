@@ -25,7 +25,10 @@ SOFTWARE.
 
 
 #include "Reader.h"
+#include "exception/LexerException.h"
 #include <vector>
+
+using namespace ninx::lexer::exception;
 
 ninx::lexer::Reader::Reader(std::istream &stream, std::string &origin) : stream{stream}, origin{origin} {
     // Allocate the initial buffer size
@@ -74,6 +77,9 @@ int ninx::lexer::Reader::get_next_limiter() {
 std::string ninx::lexer::Reader::read_until_limiter() {
     this->buffer.clear();
 
+    // Used to prevent more than two consecutive newlines
+    int newline_count = 0;
+
     while (stream) {
         // Check if the next char is one of the limiting ones
         char next_char = static_cast<char>(stream.peek());
@@ -83,12 +89,23 @@ std::string ninx::lexer::Reader::read_until_limiter() {
 
         // Read the current char
         char current = static_cast<char>(stream.get());
-        if (current == '\n') { // Increment the line count if a newline was found
-            this->increment_line();
+        if (current == -1) {
+            break;
         }
 
+        if (current == '\n') { // Increment the line count if a newline was found
+            this->increment_line();
+            newline_count++;
+        }else{
+            if (!isspace(current)) {
+                newline_count = 0;
+            }
+        }
 
-        this->buffer.push_back(current);
+        // If the new character is a newline that exceed the maximum number, remove it
+        if (newline_count < MAX_CONSECUTIVE_NEWLINES) {
+            this->buffer.push_back(current);
+        }
     }
 
     this->buffer.push_back(0);
@@ -108,10 +125,13 @@ std::string ninx::lexer::Reader::read_identifier() {
 
         // Read the current char
         char current = static_cast<char>(stream.get());
+        if (current == -1) {
+            break;
+        }
 
         // If the current char is not alphanumeric, raise an exception
         if (isalpha(current) == 0 && isdigit(current) == 0) {
-            // TODO: exception
+            throw LexerException(this->line_number, "Identifier can only contain alphanumeric characters.");
         }
 
         this->buffer.push_back(current);
