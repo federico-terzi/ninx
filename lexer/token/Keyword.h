@@ -27,13 +27,19 @@ SOFTWARE.
 #define NINX_KEYWORD_H
 
 #include "Token.h"
+#include <map>
 
 namespace ninx {
     namespace lexer {
         namespace token {
+            // Reserved keywords, associated with their Type
+            const std::map<std::string, Type> RESERVED_KEYWORDS = {{"func", Type::FUNCDEF}, {"operator", Type::OPDEF}};
+
             class Keyword : public Token {
             private:
                 std::string keyword;
+                Type type;
+
             public:
                 explicit Keyword(int line_number, const std::string &keyword);
 

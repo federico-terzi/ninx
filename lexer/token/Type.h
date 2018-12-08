@@ -32,9 +32,13 @@ namespace ninx {
             enum class Type {
                 TEXT,
                 LIMITER,
-                KEYWORD,
                 ID,
                 VARIABLE,
+
+                // KEYWORDS @
+                FUNCNAME,  // Generic keyword type
+                FUNCDEF,   // Definition of a new function
+                OPDEF      // Definition of a new operator
             };
         }
     }

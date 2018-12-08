@@ -2,9 +2,11 @@
 #include <fstream>
 #include <memory>
 #include "lexer/Lexer.h"
+#include "parser/Parser.h"
 
 using namespace ninx::lexer;
 using namespace ninx::lexer::token;
+using namespace ninx::parser;
 using namespace std;
 
 int main() {
@@ -13,6 +15,8 @@ int main() {
     Lexer lexer {source, "test"};
 
     auto tokens = lexer.generate();
+
+    Parser parser{tokens, "test"};
 
     return 0;
 }

@@ -32,6 +32,7 @@ SOFTWARE.
 #include "Reader.h"
 #include "token/Token.h"
 
+
 using namespace ninx::lexer::token;
 
 namespace ninx {

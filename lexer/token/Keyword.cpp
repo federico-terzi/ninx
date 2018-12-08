@@ -23,16 +23,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <sstream>
 #include "Keyword.h"
 
-ninx::lexer::token::Keyword::Keyword(int line_number, const std::string &keyword) : Token(line_number), keyword(keyword) {}
+ninx::lexer::token::Keyword::Keyword(int line_number, const std::string &keyword) : Token(line_number), keyword(keyword) {
+    if (RESERVED_KEYWORDS.count(keyword) > 0) {  // The given keyword is a reserved one, get the corresponding Type
+        this->type = RESERVED_KEYWORDS.at(keyword);
+    }else{
+        this->type = Type::FUNCNAME;  // If a keyword is not reserved, then it is a function call
+    }
+}
 
 ninx::lexer::token::Type ninx::lexer::token::Keyword::get_type() {
-    return Type::KEYWORD;
+    return this->type;
 }
 
 std::string ninx::lexer::token::Keyword::dump() const {
-    return "KEYWORD: '" + this->keyword + "'";
+    std::stringstream s;
+    s << "KEYWORD ( type " << static_cast<int>(this-> type) << " ): '" << this->keyword << "'";
+    return s.str();
 }
 
 const std::string &ninx::lexer::token::Keyword::get_keyword() const {
