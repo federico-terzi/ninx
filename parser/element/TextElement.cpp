@@ -23,25 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_LEXEREXCEPTION_H
-#define NINX_LEXEREXCEPTION_H
+#include "TextElement.h"
 
-#include <stdexcept>
+ninx::parser::element::TextElement::TextElement(const std::string &text) : text(text) {}
 
-namespace ninx {
-    namespace lexer {
-        namespace exception {
-            class LexerException : public std::runtime_error {
-            private:
-                int line;
-                std::string &origin;
-
-                static std::string make_message(int line, const std::string &origin, const std::string &message);
-            public:
-                explicit LexerException(int line, std::string &origin, const std::string &message);
-            };
-        }
-    }
+std::string ninx::parser::element::TextElement::dump() const {
+    return "TextElement: "+this->text;
 }
-
-#endif //NINX_LEXEREXCEPTION_H

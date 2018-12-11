@@ -26,11 +26,19 @@ SOFTWARE.
 #ifndef NINX_ASTELEMENT_H
 #define NINX_ASTELEMENT_H
 
+#include <iostream>
+
 namespace ninx {
     namespace parser {
         namespace element {
             class ASTElement {
+            public:
+                virtual ~ASTElement() = default;
 
+                virtual std::string dump() const = 0;
+                friend std::ostream& operator<<(std::ostream &strm, const ASTElement &a) {
+                    return strm << a.dump();
+                }
             };
         }
     }

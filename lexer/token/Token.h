@@ -39,11 +39,11 @@ namespace ninx {
                 int line_number = 0;
             public:
                 explicit Token(int line_number) : line_number(line_number) {}
+                virtual ~Token() = default;
 
                 virtual Type get_type() = 0;
 
                 virtual std::string dump() const = 0;
-
                 friend std::ostream& operator<<(std::ostream &strm, const Token &a) {
                     return strm << a.dump();
                 }
