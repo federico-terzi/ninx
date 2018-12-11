@@ -18,5 +18,7 @@ int main() {
 
     Parser parser{tokens, "test"};
 
+    parser.generate();
+
     return 0;
 }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include "../lexer/token/Token.h"
+#include "TokenReader.h"
 
 using namespace ninx::lexer::token;
 
@@ -17,10 +18,12 @@ namespace ninx {
         class Parser {
         private:
             std::string origin;
-            std::vector<std::unique_ptr<Token>> &tokens;
+            TokenReader reader;
 
         public:
             explicit Parser(std::vector<std::unique_ptr<Token>> &tokens, const std::string &origin);
+
+            void parse();
         };
     }
 }

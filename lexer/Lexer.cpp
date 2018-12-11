@@ -72,9 +72,5 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
         }
     }
 
-    for (auto& token : tokens ) {
-        std::cout << *token << std::endl;
-    }
-
     return std::move(tokens);
 }
