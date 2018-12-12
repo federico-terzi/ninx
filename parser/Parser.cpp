@@ -5,11 +5,34 @@
 #include "Parser.h"
 #include "element/TextElement.h"
 #include "../lexer/token/Text.h"
+#include "../lexer/token/Limiter.h"
+#include "exception/ParserException.h"
+
+using namespace ninx::parser::exception;
 
 ninx::parser::Parser::Parser(std::vector<std::unique_ptr<Token>> &tokens, const std::string &origin) : origin(origin),
                                                                                                        reader(tokens) {
 
 }
+
+std::unique_ptr<Block> ninx::parser::Parser::parse_block() {
+    Token *open_bracket{reader.get_token()};
+    if (!open_bracket || open_bracket->get_type() != Type::LIMITER ||
+        dynamic_cast<ninx::lexer::token::Limiter *>(open_bracket)->get_limiter() != '{') {
+        throw ParserException(open_bracket->get_line_number(), this->origin, "Expected open bracket {, but could not find one.");
+    }
+
+    auto block {parse_implicit_block()};
+
+    Token *close_bracket{reader.get_token()};
+    if (!close_bracket || close_bracket->get_type() != Type::LIMITER ||
+        dynamic_cast<ninx::lexer::token::Limiter *>(close_bracket)->get_limiter() != '}') {
+        throw ParserException(close_bracket->get_line_number(), this->origin, "Expected close bracket }, but could not find one.");
+    }
+
+    return block;
+}
+
 
 std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     Token *token{reader.get_token()};
@@ -29,7 +52,17 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::LIMITER: {
-                // TODO: parse_operator_block
+                auto limiter = dynamic_cast<ninx::lexer::token::Limiter *>(token);
+                switch (limiter->get_limiter()) {
+                    case '{': {
+                        reader.seek_previous();
+                        auto block{this->parse_block()};
+                        return block;
+                    }
+                }
+
+                // The given limiter does not trigger any built-in statement, rewind to avoid consuming it.
+                reader.seek_previous();
                 break;
             }
             case Type::FUNCNAME: {
@@ -37,7 +70,8 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::TEXT: {
-                auto element = std::make_unique<TextElement>(dynamic_cast<ninx::lexer::token::Text*>(token)->get_text());
+                auto element = std::make_unique<TextElement>(
+                        dynamic_cast<ninx::lexer::token::Text *>(token)->get_text());
                 return element;
             }
         }
@@ -54,7 +88,28 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_function_call() {
 }
 
 void ninx::parser::Parser::parse() {
-    std::cout << *parse_statement() << std::endl;
+    std::cout << *parse_implicit_block() << std::endl;
+}
+
+std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
+    std::vector<std::unique_ptr<Statement>> statements;
+
+    std::unique_ptr<Statement> current;
+    while ((current = parse_statement())) {
+        statements.push_back(std::move(current));
+
+
+        // Check if the block will be closed
+        Token *close_bracket{reader.peek_token()};
+        if (close_bracket && close_bracket->get_type() == Type::LIMITER &&
+            dynamic_cast<ninx::lexer::token::Limiter *>(close_bracket)->get_limiter() == '}') {
+            // Exit the cycle, because the next token marks the end of a block
+            break;
+        }
+    }
+
+    auto block = std::make_unique<Block>(std::move(statements));
+    return std::move(block);
 }
 
 /*

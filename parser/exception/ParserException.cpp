@@ -26,14 +26,14 @@ SOFTWARE.
 #include <sstream>
 #include "ParserException.h"
 
-ninx::lexer::exception::ParserException::ParserException(int line, std::string &origin, const std::string &message)
+ninx::parser::exception::ParserException::ParserException(int line, std::string &origin, const std::string &message)
         : runtime_error(
         make_message(line, origin, message)), line{line}, origin(origin) {
 
 }
 
 std::string
-ninx::lexer::exception::ParserException::make_message(int line, const std::string &origin, const std::string &message) {
+ninx::parser::exception::ParserException::make_message(int line, const std::string &origin, const std::string &message) {
     std::stringstream s;
     s << "ParserError at line: " << line << ", " << message << std::endl;
     s << "\tfrom origin: " << origin;

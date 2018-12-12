@@ -10,7 +10,7 @@ using namespace ninx::parser;
 using namespace std;
 
 int main() {
-    std::ifstream source{R"(test/data/test.txt)", std::ios_base::binary};
+    std::ifstream source{R"(test/data/test2.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "test"};
 

@@ -1,3 +1,6 @@
+#include <utility>
+#include <sstream>
+
 /*
 
 MIT License
@@ -24,3 +27,18 @@ SOFTWARE.
 */
 
 #include "Block.h"
+
+ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
+        statements)) {}
+
+std::string ninx::parser::element::Block::dump() const {
+    std::stringstream s;
+
+    s << "Block {" << std::endl;
+    for (auto& statement : statements) {
+        s << "\t" << *statement << std::endl;
+    }
+    s << "}" << std::endl;
+
+    return s.str();
+}

@@ -26,13 +26,22 @@ SOFTWARE.
 #ifndef NINX_BLOCK_H
 #define NINX_BLOCK_H
 
+#include <vector>
+#include <memory>
 #include "ASTElement.h"
+#include "Statement.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class Block : public ASTElement {
+            class Block : public Statement {
+            public:
+                explicit Block(std::vector<std::unique_ptr<Statement>> statements);
 
+                std::string dump() const override;
+
+            private:
+                std::vector<std::unique_ptr<Statement>> statements;
             };
         }
     }

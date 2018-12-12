@@ -44,3 +44,7 @@ Token *ninx::parser::TokenReader::peek_token() {
 
     return nullptr;
 }
+
+void ninx::parser::TokenReader::seek_previous() {
+    current_token--;
+}

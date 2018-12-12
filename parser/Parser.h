@@ -24,6 +24,8 @@ namespace ninx {
             TokenReader reader;
 
             std::unique_ptr<Statement> parse_statement();
+            std::unique_ptr<Block> parse_implicit_block();
+            std::unique_ptr<Block> parse_block();
             std::unique_ptr<Block> parse_function_call();
         public:
             explicit Parser(std::vector<std::unique_ptr<ninx::lexer::token::Token>> &tokens, const std::string &origin);

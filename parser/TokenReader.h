@@ -45,6 +45,8 @@ namespace ninx {
 
             Token * get_token();
             Token * peek_token();
+
+            void seek_previous();
         };
     }
 }

@@ -29,7 +29,7 @@ SOFTWARE.
 #include <stdexcept>
 
 namespace ninx {
-    namespace lexer {
+    namespace parser {
         namespace exception {
             class ParserException : public std::runtime_error {
             private:
