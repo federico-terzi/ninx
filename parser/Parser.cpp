@@ -7,6 +7,8 @@
 #include "../lexer/token/Text.h"
 #include "../lexer/token/Limiter.h"
 #include "exception/ParserException.h"
+#include "element/FunctionCall.h"
+#include "../lexer/token/Keyword.h"
 
 using namespace ninx::parser::exception;
 
@@ -66,8 +68,8 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::FUNCNAME: {
-                // TODO: parse_function_call
-                break;
+                auto element = std::make_unique<FunctionCall>(dynamic_cast<ninx::lexer::token::Keyword *>(token)->get_keyword());
+                return element;
             }
             case Type::TEXT: {
                 auto element = std::make_unique<TextElement>(
