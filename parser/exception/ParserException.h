@@ -27,6 +27,7 @@ SOFTWARE.
 #define NINX_PARSEEXCEPTION_H
 
 #include <stdexcept>
+#include "../../lexer/token/Token.h"
 
 namespace ninx {
     namespace parser {
@@ -39,6 +40,7 @@ namespace ninx {
                 static std::string make_message(int line, const std::string &origin, const std::string &message);
             public:
                 explicit ParserException(int line, std::string &origin, const std::string &message);
+                explicit ParserException(ninx::lexer::token::Token *token, std::string &origin, const std::string &message);
             };
         }
     }

@@ -19,7 +19,7 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_block() {
     Token *open_bracket{reader.get_token()};
     if (!open_bracket || open_bracket->get_type() != Type::LIMITER ||
         dynamic_cast<ninx::lexer::token::Limiter *>(open_bracket)->get_limiter() != '{') {
-        throw ParserException(open_bracket->get_line_number(), this->origin, "Expected open bracket {, but could not find one.");
+        throw ParserException(open_bracket, this->origin, "Expected open bracket {, but could not find one.");
     }
 
     auto block {parse_implicit_block()};
@@ -27,7 +27,7 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_block() {
     Token *close_bracket{reader.get_token()};
     if (!close_bracket || close_bracket->get_type() != Type::LIMITER ||
         dynamic_cast<ninx::lexer::token::Limiter *>(close_bracket)->get_limiter() != '}') {
-        throw ParserException(close_bracket->get_line_number(), this->origin, "Expected close bracket }, but could not find one.");
+        throw ParserException(close_bracket, this->origin, "Expected close bracket }, but could not find one.");
     }
 
     return block;
