@@ -11,6 +11,7 @@
 #include "../lexer/token/Keyword.h"
 #include "element/VariableRead.h"
 #include "../lexer/token/Variable.h"
+#include "element/Assignment.h"
 
 using namespace ninx::parser::exception;
 
@@ -58,7 +59,11 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 // Determine if the variable is used in an assignment by getting the next
                 // token and checking if it is a limiter equal to =
                 if (reader.check_limiter('=')) {  // Assignment
-                    // TODO: Assignment
+                    // Parse the block containing the assignment value
+                    auto block = parse_block();
+
+                    auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(block));
+                    return element;
                 }else{  // Variable used as value
                     reader.seek_previous();  // Rewind
 

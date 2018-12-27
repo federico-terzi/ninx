@@ -3,3 +3,5 @@ Hello this is the first {yey bro } testz. @ninx
 $yey
 
 is my name
+
+$hello = {3}
