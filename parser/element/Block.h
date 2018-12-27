@@ -38,7 +38,7 @@ namespace ninx {
             public:
                 explicit Block(std::vector<std::unique_ptr<Statement>> statements);
 
-                std::string dump() const override;
+                std::string dump(int level) const override;
 
             private:
                 std::vector<std::unique_ptr<Statement>> statements;

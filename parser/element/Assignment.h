@@ -15,7 +15,7 @@ namespace ninx {
             public:
                 explicit Assignment(const std::string &name, std::unique_ptr<Block> block);
 
-                std::string dump() const override;
+                std::string dump(int level) const override;
 
                 Block * get_block();
             private:

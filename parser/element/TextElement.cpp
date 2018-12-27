@@ -27,6 +27,6 @@ SOFTWARE.
 
 ninx::parser::element::TextElement::TextElement(const std::string &text) : text(text) {}
 
-std::string ninx::parser::element::TextElement::dump() const {
-    return "TextElement: "+this->text;
+std::string ninx::parser::element::TextElement::dump(int level) const {
+    return std::string(level, '\t')+"TextElement: "+this->text;
 }

@@ -14,7 +14,7 @@ namespace ninx {
             public:
                 explicit FunctionCall(const std::string &name);
 
-                std::string dump() const override;
+                std::string dump(int level) const override;
 
             private:
                 std::string name; // The name of the function to be called

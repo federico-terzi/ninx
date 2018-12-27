@@ -8,8 +8,8 @@ ninx::parser::element::Block *ninx::parser::element::Assignment::get_block() {
     return this->block.get();
 }
 
-std::string ninx::parser::element::Assignment::dump() const {
-    return "Assignment: "+name+" = "+block->dump();
+std::string ninx::parser::element::Assignment::dump(int level) const {
+    return std::string(level, '\t')+"Assignment: "+name+" = "+block->dump(level+1);
 }
 
 ninx::parser::element::Assignment::Assignment(const std::string &name,

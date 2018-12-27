@@ -6,6 +6,6 @@
 
 ninx::parser::element::FunctionCall::FunctionCall(const std::string &name) : name(name) {}
 
-std::string ninx::parser::element::FunctionCall::dump() const {
-    return "FunctionCall: "+this->name;
+std::string ninx::parser::element::FunctionCall::dump(int level) const {
+    return std::string(level, '\t')+ "FunctionCall: "+this->name;
 }

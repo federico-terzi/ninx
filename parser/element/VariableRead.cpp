@@ -25,8 +25,8 @@ SOFTWARE.
 
 #include "VariableRead.h"
 
-std::string ninx::parser::element::VariableRead::dump() const {
-    return "VariableRead: "+name;
+std::string ninx::parser::element::VariableRead::dump(int level) const {
+    return std::string(level, '\t')+"VariableRead: "+name;
 }
 
 const std::string &ninx::parser::element::VariableRead::get_name() const {

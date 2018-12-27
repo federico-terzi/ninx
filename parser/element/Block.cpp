@@ -31,14 +31,14 @@ SOFTWARE.
 ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
         statements)) {}
 
-std::string ninx::parser::element::Block::dump() const {
+std::string ninx::parser::element::Block::dump(int level) const {
     std::stringstream s;
 
-    s << "Block {" << std::endl;
+    s << std::string(level, '\t') + "Block {" << std::endl;
     for (auto& statement : statements) {
-        s << "\t" << *statement << std::endl;
+        s << statement->dump(level+1) << std::endl;
     }
-    s << "}" << std::endl;
+    s << std::string(level, '\t') + "}" << std::endl;
 
     return s.str();
 }

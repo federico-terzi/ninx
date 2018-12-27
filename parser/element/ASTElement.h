@@ -35,10 +35,12 @@ namespace ninx {
             public:
                 virtual ~ASTElement() = default;
 
-                virtual std::string dump() const = 0;
+                virtual std::string dump(int level) const = 0;
                 friend std::ostream& operator<<(std::ostream &strm, const ASTElement &a) {
-                    return strm << a.dump();
+                    return strm << a.dump(0);
                 }
+
+
             };
         }
     }

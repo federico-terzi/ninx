@@ -39,7 +39,7 @@ namespace ninx {
             public:
                 explicit TextElement(const std::string &text);
 
-                std::string dump() const override;
+                std::string dump(int level) const override;
             };
         }
     }
