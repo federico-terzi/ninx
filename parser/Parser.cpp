@@ -9,6 +9,8 @@
 #include "exception/ParserException.h"
 #include "element/FunctionCall.h"
 #include "../lexer/token/Keyword.h"
+#include "element/VariableRead.h"
+#include "../lexer/token/Variable.h"
 
 using namespace ninx::parser::exception;
 
@@ -50,8 +52,19 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::VARIABLE: {
-                // TODO: parse_variable
-                break;
+                // Get the variable name
+                auto name {dynamic_cast<ninx::lexer::token::Variable *>(token)->get_name()};
+
+                // Determine if the variable is used in an assignment by getting the next
+                // token and checking if it is a limiter equal to =
+                if (reader.check_limiter('=')) {  // Assignment
+                    // TODO: Assignment
+                }else{  // Variable used as value
+                    reader.seek_previous();  // Rewind
+
+                    auto element = std::make_unique<ninx::parser::element::VariableRead>(name);
+                    return element;
+                }
             }
             case Type::LIMITER: {
                 auto limiter = dynamic_cast<ninx::lexer::token::Limiter *>(token);

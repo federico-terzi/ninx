@@ -23,45 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "TokenReader.h"
-#include "../lexer/token/Limiter.h"
+#include "VariableRead.h"
 
-ninx::parser::TokenReader::TokenReader(std::vector<std::unique_ptr<Token>> &tokens) : tokens(tokens) {}
-
-Token *ninx::parser::TokenReader::get_token() {
-    if (current_token < tokens.size()) {
-        Token * token = tokens[current_token].get();
-        current_token++;
-        return token;
-    }
-
-    return nullptr;
+std::string ninx::parser::element::VariableRead::dump() const {
+    return "VariableRead: "+name;
 }
 
-Token *ninx::parser::TokenReader::peek_token() {
-    if ((current_token + 1) < tokens.size()) {
-        return tokens[current_token+1].get();
-    }
-
-    return nullptr;
+const std::string &ninx::parser::element::VariableRead::get_name() const {
+    return name;
 }
 
-void ninx::parser::TokenReader::seek_previous() {
-    if (current_token > 0) {
-        current_token--;
-    }
+void ninx::parser::element::VariableRead::set_name(const std::string &name) {
+    VariableRead::name = name;
 }
 
-bool ninx::parser::TokenReader::check_limiter(char limiter) {
-    auto token = get_token();
-    if (!token) {
-        return false;
-    }
-
-    if (token->get_type() != Type::LIMITER) {
-        return false;
-    }
-
-    return dynamic_cast<ninx::lexer::token::Limiter*>(token)->get_limiter() == limiter;
-
-}
+ninx::parser::element::VariableRead::VariableRead(const std::string &name) : name(name) {}

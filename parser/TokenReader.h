@@ -39,12 +39,16 @@ namespace ninx {
             std::vector<std::unique_ptr<Token>> &tokens;
 
             int current_token = 0;
-
         public:
             explicit TokenReader(std::vector<std::unique_ptr<Token>> &tokens);
 
             Token * get_token();
             Token * peek_token();
+
+            /*
+             * Get the next token and verify that is a limiter equal to the given char.
+             */
+            bool check_limiter(char limiter);
 
             void seek_previous();
         };

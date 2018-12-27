@@ -16,6 +16,6 @@ add_executable(ninx main.cpp lexer/Lexer.cpp lexer/Lexer.h
         parser/TokenReader.cpp parser/TokenReader.h
         parser/exception/ParserException.cpp parser/exception/ParserException.h
         parser/element/ASTElement.h
-        parser/element/Block.cpp parser/element/Block.h parser/element/TextElement.cpp parser/element/TextElement.h parser/element/Statement.h parser/element/FunctionCall.cpp parser/element/FunctionCall.h)
+        parser/element/Block.cpp parser/element/Block.h parser/element/TextElement.cpp parser/element/TextElement.h parser/element/Statement.h parser/element/FunctionCall.cpp parser/element/FunctionCall.h parser/element/VariableRead.cpp parser/element/VariableRead.h)
 
 file(COPY test DESTINATION .)
