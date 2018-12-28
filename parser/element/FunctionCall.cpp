@@ -9,3 +9,7 @@ ninx::parser::element::FunctionCall::FunctionCall(const std::string &name) : nam
 std::string ninx::parser::element::FunctionCall::dump(int level) const {
     return std::string(level, '\t')+ "FunctionCall: "+this->name;
 }
+
+void ninx::parser::element::FunctionCall::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
+}

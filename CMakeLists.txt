@@ -21,6 +21,7 @@ add_executable(ninx main.cpp lexer/Lexer.cpp lexer/Lexer.h
         parser/element/Statement.h
         parser/element/FunctionCall.cpp parser/element/FunctionCall.h
         parser/element/VariableRead.cpp parser/element/VariableRead.h
-        parser/element/Assignment.cpp parser/element/Assignment.h)
+        parser/element/Assignment.cpp parser/element/Assignment.h
+        evaluator/Evaluator.h evaluator/DefaultEvaluator.cpp evaluator/DefaultEvaluator.h)
 
 file(COPY test DESTINATION .)

@@ -107,8 +107,8 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_function_call() {
     return std::unique_ptr<Block>();
 }
 
-void ninx::parser::Parser::parse() {
-    std::cout << *parse_implicit_block() << std::endl;
+std::unique_ptr<Block> ninx::parser::Parser::parse() {
+    return parse_implicit_block();
 }
 
 std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {

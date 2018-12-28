@@ -3,10 +3,12 @@
 #include <memory>
 #include "lexer/Lexer.h"
 #include "parser/Parser.h"
+#include "evaluator/DefaultEvaluator.h"
 
 using namespace ninx::lexer;
 using namespace ninx::lexer::token;
 using namespace ninx::parser;
+using namespace ninx::evaluator;
 using namespace std;
 
 int main() {
@@ -18,7 +20,13 @@ int main() {
 
     Parser parser{tokens, "test"};
 
-    parser.parse();
+    auto ast = parser.parse();
+
+    std::cout << *ast << std::endl;
+
+    DefaultEvaluator eval;
+
+    ast->accept(&eval);
 
     return 0;
 }

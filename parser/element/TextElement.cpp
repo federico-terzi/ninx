@@ -30,3 +30,11 @@ ninx::parser::element::TextElement::TextElement(const std::string &text) : text(
 std::string ninx::parser::element::TextElement::dump(int level) const {
     return std::string(level, '\t')+"TextElement: "+this->text;
 }
+
+void ninx::parser::element::TextElement::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
+}
+
+const std::string &ninx::parser::element::TextElement::get_text() const {
+    return text;
+}

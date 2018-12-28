@@ -30,7 +30,7 @@ namespace ninx {
         public:
             explicit Parser(std::vector<std::unique_ptr<ninx::lexer::token::Token>> &tokens, const std::string &origin);
 
-            void parse();
+            std::unique_ptr<Block> parse();
         };
     }
 }

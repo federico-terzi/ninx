@@ -42,3 +42,12 @@ std::string ninx::parser::element::Block::dump(int level) const {
 
     return s.str();
 }
+
+void ninx::parser::element::Block::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
+}
+
+const std::vector<std::unique_ptr<ninx::parser::element::Statement>> &
+ninx::parser::element::Block::get_statements() const {
+    return statements;
+}

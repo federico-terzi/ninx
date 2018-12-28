@@ -37,6 +37,8 @@ namespace ninx {
 
                 std::string dump(int level) const override;
 
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
                 const std::string &get_name() const;
                 void set_name(const std::string &name);
             private:

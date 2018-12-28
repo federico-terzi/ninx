@@ -40,6 +40,10 @@ namespace ninx {
 
                 std::string dump(int level) const override;
 
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
+                const std::vector<std::unique_ptr<Statement>> &get_statements() const;
+
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
             };

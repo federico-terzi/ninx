@@ -27,6 +27,7 @@ SOFTWARE.
 #define NINX_ASTELEMENT_H
 
 #include <iostream>
+#include "../../evaluator/Evaluator.h"
 
 namespace ninx {
     namespace parser {
@@ -34,6 +35,8 @@ namespace ninx {
             class ASTElement {
             public:
                 virtual ~ASTElement() = default;
+
+                virtual void accept(ninx::evaluator::Evaluator * evaluator) = 0;
 
                 virtual std::string dump(int level) const = 0;
                 friend std::ostream& operator<<(std::ostream &strm, const ASTElement &a) {

@@ -38,3 +38,7 @@ void ninx::parser::element::VariableRead::set_name(const std::string &name) {
 }
 
 ninx::parser::element::VariableRead::VariableRead(const std::string &name) : name(name) {}
+
+void ninx::parser::element::VariableRead::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
+}

@@ -23,31 +23,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_TEXTELEMENT_H
-#define NINX_TEXTELEMENT_H
+#ifndef NINX_EVALUATOR_H
+#define NINX_EVALUATOR_H
 
-#include <string>
-#include "Statement.h"
-
+// Forward declaration of classes
 namespace ninx {
     namespace parser {
-        namespace element {
-            class TextElement : public Statement {
-            private:
-                std::string text;
-
-            public:
-                explicit TextElement(const std::string &text);
-
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::string &get_text() const;
-            };
+        namespace element{
+            class TextElement;
+            class Assignment;
+            class Block;
+            class FunctionCall;
+            class VariableRead;
         }
     }
 }
 
+namespace ninx {
+    namespace evaluator {
+        class Evaluator {
+        public:
+            virtual ~Evaluator() = default;
 
-#endif //NINX_TEXTELEMENT_H
+            virtual void visit(ninx::parser::element::TextElement * e) = 0;
+            virtual void visit(ninx::parser::element::Assignment * e) = 0;
+            virtual void visit(ninx::parser::element::Block * e) = 0;
+            virtual void visit(ninx::parser::element::FunctionCall * e) = 0;
+            virtual void visit(ninx::parser::element::VariableRead * e) = 0;
+        };
+    }
+}
+
+#endif

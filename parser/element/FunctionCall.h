@@ -16,6 +16,8 @@ namespace ninx {
 
                 std::string dump(int level) const override;
 
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
             private:
                 std::string name; // The name of the function to be called
             };
