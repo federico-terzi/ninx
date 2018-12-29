@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <memory>
 #include "lexer/Lexer.h"
@@ -24,9 +25,15 @@ int main() {
 
     std::cout << *ast << std::endl;
 
-    DefaultEvaluator eval;
 
+
+    std::cout << "############ OUTPUT #############" << std::endl;
+
+    std::stringstream output;
+    DefaultEvaluator eval {output};
     ast->accept(&eval);
+
+    std::cout << output.str() << std::endl;
 
     return 0;
 }
