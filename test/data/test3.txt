@@ -1,0 +1,5 @@
+Hello let me initialize that first
+
+$name = {Federico}
+
+Hi my name is $name

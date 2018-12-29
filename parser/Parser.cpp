@@ -56,17 +56,18 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 // Get the variable name
                 auto name {dynamic_cast<ninx::lexer::token::Variable *>(token)->get_name()};
 
-                // Determine if the variable is used in an assignment by getting the next
+                // Determine if the variable is used in an assignment by peeking the next
                 // token and checking if it is a limiter equal to =
                 if (reader.check_limiter('=')) {  // Assignment
+                    // Skip the = limiter
+                    reader.get_token();
+
                     // Parse the block containing the assignment value
                     auto block = parse_block();
 
                     auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(block));
                     return element;
                 }else{  // Variable used as value
-                    reader.seek_previous();  // Rewind
-
                     auto element = std::make_unique<ninx::parser::element::VariableRead>(name);
                     return element;
                 }
@@ -120,9 +121,7 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
 
 
         // Check if the block will be closed
-        Token *close_bracket{reader.peek_token()};
-        if (close_bracket && close_bracket->get_type() == Type::LIMITER &&
-            dynamic_cast<ninx::lexer::token::Limiter *>(close_bracket)->get_limiter() == '}') {
+        if (reader.check_limiter('}')) {
             // Exit the cycle, because the next token marks the end of a block
             break;
         }

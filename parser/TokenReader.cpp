@@ -39,8 +39,9 @@ Token *ninx::parser::TokenReader::get_token() {
 }
 
 Token *ninx::parser::TokenReader::peek_token() {
-    if ((current_token + 1) < tokens.size()) {
-        return tokens[current_token+1].get();
+    if (current_token < tokens.size()) {
+        Token * token = tokens[current_token].get();
+        return token;
     }
 
     return nullptr;
@@ -53,7 +54,7 @@ void ninx::parser::TokenReader::seek_previous() {
 }
 
 bool ninx::parser::TokenReader::check_limiter(char limiter) {
-    auto token = get_token();
+    auto token = peek_token();
     if (!token) {
         return false;
     }
