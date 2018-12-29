@@ -42,3 +42,7 @@ void ninx::parser::element::Assignment::accept(ninx::evaluator::Evaluator *evalu
     evaluator->visit(this);
 }
 
+const std::string &ninx::parser::element::Assignment::get_name() const {
+    return name;
+}
+

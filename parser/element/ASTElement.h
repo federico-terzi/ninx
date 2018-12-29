@@ -43,7 +43,16 @@ namespace ninx {
                     return strm << a.dump(0);
                 }
 
+                Block *get_parent() const {
+                    return parent;
+                }
 
+                void set_parent(Block *parent) {
+                    this->parent = parent;
+                }
+
+            protected:
+                Block * parent = nullptr;  // Reference to the parent block
             };
         }
     }

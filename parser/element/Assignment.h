@@ -41,6 +41,9 @@ namespace ninx {
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
                 Block * get_block();
+
+                const std::string &get_name() const;
+
             private:
                 std::string name;  // Variable name
 

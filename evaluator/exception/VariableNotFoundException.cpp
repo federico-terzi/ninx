@@ -23,39 +23,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_BLOCK_H
-#define NINX_BLOCK_H
+#include "VariableNotFoundException.h"
+#include <sstream>
 
-#include <vector>
-#include <memory>
-#include <unordered_map>
-#include "ASTElement.h"
-#include "Statement.h"
-
-namespace ninx {
-    namespace parser {
-        namespace element {
-            class Block : public Statement {
-            public:
-                explicit Block(std::vector<std::unique_ptr<Statement>> statements);
-
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::vector<std::unique_ptr<Statement>> &get_statements() const;
-
-                Block * get_variable(const std::string& name) const;
-                void set_variable(const std::string &name, Block * value);
-
-            private:
-                std::vector<std::unique_ptr<Statement>> statements;
-
-                std::unordered_map<std::string, Block*> variables;
-            };
-        }
-    }
+std::string ninx::evaluator::exception::VariableNotFoundException::make_message(int line, const std::string &origin,
+                                                                                const std::string &message) {
+    std::stringstream s;
+    s << "VariableNotFoundException at line: " << line << ", " << message << std::endl;
+    s << "\tfrom origin: " << origin;
+    return s.str();
 }
 
+ninx::evaluator::exception::VariableNotFoundException::VariableNotFoundException(int line, const std::string &origin,
+                                                                                 const std::string &message)  : runtime_error(
+        make_message(line, origin, message)), line{line}, origin(origin) {
 
-#endif //NINX_BLOCK_H
+}

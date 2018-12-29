@@ -29,7 +29,12 @@ SOFTWARE.
 #include "Block.h"
 
 ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
-        statements)) {}
+        statements)) {
+    // Make all the statements parent reference point to this block
+    for (auto &statement : this->statements) {
+        statement->set_parent(this);
+    }
+}
 
 std::string ninx::parser::element::Block::dump(int level) const {
     std::stringstream s;
@@ -50,4 +55,21 @@ void ninx::parser::element::Block::accept(ninx::evaluator::Evaluator *evaluator)
 const std::vector<std::unique_ptr<ninx::parser::element::Statement>> &
 ninx::parser::element::Block::get_statements() const {
     return statements;
+}
+
+ninx::parser::element::Block *ninx::parser::element::Block::get_variable(const std::string &name) const {
+    if (variables.find(name) != variables.end()) {
+        return this->variables.at(name);
+    }
+
+    // Check if the variable is declared in the parent block
+    if (this->parent) {
+        return this->parent->get_variable(name);
+    }
+
+    return nullptr;
+}
+
+void ninx::parser::element::Block::set_variable(const std::string &name, ninx::parser::element::Block *value) {
+    this->variables[name] = value;
 }

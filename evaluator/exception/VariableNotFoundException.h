@@ -23,39 +23,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_BLOCK_H
-#define NINX_BLOCK_H
+#ifndef NINX_VARIABLENOTFOUNDEXCEPTION_H
+#define NINX_VARIABLENOTFOUNDEXCEPTION_H
 
-#include <vector>
-#include <memory>
-#include <unordered_map>
-#include "ASTElement.h"
-#include "Statement.h"
+#include <stdexcept>
 
 namespace ninx {
-    namespace parser {
-        namespace element {
-            class Block : public Statement {
-            public:
-                explicit Block(std::vector<std::unique_ptr<Statement>> statements);
-
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::vector<std::unique_ptr<Statement>> &get_statements() const;
-
-                Block * get_variable(const std::string& name) const;
-                void set_variable(const std::string &name, Block * value);
-
+    namespace evaluator {
+        namespace exception {
+            class VariableNotFoundException : public std::runtime_error {
             private:
-                std::vector<std::unique_ptr<Statement>> statements;
+                int line;
+                std::string origin;
 
-                std::unordered_map<std::string, Block*> variables;
+                static std::string make_message(int line, const std::string &origin, const std::string &message);
+            public:
+                explicit VariableNotFoundException(int line, const std::string &origin, const std::string &message);
             };
         }
     }
 }
 
 
-#endif //NINX_BLOCK_H
+#endif //NINX_VARIABLENOTFOUNDEXCEPTION_H

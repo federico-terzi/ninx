@@ -28,13 +28,16 @@ SOFTWARE.
 #include "DefaultEvaluator.h"
 #include "../parser/element/TextElement.h"
 #include "../parser/element/Block.h"
+#include "../parser/element/Assignment.h"
+#include "../parser/element/VariableRead.h"
+#include "exception/VariableNotFoundException.h"
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
     this->output << e->get_text();
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
-
+    e->get_parent()->set_variable(e->get_name(), e->get_block());
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
@@ -48,7 +51,14 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
+    auto variable {e->get_parent()->get_variable(e->get_name())};
 
+    if (!variable) {
+        // TODO: add information of line number and origin
+        throw ninx::evaluator::exception::VariableNotFoundException(0, "TODO", "Variable \""+e->get_name()+"\" has not been declared!");
+    }
+
+    variable->accept(this);
 }
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
