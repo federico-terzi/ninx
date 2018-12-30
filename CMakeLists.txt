@@ -37,16 +37,7 @@ endif()
 
 set (Boost_USE_STATIC_LIBS ON) # enable static linking
 set (Boost_USE_MULTITHREAD ON)  # enable multithreading
-
-if(WIN32 AND "x${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" STREQUAL "x")
-    message(WARNING "WIN32 compiler does not specify CMAKE_CXX_COMPILER_ARCHITECTURE_ID -- filling in manually")
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(CMAKE_CXX_COMPILER_ARCHITECTURE_ID "x64")
-    else()
-        set(CMAKE_CXX_COMPILER_ARCHITECTURE_ID "x86")
-    endif()
-    message(STATUS "Compiler architecture: ${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
-endif()
+set (Boost_ARCHITECTURE "-x64")
 
 find_package (Boost COMPONENTS REQUIRED regex)
 
