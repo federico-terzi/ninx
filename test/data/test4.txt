@@ -1,0 +1,7 @@
+Hello let me initialize that first
+
+$title = {Mr}
+
+$name = {$title Federico}
+
+Hi my name is $name

@@ -44,6 +44,8 @@ namespace ninx {
 
                 const std::string &get_name() const;
 
+                void set_parent(Block *parent) override;
+
             private:
                 std::string name;  // Variable name
 

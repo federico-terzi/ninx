@@ -13,7 +13,7 @@ using namespace ninx::evaluator;
 using namespace std;
 
 int main() {
-    std::ifstream source{R"(test/data/test3.txt)", std::ios_base::binary};
+    std::ifstream source{R"(test/data/test4.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "test"};
 

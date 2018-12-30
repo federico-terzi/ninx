@@ -47,7 +47,7 @@ namespace ninx {
                     return parent;
                 }
 
-                void set_parent(Block *parent) {
+                virtual void set_parent(Block *parent) {
                     this->parent = parent;
                 }
 

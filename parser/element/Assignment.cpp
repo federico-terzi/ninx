@@ -27,8 +27,8 @@ SOFTWARE.
 
 
 ninx::parser::element::Assignment::Assignment(const std::string &name,
-                                              std::unique_ptr<ninx::parser::element::Block> block) : name(name),
-                                                                                                     block(std::move(block)) {}
+                                              std::unique_ptr<ninx::parser::element::Block> block)
+                                              : name(name), block(std::move(block)) {}
 
 ninx::parser::element::Block *ninx::parser::element::Assignment::get_block() {
     return this->block.get();
@@ -44,5 +44,12 @@ void ninx::parser::element::Assignment::accept(ninx::evaluator::Evaluator *evalu
 
 const std::string &ninx::parser::element::Assignment::get_name() const {
     return name;
+}
+
+void ninx::parser::element::Assignment::set_parent(ninx::parser::element::Block *parent) {
+    ASTElement::set_parent(parent);
+
+    // Also set the value block parent to the given one, to enable it to access outer scope variables
+    this->block->set_parent(parent);
 }
 
