@@ -24,6 +24,8 @@ SOFTWARE.
 */
 
 #include "Text.h"
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 ninx::lexer::token::Type ninx::lexer::token::Text::get_type() {
     return Type::TEXT;
@@ -37,4 +39,18 @@ const std::string &ninx::lexer::token::Text::get_text() const {
 
 std::string ninx::lexer::token::Text::dump() const {
     return "TEXT: '" + this->get_text() + "'";
+}
+
+std::unique_ptr<std::string> ninx::lexer::token::Text::get_identifier() {
+    // Check if the text is alphanumeric, and do not contain spaces
+    static const boost::regex identifierValidation("^\\s*[a-zA-Z][a-zA-Z0-9]*\\s*$");
+    if (!regex_match(this->get_text(), identifierValidation)) {
+        return nullptr;
+    }
+
+    // Trim the text to extract the identifier
+    std::string identifier {this->get_text()};
+    boost::algorithm::trim(identifier);
+
+    return std::make_unique<std::string>(identifier);
 }

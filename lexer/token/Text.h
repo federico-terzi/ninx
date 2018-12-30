@@ -26,6 +26,7 @@ SOFTWARE.
 #ifndef NINX_TEXT_H
 #define NINX_TEXT_H
 
+#include <memory>
 #include "Token.h"
 
 namespace ninx {
@@ -42,6 +43,15 @@ namespace ninx {
                 std::string dump() const override;
 
                 const std::string &get_text() const;
+
+                /**
+                 * Try to convert the current Text token into an identifier ( only alphanumeric characters,
+                 * not beginning with a number ) removing trailing and ending spaces.
+                 * If cannot be converted ( contain spaces in between or contain non-alphanumeric chars )
+                 * return nullptr.
+                 * @return the text converted to a valid identifier, or nullptr if not valid
+                 */
+                std::unique_ptr<std::string> get_identifier();
             };
         }
     }

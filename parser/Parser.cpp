@@ -45,7 +45,20 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     if (token) {
         switch (token->get_type()) {
             case Type::FUNCDEF: {
-                // TODO: parse_function_definition
+                // Extract the function definition name
+                auto id_token {reader.get_token()};
+                if (!id_token) {
+                    throw ParserException(id_token, this->origin, "Expected function name, but could not find one.");
+                }
+                if (id_token->get_type() != Type::TEXT) {
+                    throw ParserException(id_token, this->origin, "Function name must be alphanumeric, and begin with a letter.");
+                }
+                auto id {dynamic_cast<ninx::lexer::token::Text *>(id_token)->get_identifier()};
+                if (!id) {
+                    throw ParserException(id_token, this->origin, "Invalid function name. It must be alphanumeric, and begin with a letter.");
+                }
+
+                // TODO: FINISH FUNCTION DEFINITION
                 break;
             }
             case Type::OPDEF: {

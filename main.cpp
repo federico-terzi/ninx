@@ -13,7 +13,7 @@ using namespace ninx::evaluator;
 using namespace std;
 
 int main() {
-    std::ifstream source{R"(test/data/test4.txt)", std::ios_base::binary};
+    std::ifstream source{R"(test/data/test5.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "test"};
 
@@ -24,8 +24,6 @@ int main() {
     auto ast = parser.parse();
 
     std::cout << *ast << std::endl;
-
-
 
     std::cout << "############ OUTPUT #############" << std::endl;
 

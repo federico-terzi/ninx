@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(ninx)
 
+set(CMAKE_GENERATOR_PLATFORM x64)
+
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(ninx main.cpp lexer/Lexer.cpp lexer/Lexer.h
@@ -25,3 +27,27 @@ add_executable(ninx main.cpp lexer/Lexer.cpp lexer/Lexer.h
         evaluator/Evaluator.h evaluator/DefaultEvaluator.cpp evaluator/DefaultEvaluator.h evaluator/exception/VariableNotFoundException.cpp evaluator/exception/VariableNotFoundException.h)
 
 file(COPY test DESTINATION .)
+
+#set(Boost_DEBUG 1)
+
+find_package(Boost)
+IF (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIR})
+endif()
+
+set (Boost_USE_STATIC_LIBS ON) # enable static linking
+set (Boost_USE_MULTITHREAD ON)  # enable multithreading
+
+if(WIN32 AND "x${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}" STREQUAL "x")
+    message(WARNING "WIN32 compiler does not specify CMAKE_CXX_COMPILER_ARCHITECTURE_ID -- filling in manually")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(CMAKE_CXX_COMPILER_ARCHITECTURE_ID "x64")
+    else()
+        set(CMAKE_CXX_COMPILER_ARCHITECTURE_ID "x86")
+    endif()
+    message(STATUS "Compiler architecture: ${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
+endif()
+
+find_package (Boost COMPONENTS REQUIRED regex)
+
+target_link_libraries (ninx ${Boost_LIBRARIES})
