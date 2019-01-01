@@ -45,7 +45,9 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     if (token) {
         switch (token->get_type()) {
             case Type::FUNCDEF: {
-                // Extract the function definition name
+                // TODO: move this part to a separate function
+
+                // Extract the function definition identifier
                 auto id_token {reader.get_token()};
                 if (!id_token) {
                     throw ParserException(id_token, this->origin, "Expected function name, but could not find one.");
@@ -58,8 +60,48 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                     throw ParserException(id_token, this->origin, "Invalid function name. It must be alphanumeric, and begin with a letter.");
                 }
 
-                // TODO: FINISH FUNCTION DEFINITION
-                break;
+                // Extract the parameters
+                if (reader.check_limiter('(') != 1) {
+                    throw ParserException(id_token, this->origin, "Expected '(' but could not find one.");
+                }
+                reader.get_token();
+
+                // Cycle until a closing parenthesis is found or EOF is reached
+                int result;
+                while((result = reader.check_limiter(')')) == 0) {
+                    auto argument_token {reader.get_token()};
+
+                    if (argument_token->get_type() != Type::VARIABLE) {
+                        throw ParserException(argument_token, this->origin, "Argument expected but not found. Maybe "
+                                                                            "you forgot to prepend $ to the argument"
+                                                                            " name?");
+                    }
+
+                    std::unique_ptr<Block> default_value {nullptr};
+
+                    // Check if the argument does have a default value
+                    if (reader.check_limiter('=')) {
+                        reader.get_token();
+
+                        default_value = parse_block();
+                    }
+
+                    if (reader.check_limiter(',') == 1) {
+                        // Skip the period limiter
+                        reader.get_token();
+                    }else if(reader.check_limiter(')') == 1) {
+                        break;
+                    }else{
+                        throw ParserException(argument_token, this->origin, "Another argument or end of arguments expected.");
+                    }
+                }
+                reader.get_token(); // Skip the closing parenthesis
+                if (result == -1) {
+                    throw ParserException(nullptr, this->origin, "Expected ')' but EOF has been reached.");
+                }
+
+                // Parse the function block
+                auto function_block {parse_block()};
             }
             case Type::OPDEF: {
                 // TODO: parse_operator_definition
@@ -71,7 +113,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
 
                 // Determine if the variable is used in an assignment by peeking the next
                 // token and checking if it is a limiter equal to =
-                if (reader.check_limiter('=')) {  // Assignment
+                if (reader.check_limiter('=') == 1) {  // Assignment
                     // Skip the = limiter
                     reader.get_token();
 
@@ -134,7 +176,7 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
 
 
         // Check if the block will be closed
-        if (reader.check_limiter('}')) {
+        if (reader.check_limiter('}') > 0) {
             // Exit the cycle, because the next token marks the end of a block
             break;
         }

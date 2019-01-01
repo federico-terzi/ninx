@@ -23,14 +23,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "FunctionCall.h"
+#ifndef NINX_FUNCTIONDEFINITION_H
+#define NINX_FUNCTIONDEFINITION_H
 
-ninx::parser::element::FunctionCall::FunctionCall(const std::string &name) : name(name) {}
+#include "Statement.h"
 
-std::string ninx::parser::element::FunctionCall::dump(int level) const {
-    return std::string(level, '\t')+ "FunctionCall: "+this->name;
+namespace ninx {
+    namespace parser {
+        namespace element {
+            class FunctionDefinition : public Statement {
+            public:
+
+                std::string dump(int level) const override;
+
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
+            private:
+                std::string name;  // Function name
+            };
+        }
+    }
 }
 
-void ninx::parser::element::FunctionCall::accept(ninx::evaluator::Evaluator *evaluator) {
-    evaluator->visit(this);
-}
+
+#endif //NINX_FUNCTIONDEFINITION_H

@@ -53,16 +53,19 @@ void ninx::parser::TokenReader::seek_previous() {
     }
 }
 
-bool ninx::parser::TokenReader::check_limiter(char limiter) {
+int ninx::parser::TokenReader::check_limiter(char limiter) {
     auto token = peek_token();
     if (!token) {
-        return false;
+        return -1;
     }
 
     if (token->get_type() != Type::LIMITER) {
-        return false;
+        return 0;
     }
 
-    return dynamic_cast<ninx::lexer::token::Limiter*>(token)->get_limiter() == limiter;
+    if (dynamic_cast<ninx::lexer::token::Limiter*>(token)->get_limiter() == limiter) {
+        return 1;
+    }
 
+    return 0;
 }

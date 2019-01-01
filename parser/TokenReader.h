@@ -46,9 +46,10 @@ namespace ninx {
             Token * peek_token();
 
             /*
-             * Get the next token and verify that is a limiter equal to the given char.
+             * Peek the next token and verify that is a limiter equal to the given char.
+             * @return 1 if they match, 0 if they don't and -1 if EOF is reached.
              */
-            bool check_limiter(char limiter);
+            int check_limiter(char limiter);
 
             void seek_previous();
         };
