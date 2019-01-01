@@ -62,3 +62,11 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
 }
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {
+
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
+
+}

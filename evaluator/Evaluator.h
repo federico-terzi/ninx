@@ -35,6 +35,8 @@ namespace ninx {
             class Block;
             class FunctionCall;
             class VariableRead;
+            class FunctionDefinition;
+            class FunctionArgument;
         }
     }
 }
@@ -50,6 +52,8 @@ namespace ninx {
             virtual void visit(ninx::parser::element::Block * e) = 0;
             virtual void visit(ninx::parser::element::FunctionCall * e) = 0;
             virtual void visit(ninx::parser::element::VariableRead * e) = 0;
+            virtual void visit(ninx::parser::element::FunctionDefinition * e) = 0;
+            virtual void visit(ninx::parser::element::FunctionArgument * e) = 0;
         };
     }
 }

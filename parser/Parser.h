@@ -13,6 +13,8 @@
 #include "element/Statement.h"
 #include "TokenReader.h"
 #include "element/Block.h"
+#include "element/FunctionArgument.h"
+#include "element/FunctionDefinition.h"
 
 using namespace ninx::parser::element;
 
@@ -27,6 +29,8 @@ namespace ninx {
             std::unique_ptr<Block> parse_implicit_block();
             std::unique_ptr<Block> parse_block();
             std::unique_ptr<Block> parse_function_call();
+            std::unique_ptr<FunctionArgument> parse_function_argument();
+            std::unique_ptr<FunctionDefinition> parse_function_definition();
         public:
             explicit Parser(std::vector<std::unique_ptr<ninx::lexer::token::Token>> &tokens, const std::string &origin);
 

@@ -23,28 +23,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <sstream>
-#include "FunctionDefinition.h"
-#include "Block.h"
+#ifndef NINX_FUNCTIONARGUMENT_H
+#define NINX_FUNCTIONARGUMENT_H
 
-std::string ninx::parser::element::FunctionDefinition::dump(int level) const {
-    std::stringstream s;
+#include "ASTElement.h"
+#include <memory>
 
-    s << std::string(level, '\t') + "FunctionDefinition " << this->name << " {" << std::endl;
-    for (auto& argument : arguments) {
-        s << argument->dump(level+1) << std::endl;
+namespace ninx {
+    namespace parser {
+        namespace element {
+            class FunctionArgument : public ASTElement {
+            public:
+                explicit FunctionArgument(const std::string &name, std::unique_ptr<Block> default_value);
+
+                std::string dump(int level) const override;
+
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
+                const std::string &get_name() const;
+                const std::unique_ptr<Block> &get_default_value() const;
+
+            private:
+                std::string name;  // Argument name
+                std::unique_ptr<Block> default_value;  // Optional default value of the argument
+            };
+        }
     }
-    s << body->dump(level+1) << std::endl;
-    s << std::string(level, '\t') + "}" << std::endl;
-
-    return s.str();
 }
 
-void ninx::parser::element::FunctionDefinition::accept(ninx::evaluator::Evaluator *evaluator) {
-    evaluator->visit(this);
-}
 
-ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string &name,
-                                                              std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments,
-                                                              std::unique_ptr<ninx::parser::element::Block> body)
-        : name(name), arguments(std::move(arguments)), body(std::move(body)) {}
+#endif //NINX_FUNCTIONARGUMENT_H

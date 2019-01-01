@@ -26,6 +26,9 @@ SOFTWARE.
 #ifndef NINX_FUNCTIONDEFINITION_H
 #define NINX_FUNCTIONDEFINITION_H
 
+#include <vector>
+#include <memory>
+#include "FunctionArgument.h"
 #include "Statement.h"
 
 namespace ninx {
@@ -33,6 +36,9 @@ namespace ninx {
         namespace element {
             class FunctionDefinition : public Statement {
             public:
+                explicit FunctionDefinition(const std::string &name,
+                                            std::vector<std::unique_ptr<FunctionArgument>> arguments,
+                                            std::unique_ptr<Block> body);
 
                 std::string dump(int level) const override;
 
@@ -40,6 +46,8 @@ namespace ninx {
 
             private:
                 std::string name;  // Function name
+                std::vector<std::unique_ptr<FunctionArgument>> arguments;  // Function arguments
+                std::unique_ptr<Block> body;  // Function body block
             };
         }
     }

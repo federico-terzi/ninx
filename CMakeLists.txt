@@ -26,7 +26,7 @@ add_executable(ninx main.cpp lexer/Lexer.cpp lexer/Lexer.h
         parser/element/Assignment.cpp parser/element/Assignment.h
         evaluator/Evaluator.h
         evaluator/DefaultEvaluator.cpp evaluator/DefaultEvaluator.h
-        evaluator/exception/VariableNotFoundException.cpp evaluator/exception/VariableNotFoundException.h parser/element/FunctionDefinition.cpp parser/element/FunctionDefinition.h)
+        evaluator/exception/VariableNotFoundException.cpp evaluator/exception/VariableNotFoundException.h parser/element/FunctionDefinition.cpp parser/element/FunctionDefinition.h parser/element/FunctionArgument.cpp parser/element/FunctionArgument.h)
 
 file(COPY test DESTINATION .)
 

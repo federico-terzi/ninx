@@ -45,63 +45,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     if (token) {
         switch (token->get_type()) {
             case Type::FUNCDEF: {
-                // TODO: move this part to a separate function
-
-                // Extract the function definition identifier
-                auto id_token {reader.get_token()};
-                if (!id_token) {
-                    throw ParserException(id_token, this->origin, "Expected function name, but could not find one.");
-                }
-                if (id_token->get_type() != Type::TEXT) {
-                    throw ParserException(id_token, this->origin, "Function name must be alphanumeric, and begin with a letter.");
-                }
-                auto id {dynamic_cast<ninx::lexer::token::Text *>(id_token)->get_identifier()};
-                if (!id) {
-                    throw ParserException(id_token, this->origin, "Invalid function name. It must be alphanumeric, and begin with a letter.");
-                }
-
-                // Extract the parameters
-                if (reader.check_limiter('(') != 1) {
-                    throw ParserException(id_token, this->origin, "Expected '(' but could not find one.");
-                }
-                reader.get_token();
-
-                // Cycle until a closing parenthesis is found or EOF is reached
-                int result;
-                while((result = reader.check_limiter(')')) == 0) {
-                    auto argument_token {reader.get_token()};
-
-                    if (argument_token->get_type() != Type::VARIABLE) {
-                        throw ParserException(argument_token, this->origin, "Argument expected but not found. Maybe "
-                                                                            "you forgot to prepend $ to the argument"
-                                                                            " name?");
-                    }
-
-                    std::unique_ptr<Block> default_value {nullptr};
-
-                    // Check if the argument does have a default value
-                    if (reader.check_limiter('=')) {
-                        reader.get_token();
-
-                        default_value = parse_block();
-                    }
-
-                    if (reader.check_limiter(',') == 1) {
-                        // Skip the period limiter
-                        reader.get_token();
-                    }else if(reader.check_limiter(')') == 1) {
-                        break;
-                    }else{
-                        throw ParserException(argument_token, this->origin, "Another argument or end of arguments expected.");
-                    }
-                }
-                reader.get_token(); // Skip the closing parenthesis
-                if (result == -1) {
-                    throw ParserException(nullptr, this->origin, "Expected ')' but EOF has been reached.");
-                }
-
-                // Parse the function block
-                auto function_block {parse_block()};
+                return parse_function_definition();
             }
             case Type::OPDEF: {
                 // TODO: parse_operator_definition
@@ -159,6 +103,85 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     return nullptr;
 }
 
+std::unique_ptr<FunctionArgument> ninx::parser::Parser::parse_function_argument() {
+    auto raw_token {reader.get_token()};
+
+    if (raw_token->get_type() != Type::VARIABLE) {
+        throw ParserException(raw_token, this->origin, "Argument expected but not found. Maybe "
+                                                            "you forgot to prepend $ to the argument"
+                                                            " name?");
+    }
+
+    std::unique_ptr<Block> default_value {nullptr};
+
+    // Check if the argument does have a default value
+    if (reader.check_limiter('=')) {
+        reader.get_token();
+
+        default_value = parse_block();
+    }
+
+    auto argument_token {dynamic_cast<ninx::lexer::token::Variable*>(raw_token)};
+
+    auto argument = std::make_unique<FunctionArgument>(argument_token->get_name(), std::move(default_value));
+
+    return argument;
+}
+
+
+std::unique_ptr<FunctionDefinition> ninx::parser::Parser::parse_function_definition() {
+    // Extract the function definition identifier
+    auto id_token {reader.get_token()};
+    if (!id_token) {
+        throw ParserException(id_token, this->origin, "Expected function name, but could not find one.");
+    }
+    if (id_token->get_type() != Type::TEXT) {
+        throw ParserException(id_token, this->origin, "Function name must be alphanumeric, and begin with a letter.");
+    }
+    auto id_ptr {dynamic_cast<ninx::lexer::token::Text *>(id_token)->get_identifier()};
+    if (!id_ptr) {
+        throw ParserException(id_token, this->origin, "Invalid function name. It must be alphanumeric, and begin with a letter.");
+    }
+    std::string id {*id_ptr};
+
+    // Extract the parameters
+    if (reader.check_limiter('(') != 1) {
+        throw ParserException(id_token, this->origin, "Expected '(' but could not find one.");
+    }
+    reader.get_token();
+
+    std::vector<std::unique_ptr<FunctionArgument>> arguments;
+
+    // Cycle until a closing parenthesis is found or EOF is reached
+    int result;
+    while((result = reader.check_limiter(')')) == 0) {
+        auto argument {parse_function_argument()};
+
+        arguments.push_back(std::move(argument));
+
+        if (reader.check_limiter(',') == 1) {
+            // Skip the period limiter
+            reader.get_token();
+        }else if(reader.check_limiter(')') == 1) {
+            break;
+        }else{
+            auto error_token {reader.get_token()};
+            throw ParserException(error_token, this->origin, "Another argument or end of arguments expected.");
+        }
+    }
+    reader.get_token(); // Skip the closing parenthesis
+    if (result == -1) {
+        throw ParserException(nullptr, this->origin, "Expected ')' but EOF has been reached.");
+    }
+
+    // Parse the function block
+    auto function_body {parse_block()};
+
+    auto function_definition = std::make_unique<FunctionDefinition>(id, std::move(arguments), std::move(function_body));
+
+    return function_definition;
+}
+
 std::unique_ptr<Block> ninx::parser::Parser::parse_function_call() {
     return std::unique_ptr<Block>();
 }
@@ -185,6 +208,7 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
     auto block = std::make_unique<Block>(std::move(statements));
     return std::move(block);
 }
+
 
 /*
 void ninx::parser::Parser::generate() {

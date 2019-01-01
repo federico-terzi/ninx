@@ -23,28 +23,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <sstream>
-#include "FunctionDefinition.h"
+#include "FunctionArgument.h"
 #include "Block.h"
 
-std::string ninx::parser::element::FunctionDefinition::dump(int level) const {
-    std::stringstream s;
-
-    s << std::string(level, '\t') + "FunctionDefinition " << this->name << " {" << std::endl;
-    for (auto& argument : arguments) {
-        s << argument->dump(level+1) << std::endl;
+std::string ninx::parser::element::FunctionArgument::dump(int level) const {
+    std::string value {"null"};
+    if (this->default_value) {
+        value = this->default_value->dump(level+1);
     }
-    s << body->dump(level+1) << std::endl;
-    s << std::string(level, '\t') + "}" << std::endl;
-
-    return s.str();
+    return std::string(level, '\t')+ "FunctionArgument: "+this->name + " = "+ value;
 }
 
-void ninx::parser::element::FunctionDefinition::accept(ninx::evaluator::Evaluator *evaluator) {
+void ninx::parser::element::FunctionArgument::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
 
-ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string &name,
-                                                              std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments,
-                                                              std::unique_ptr<ninx::parser::element::Block> body)
-        : name(name), arguments(std::move(arguments)), body(std::move(body)) {}
+ninx::parser::element::FunctionArgument::FunctionArgument(const std::string &name,
+                                                          std::unique_ptr<ninx::parser::element::Block> default_value)
+        : name(name), default_value(std::move(default_value)) {}
+
+const std::string &ninx::parser::element::FunctionArgument::get_name() const {
+    return name;
+}
+
+const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::FunctionArgument::get_default_value() const {
+    return default_value;
+}

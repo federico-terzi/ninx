@@ -1,7 +1,10 @@
 Hello let me initialize that first
 
-@func test() {
-    Hello world
+@func test($name = {John}) {
+    Hello $name
 }
 
-@test
+Without arguments: @test
+
+With arguments: @test($name = {Freddy})
+
