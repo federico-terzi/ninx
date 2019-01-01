@@ -23,34 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONCALL_H
-#define NINX_FUNCTIONCALL_H
+#ifndef NINX_FUNCTIONCALLARGUMENT_H
+#define NINX_FUNCTIONCALLARGUMENT_H
 
 #include <memory>
-#include <vector>
-#include "Statement.h"
+#include "ASTElement.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class FunctionCall : public Statement {
+            class FunctionCallArgument : public ASTElement {
             public:
-                explicit FunctionCall(const std::string &name,
-                                      std::vector<std::unique_ptr<FunctionCallArgument>> arguments);
-
-                std::string dump(int level) const override;
+                explicit FunctionCallArgument(std::unique_ptr<std::string> name, std::unique_ptr<Block> value);
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
-                const std::string &get_name() const;
+                std::string dump(int level) const override;
 
             private:
-                std::string name; // The name of the function to be called
-                std::vector<std::unique_ptr<FunctionCallArgument>> arguments;  // Function call arguments
+                std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
+                std::unique_ptr<Block> value;  // Argument's value
             };
         }
     }
 }
 
 
-#endif //NINX_FUNCTIONCALL_H
+#endif //NINX_FUNCTIONCALLARGUMENT_H

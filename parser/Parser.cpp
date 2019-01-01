@@ -3,6 +3,7 @@
 //
 
 #include "Parser.h"
+#include "element/Block.h"
 #include "element/TextElement.h"
 #include "../lexer/token/Text.h"
 #include "../lexer/token/Limiter.h"
@@ -12,6 +13,7 @@
 #include "element/VariableRead.h"
 #include "../lexer/token/Variable.h"
 #include "element/Assignment.h"
+#include "element/FunctionCallArgument.h"
 
 using namespace ninx::parser::exception;
 
@@ -73,7 +75,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
             }
             case Type::LIMITER: {
                 auto limiter = dynamic_cast<ninx::lexer::token::Limiter *>(token);
-                switch (limiter->get_limiter()) {
+                switch (limiter->get_limiter()) {  // TODO: think about the effective usage of a standalone block, and remove it if not needed
                     case '{': {
                         reader.seek_previous();
                         auto block{this->parse_block()};
@@ -86,8 +88,8 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::FUNCNAME: {
-                auto element = std::make_unique<FunctionCall>(dynamic_cast<ninx::lexer::token::Keyword *>(token)->get_keyword());
-                return element;
+                reader.seek_previous();  // Seek to the previous token to make the function able to read it again
+                return parse_function_call();
             }
             case Type::TEXT: {
                 auto element = std::make_unique<TextElement>(
@@ -182,8 +184,83 @@ std::unique_ptr<FunctionDefinition> ninx::parser::Parser::parse_function_definit
     return function_definition;
 }
 
-std::unique_ptr<Block> ninx::parser::Parser::parse_function_call() {
-    return std::unique_ptr<Block>();
+std::unique_ptr<FunctionCallArgument> ninx::parser::Parser::parse_function_call_argument() {
+    // Check if the function call argument use implicit naming ( without the argument name )
+    // to do that, check if there is the beginning of a block.
+
+    std::unique_ptr<std::string> id {nullptr}; // Argument name
+
+    if (reader.check_limiter('{') == 0) {
+        auto raw_token {reader.get_token()};
+
+        if (raw_token->get_type() != Type::TEXT) {
+            throw ParserException(raw_token, this->origin, "Invalid function argument name. It must be alphanumeric, and begin with a letter.");
+        }
+        auto id_ptr {dynamic_cast<ninx::lexer::token::Text *>(raw_token)->get_identifier()};
+        if (!id_ptr) {
+            throw ParserException(raw_token, this->origin, "Invalid function argument name. It must be alphanumeric, and begin with a letter.");
+        }
+        id = std::move(id_ptr);
+
+        if (reader.check_limiter('=') != 1) {
+            auto error_token {reader.get_token()};
+            throw ParserException(error_token, this->origin, "Expected '=' after argument name, but could not find one.");
+        }
+        reader.get_token();  // Skip the = limiter
+    }
+
+    auto value {parse_block()};
+
+    auto argument = std::make_unique<FunctionCallArgument>(std::move(id), std::move(value));
+
+    return argument;
+}
+
+std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_function_call() {
+    auto token {reader.get_token()};
+    auto call_token {dynamic_cast<ninx::lexer::token::Keyword *>(token)};
+
+    std::vector<std::unique_ptr<FunctionCallArgument>> arguments;
+
+    // Parse optional call parameters
+    if (reader.check_limiter('(') == 1) {
+        reader.get_token();
+
+        // Cycle until a closing parenthesis is found or EOF is reached
+        int result;
+        while((result = reader.check_limiter(')')) == 0) {
+            auto argument {parse_function_call_argument()};
+
+            arguments.push_back(std::move(argument));
+
+            if (reader.check_limiter(',') == 1) {
+                // Skip the period limiter
+                reader.get_token();
+            }else if(reader.check_limiter(')') == 1) {
+                break;
+            }else{
+                auto error_token {reader.get_token()};
+                throw ParserException(error_token, this->origin, "Another argument or end of arguments expected.");
+            }
+        }
+        reader.get_token(); // Skip the closing parenthesis
+        if (result == -1) {
+            throw ParserException(nullptr, this->origin, "Expected ')' but EOF has been reached.");
+        }
+    }
+
+    // Check if there is a block argument at the end
+    if (reader.check_limiter('{') == 1) {
+        auto value {parse_block()};
+
+        auto argument = std::make_unique<FunctionCallArgument>(nullptr, std::move(value));
+
+        arguments.push_back(std::move(argument));
+    }
+
+    auto function_call = std::make_unique<FunctionCall>(call_token->get_keyword(), std::move(arguments));
+
+    return function_call;
 }
 
 std::unique_ptr<Block> ninx::parser::Parser::parse() {

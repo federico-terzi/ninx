@@ -6,5 +6,5 @@ Hello let me initialize that first
 
 Without arguments: @test
 
-With arguments: @test($name = {Freddy})
+With arguments: @test(name = {Freddy})
 

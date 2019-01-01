@@ -23,34 +23,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONCALL_H
-#define NINX_FUNCTIONCALL_H
+#include "FunctionCallArgument.h"
+#include "Block.h"
 
-#include <memory>
-#include <vector>
-#include "Statement.h"
+ninx::parser::element::FunctionCallArgument::FunctionCallArgument(std::unique_ptr<std::string> name,
+                                                                  std::unique_ptr<Block> value)
+        : name(std::move(name)), value(std::move(value)) {}
 
-namespace ninx {
-    namespace parser {
-        namespace element {
-            class FunctionCall : public Statement {
-            public:
-                explicit FunctionCall(const std::string &name,
-                                      std::vector<std::unique_ptr<FunctionCallArgument>> arguments);
-
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::string &get_name() const;
-
-            private:
-                std::string name; // The name of the function to be called
-                std::vector<std::unique_ptr<FunctionCallArgument>> arguments;  // Function call arguments
-            };
-        }
-    }
+void ninx::parser::element::FunctionCallArgument::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
 }
 
-
-#endif //NINX_FUNCTIONCALL_H
+std::string ninx::parser::element::FunctionCallArgument::dump(int level) const {
+    std::string _name {"<implicit>"};
+    if (this->name) {
+        _name = *(this->name);
+    }
+    return std::string(level, '\t')+ "FunctionCallArgument: "+_name + " = "+ this->value->dump(level+1);
+}

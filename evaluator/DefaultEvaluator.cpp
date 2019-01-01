@@ -89,3 +89,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDef
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
 
 }
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCallArgument *e) {
+
+}

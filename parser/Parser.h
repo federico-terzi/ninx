@@ -15,6 +15,8 @@
 #include "element/Block.h"
 #include "element/FunctionArgument.h"
 #include "element/FunctionDefinition.h"
+#include "element/FunctionCallArgument.h"
+#include "element/FunctionCall.h"
 
 using namespace ninx::parser::element;
 
@@ -28,7 +30,8 @@ namespace ninx {
             std::unique_ptr<Statement> parse_statement();
             std::unique_ptr<Block> parse_implicit_block();
             std::unique_ptr<Block> parse_block();
-            std::unique_ptr<Block> parse_function_call();
+            std::unique_ptr<FunctionCall> parse_function_call();
+            std::unique_ptr<FunctionCallArgument> parse_function_call_argument();
             std::unique_ptr<FunctionArgument> parse_function_argument();
             std::unique_ptr<FunctionDefinition> parse_function_definition();
         public:

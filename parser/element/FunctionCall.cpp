@@ -24,8 +24,12 @@ SOFTWARE.
 */
 
 #include "FunctionCall.h"
+#include "FunctionCallArgument.h"
+#include "Block.h"
 
-ninx::parser::element::FunctionCall::FunctionCall(const std::string &name) : name(name) {}
+ninx::parser::element::FunctionCall::FunctionCall(const std::string &name,
+                                                  std::vector<std::unique_ptr<FunctionCallArgument>> arguments)
+        : name(name), arguments(std::move(arguments)) {}
 
 std::string ninx::parser::element::FunctionCall::dump(int level) const {
     return std::string(level, '\t')+ "FunctionCall: "+this->name;
