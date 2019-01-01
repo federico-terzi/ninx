@@ -23,18 +23,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "VariableNotFoundException.h"
+#include "RuntimeException.h"
 #include <sstream>
 
-std::string ninx::evaluator::exception::VariableNotFoundException::make_message(int line, const std::string &origin,
+std::string ninx::evaluator::exception::RuntimeException::make_message(int line, const std::string &origin,
                                                                                 const std::string &message) {
     std::stringstream s;
-    s << "VariableNotFoundException at line: " << line << ", " << message << std::endl;
+    s << "RuntimeException at line: " << line << ", " << message << std::endl;
     s << "\tfrom origin: " << origin;
     return s.str();
 }
 
-ninx::evaluator::exception::VariableNotFoundException::VariableNotFoundException(int line, const std::string &origin,
+ninx::evaluator::exception::RuntimeException::RuntimeException(int line, const std::string &origin,
                                                                                  const std::string &message)  : runtime_error(
         make_message(line, origin, message)), line{line}, origin(origin) {
 

@@ -8,3 +8,6 @@ Without arguments: @test
 
 With arguments: @test(name = {Freddy})
 
+With outer argument: @test {Bob}
+
+With ordinal argument @test({James})

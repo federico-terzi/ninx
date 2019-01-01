@@ -30,7 +30,13 @@ SOFTWARE.
 ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string &name,
                                                               std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments,
                                                               std::unique_ptr<ninx::parser::element::Block> body)
-        : name(name), arguments(std::move(arguments)), body(std::move(body)) {}
+        : name(name), arguments(std::move(arguments)), body(std::move(body)) {
+
+    // Populate the argument name cache
+    for (auto &argument : this->arguments) {
+        this->argument_name_cache.insert(argument->get_name());
+    }
+}
 
 std::string ninx::parser::element::FunctionDefinition::dump(int level) const {
     std::stringstream s;
@@ -67,4 +73,8 @@ void ninx::parser::element::FunctionDefinition::set_parent(ninx::parser::element
 
     // Also set the body block parent to the given one, to enable it to access outer scope variables
     this->body->set_parent(parent);
+}
+
+bool ninx::parser::element::FunctionDefinition::check_argument(const std::string &name) {
+    return this->argument_name_cache.find(name) != this->argument_name_cache.end();
 }

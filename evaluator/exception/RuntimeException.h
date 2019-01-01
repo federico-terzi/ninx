@@ -23,26 +23,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_VARIABLENOTFOUNDEXCEPTION_H
-#define NINX_VARIABLENOTFOUNDEXCEPTION_H
+#ifndef NINX_RUNTIMEEXCEPTION_H
+#define NINX_RUNTIMEEXCEPTION_H
 
 #include <stdexcept>
 
 namespace ninx {
     namespace evaluator {
         namespace exception {
-            class VariableNotFoundException : public std::runtime_error {
+            class RuntimeException : public std::runtime_error {
             private:
                 int line;
                 std::string origin;
 
                 static std::string make_message(int line, const std::string &origin, const std::string &message);
             public:
-                explicit VariableNotFoundException(int line, const std::string &origin, const std::string &message);
+                explicit RuntimeException(int line, const std::string &origin, const std::string &message);
             };
         }
     }
 }
 
 
-#endif //NINX_VARIABLENOTFOUNDEXCEPTION_H
+#endif //NINX_RUNTIMEEXCEPTION_H

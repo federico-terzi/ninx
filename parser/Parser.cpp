@@ -249,16 +249,16 @@ std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_function_call() {
         }
     }
 
+    std::unique_ptr<FunctionCallArgument> outer_argument {nullptr};
+
     // Check if there is a block argument at the end
     if (reader.check_limiter('{') == 1) {
         auto value {parse_block()};
 
-        auto argument = std::make_unique<FunctionCallArgument>(nullptr, std::move(value));
-
-        arguments.push_back(std::move(argument));
+        outer_argument = std::make_unique<FunctionCallArgument>(nullptr, std::move(value));
     }
 
-    auto function_call = std::make_unique<FunctionCall>(call_token->get_keyword(), std::move(arguments));
+    auto function_call = std::make_unique<FunctionCall>(call_token->get_keyword(), std::move(arguments), std::move(outer_argument));
 
     return function_call;
 }

@@ -27,9 +27,9 @@ SOFTWARE.
 #include "FunctionCallArgument.h"
 #include "Block.h"
 
-ninx::parser::element::FunctionCall::FunctionCall(const std::string &name,
-                                                  std::vector<std::unique_ptr<FunctionCallArgument>> arguments)
-        : name(name), arguments(std::move(arguments)) {}
+ninx::parser::element::FunctionCall::FunctionCall(const std::string &name, std::vector<std::unique_ptr<FunctionCallArgument>> arguments,
+                                                  std::unique_ptr<FunctionCallArgument> outer_argument)
+        : name(name), arguments(std::move(arguments)), outer_argument(std::move(outer_argument)) {}
 
 std::string ninx::parser::element::FunctionCall::dump(int level) const {
     return std::string(level, '\t')+ "FunctionCall: "+this->name;
@@ -41,4 +41,25 @@ void ninx::parser::element::FunctionCall::accept(ninx::evaluator::Evaluator *eva
 
 const std::string &ninx::parser::element::FunctionCall::get_name() const {
     return name;
+}
+
+const std::vector<std::unique_ptr<ninx::parser::element::FunctionCallArgument>> &
+ninx::parser::element::FunctionCall::get_arguments() const {
+    return arguments;
+}
+
+const std::unique_ptr<ninx::parser::element::FunctionCallArgument> &
+ninx::parser::element::FunctionCall::get_outer_argument() const {
+    return outer_argument;
+}
+
+int ninx::parser::element::FunctionCall::get_argument_count() const {
+    int count {static_cast<int>(arguments.size())};
+
+    // The outer argument is optional, so check if it is present
+    if (this->outer_argument) {
+        count++;
+    }
+
+    return count;
 }

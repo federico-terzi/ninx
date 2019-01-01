@@ -40,6 +40,9 @@ namespace ninx {
 
                 std::string dump(int level) const override;
 
+                const std::unique_ptr<std::string> &get_name() const;
+                const std::unique_ptr<Block> &get_value() const;
+
             private:
                 std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
                 std::unique_ptr<Block> value;  // Argument's value

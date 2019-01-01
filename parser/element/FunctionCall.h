@@ -35,18 +35,25 @@ namespace ninx {
         namespace element {
             class FunctionCall : public Statement {
             public:
-                explicit FunctionCall(const std::string &name,
-                                      std::vector<std::unique_ptr<FunctionCallArgument>> arguments);
+                explicit FunctionCall(const std::string &name, std::vector<std::unique_ptr<FunctionCallArgument>> arguments,
+                                                      std::unique_ptr<FunctionCallArgument> outer_argument);
 
                 std::string dump(int level) const override;
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
                 const std::string &get_name() const;
+                const std::vector<std::unique_ptr<FunctionCallArgument>> &get_arguments() const;
+                const std::unique_ptr<FunctionCallArgument> &get_outer_argument() const;
 
+                /**
+                 * @return the number of the arguments of the call, adding 1 for the outer_argument if present.
+                 */
+                int get_argument_count() const;
             private:
                 std::string name; // The name of the function to be called
                 std::vector<std::unique_ptr<FunctionCallArgument>> arguments;  // Function call arguments
+                std::unique_ptr<FunctionCallArgument> outer_argument;  // Function call argument, specified by the block syntax.
             };
         }
     }

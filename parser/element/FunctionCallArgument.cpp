@@ -41,3 +41,11 @@ std::string ninx::parser::element::FunctionCallArgument::dump(int level) const {
     }
     return std::string(level, '\t')+ "FunctionCallArgument: "+_name + " = "+ this->value->dump(level+1);
 }
+
+const std::unique_ptr<std::string> &ninx::parser::element::FunctionCallArgument::get_name() const {
+    return name;
+}
+
+const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::FunctionCallArgument::get_value() const {
+    return value;
+}
