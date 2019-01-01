@@ -47,11 +47,15 @@ namespace ninx {
 
                 Block * get_variable(const std::string& name) const;
                 void set_variable(const std::string &name, Block * value);
+                void clear_variables();
 
+                FunctionDefinition * get_function(const std::string &name) const;
+                void set_function(const std::string &name, FunctionDefinition * func);
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
 
                 std::unordered_map<std::string, Block*> variables;
+                std::unordered_map<std::string, FunctionDefinition *> functions;
             };
         }
     }

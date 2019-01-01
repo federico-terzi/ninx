@@ -27,6 +27,11 @@ SOFTWARE.
 #include "FunctionDefinition.h"
 #include "Block.h"
 
+ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string &name,
+                                                              std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments,
+                                                              std::unique_ptr<ninx::parser::element::Block> body)
+        : name(name), arguments(std::move(arguments)), body(std::move(body)) {}
+
 std::string ninx::parser::element::FunctionDefinition::dump(int level) const {
     std::stringstream s;
 
@@ -44,7 +49,22 @@ void ninx::parser::element::FunctionDefinition::accept(ninx::evaluator::Evaluato
     evaluator->visit(this);
 }
 
-ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string &name,
-                                                              std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments,
-                                                              std::unique_ptr<ninx::parser::element::Block> body)
-        : name(name), arguments(std::move(arguments)), body(std::move(body)) {}
+const std::string &ninx::parser::element::FunctionDefinition::get_name() const {
+    return name;
+}
+
+const std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> &
+ninx::parser::element::FunctionDefinition::get_arguments() const {
+    return arguments;
+}
+
+const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::FunctionDefinition::get_body() const {
+    return body;
+}
+
+void ninx::parser::element::FunctionDefinition::set_parent(ninx::parser::element::Block *parent) {
+    ASTElement::set_parent(parent);
+
+    // Also set the body block parent to the given one, to enable it to access outer scope variables
+    this->body->set_parent(parent);
+}

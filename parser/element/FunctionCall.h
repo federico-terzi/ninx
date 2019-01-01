@@ -39,6 +39,8 @@ namespace ninx {
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
+                const std::string &get_name() const;
+
             private:
                 std::string name; // The name of the function to be called
             };

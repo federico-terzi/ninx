@@ -30,6 +30,8 @@ SOFTWARE.
 #include "../parser/element/Block.h"
 #include "../parser/element/Assignment.h"
 #include "../parser/element/VariableRead.h"
+#include "../parser/element/FunctionDefinition.h"
+#include "../parser/element/FunctionCall.h"
 #include "exception/VariableNotFoundException.h"
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
@@ -47,7 +49,24 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *e) {
+    auto function {e->get_parent()->get_function(e->get_name())};
 
+    if (!function) {
+        // TODO: add information of line number and origin
+        throw ninx::evaluator::exception::VariableNotFoundException(0, "TODO", "Function \""+e->get_name()+"\" has not been declared!");
+    }
+
+    // Clear all the function body local variables
+    function->get_body()->clear_variables();
+
+    // Load all the function argument default as local variables in the function body block
+    for (auto &argument : function->get_arguments()) {
+        function->get_body()->set_variable(argument->get_name(), argument->get_default_value().get());
+    }
+
+    // TODO: add call arguments as local variables
+
+    function->get_body()->accept(this);
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
@@ -64,7 +83,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {
-
+    e->get_parent()->set_function(e->get_name(), e);
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {

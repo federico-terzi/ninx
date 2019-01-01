@@ -34,3 +34,7 @@ std::string ninx::parser::element::FunctionCall::dump(int level) const {
 void ninx::parser::element::FunctionCall::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
+
+const std::string &ninx::parser::element::FunctionCall::get_name() const {
+    return name;
+}

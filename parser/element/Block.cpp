@@ -73,3 +73,24 @@ ninx::parser::element::Block *ninx::parser::element::Block::get_variable(const s
 void ninx::parser::element::Block::set_variable(const std::string &name, ninx::parser::element::Block *value) {
     this->variables[name] = value;
 }
+
+ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_function(const std::string &name) const {
+    if (functions.find(name) != functions.end()) {
+        return this->functions.at(name);
+    }
+
+    // Check if the function is declared in the parent block
+    if (this->parent) {
+        return this->parent->get_function(name);
+    }
+
+    return nullptr;
+}
+
+void ninx::parser::element::Block::set_function(const std::string &name, ninx::parser::element::FunctionDefinition *func) {
+    this->functions[name] = func;
+}
+
+void ninx::parser::element::Block::clear_variables() {
+    this->variables.clear();
+}
