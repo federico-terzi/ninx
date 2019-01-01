@@ -32,9 +32,13 @@ ninx::parser::element::FunctionDefinition::FunctionDefinition(const std::string 
                                                               std::unique_ptr<ninx::parser::element::Block> body)
         : name(name), arguments(std::move(arguments)), body(std::move(body)) {
 
-    // Populate the argument name cache
+    // Populate the caches
     for (auto &argument : this->arguments) {
-        this->argument_name_cache.insert(argument->get_name());
+        this->_argument_name_cache.insert(argument->get_name());
+
+        if (!argument->get_default_value()) {
+            this->mandatory_arguments.insert(argument->get_name());
+        }
     }
 }
 
@@ -76,5 +80,13 @@ void ninx::parser::element::FunctionDefinition::set_parent(ninx::parser::element
 }
 
 bool ninx::parser::element::FunctionDefinition::check_argument(const std::string &name) {
-    return this->argument_name_cache.find(name) != this->argument_name_cache.end();
+    return this->_argument_name_cache.find(name) != this->_argument_name_cache.end();
+}
+
+bool ninx::parser::element::FunctionDefinition::check_mandatory(const std::string &name) {
+    return this->mandatory_arguments.find(name) != this->mandatory_arguments.end();
+}
+
+const std::unordered_set<std::string> &ninx::parser::element::FunctionDefinition::get_mandatory_arguments() const {
+    return mandatory_arguments;
 }

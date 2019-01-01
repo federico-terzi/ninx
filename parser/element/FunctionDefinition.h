@@ -49,6 +49,7 @@ namespace ninx {
                 const std::string &get_name() const;
                 const std::vector<std::unique_ptr<FunctionArgument>> &get_arguments() const;
                 const std::unique_ptr<Block> &get_body() const;
+                const std::unordered_set<std::string> &get_mandatory_arguments() const;
 
                 /**
                  * Efficiently check if the given argument is present in the function definition
@@ -56,12 +57,20 @@ namespace ninx {
                  * @return true if the argument is valid, false otherwise.
                  */
                 bool check_argument(const std::string& name);
+
+                /**
+                 * Efficiently check if the given argument is one of the mandatory of the function definition
+                 * @param name of the argument
+                 * @return true if the argument is mandatory, false otherwise.
+                 */
+                bool check_mandatory(const std::string& name);
             private:
                 std::string name;  // Function name
                 std::vector<std::unique_ptr<FunctionArgument>> arguments;  // Function arguments
                 std::unique_ptr<Block> body;  // Function body block
 
-                std::unordered_set<std::string> argument_name_cache;  // Used to efficiently check if an argument is valid
+                std::unordered_set<std::string> mandatory_arguments;  // Used to efficiently check if an argument is mandatory
+                std::unordered_set<std::string> _argument_name_cache;  // Used to efficiently check if an argument is valid
             };
         }
     }

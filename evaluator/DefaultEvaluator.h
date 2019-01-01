@@ -35,7 +35,7 @@ namespace ninx {
             void visit(ninx::parser::element::TextElement *e) override;
             void visit(ninx::parser::element::Assignment *e) override;
             void visit(ninx::parser::element::Block *e) override;
-            void visit(ninx::parser::element::FunctionCall *e) override;
+            void visit(ninx::parser::element::FunctionCall *call) override;
             void visit(ninx::parser::element::VariableRead *e) override;
             void visit(ninx::parser::element::FunctionDefinition *e) override;
             void visit(ninx::parser::element::FunctionArgument *e) override;

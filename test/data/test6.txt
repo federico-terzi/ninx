@@ -1,0 +1,7 @@
+Hello let me initialize that first
+
+@func test($name) {
+    Hello $name
+}
+
+Without arguments: @test

@@ -25,6 +25,10 @@ SOFTWARE.
 
 #include <iostream>
 #include <string>
+#include <unordered_set>
+#include <algorithm>
+#include <set>
+#include <boost/algorithm/string/join.hpp>
 #include "DefaultEvaluator.h"
 #include "../parser/element/TextElement.h"
 #include "../parser/element/Block.h"
@@ -49,12 +53,12 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     }
 }
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *e) {
-    auto function {e->get_parent()->get_function(e->get_name())};
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
+    auto function {call->get_parent()->get_function(call->get_name())};
 
     if (!function) {
         // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+e->get_name()+"\" has not been declared!");
+        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" has not been declared!");
     }
 
     // Clear all the function body local variables
@@ -68,9 +72,9 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
     // Load all the call arguments
 
     // Check if the call arguments are too many
-    if (e->get_argument_count() > function->get_arguments().size()) {
+    if (call->get_argument_count() > function->get_arguments().size()) {
         // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+e->get_name()+"\" is called with too many parameters!");
+        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" is called with too many parameters!");
     }
 
     // Check if the named call arguments are present in the function definition and make sure that
@@ -78,7 +82,10 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
     // Then populate the call arguments as function body block local variables
     bool named_started {false};
     int index {0};  // Current ordinal parameter index
-    for (auto &argument : e->get_arguments()) {
+
+    std::unordered_set<std::string> call_mandatory_arguments;
+
+    for (auto &argument : call->get_arguments()) {
         if (argument->get_name()) {
             auto argument_name {*(argument->get_name())};
             named_started = true;
@@ -86,7 +93,11 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
             if (!function->check_argument(argument_name)){
                 // TODO: add information of line number and origin
                 throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Argument \"" + *(argument->get_name()) +
-                "\" is not a valid for function \""+e->get_name()+"\"");
+                "\" is not a valid for function \""+call->get_name()+"\"");
+            }
+
+            if (function->check_mandatory(argument_name)) {
+                call_mandatory_arguments.insert(argument_name);
             }
 
             // Setup the argument as a local variable
@@ -100,6 +111,10 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 
             auto definition_argument {function->get_arguments().at(static_cast<unsigned long long int>(index)).get()};
 
+            if (function->check_mandatory(definition_argument->get_name())) {
+                call_mandatory_arguments.insert(definition_argument->get_name());
+            }
+
             // Setup the argument as a local variable
             function->get_body()->set_variable(definition_argument->get_name(), argument->get_value().get());
         }
@@ -107,10 +122,28 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
     }
 
     // Add also the outer_argument
-    if (e->get_outer_argument()) {
+    if (call->get_outer_argument()) {
         auto last_definition_argument {function->get_arguments().at(function->get_arguments().size()-1).get()};
 
-        function->get_body()->set_variable(last_definition_argument->get_name(), e->get_outer_argument()->get_value().get());
+        if (function->check_mandatory(last_definition_argument->get_name())) {
+            call_mandatory_arguments.insert(last_definition_argument->get_name());
+        }
+
+        function->get_body()->set_variable(last_definition_argument->get_name(), call->get_outer_argument()->get_value().get());
+    }
+
+    // Check if all mandatory arguments are been used
+    if (call_mandatory_arguments.size() != function->get_mandatory_arguments().size()) {
+        std::set<std::string> missing;
+
+        // Find the missing parameters by calculating the difference between the definition and the call
+        std::set_difference(function->get_mandatory_arguments().begin(), function->get_mandatory_arguments().end(),
+                call_mandatory_arguments.begin(), call_mandatory_arguments.end(),
+                std::inserter(missing, missing.end()));
+
+        auto joined_missing {boost::algorithm::join(missing, ", ")};
+        // TODO: add information of line number and origin
+        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Missing required arguments: \""+joined_missing+"\"");
     }
 
     function->get_body()->accept(this);
