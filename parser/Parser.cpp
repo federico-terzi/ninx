@@ -75,17 +75,13 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
             }
             case Type::LIMITER: {
                 auto limiter = dynamic_cast<ninx::lexer::token::Limiter *>(token);
-                switch (limiter->get_limiter()) {  // TODO: think about the effective usage of a standalone block, and remove it if not needed
-                    case '{': {
-                        reader.seek_previous();
-                        auto block{this->parse_block()};
-                        return block;
+                switch (limiter->get_limiter()) {
+                    default:  // Not defined as an operator
+                    {
+                        auto element = std::make_unique<TextElement>(std::string(1, limiter->get_limiter()));
+                        return element;
                     }
                 }
-
-                // The given limiter does not trigger any built-in statement, rewind to avoid consuming it.
-                reader.seek_previous();
-                break;
             }
             case Type::FUNCNAME: {
                 reader.seek_previous();  // Seek to the previous token to make the function able to read it again

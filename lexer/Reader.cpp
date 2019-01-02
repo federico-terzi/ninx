@@ -57,17 +57,21 @@ bool is_limiter(char c) {
 int ninx::lexer::Reader::get_next_limiter() {
     int next_char = this->stream.peek();
     if (next_char >= 0) {
-        // Check if the char is a limiter
-        if (is_limiter(static_cast<char>(next_char))) {
-            // If the char is a limiter, consume it
-            this->stream.get();
-
-            // Also ignore the trailing spaces
-            this->ignore_spaces();
-
-            return next_char;
-        }else{
+        if (next_char == '\\') {  // Escape char check
             return -2;
+        }else{
+            // Check if the char is a limiter
+            if (is_limiter(static_cast<char>(next_char))) {
+                // If the char is a limiter, consume it
+                this->stream.get();
+
+                // Also ignore the trailing spaces
+                this->ignore_spaces();
+
+                return next_char;
+            }else{
+                return -2;
+            }
         }
     }else{  // EOF
         return -1;
@@ -83,8 +87,12 @@ std::string ninx::lexer::Reader::read_until_limiter() {
     while (stream) {
         // Check if the next char is one of the limiting ones
         char next_char = static_cast<char>(stream.peek());
-        if (is_limiter(next_char)) {
-            break;
+        if (next_char == '\\') {   // Escaping control
+            stream.get();  // Discard the escaping char, and avoid limiter check so char is considered as text
+        }else{
+            if (is_limiter(next_char)) {
+                break;
+            }
         }
 
         // Read the current char
