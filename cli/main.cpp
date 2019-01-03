@@ -2,9 +2,9 @@
 #include <sstream>
 #include <fstream>
 #include <memory>
-#include "lexer/Lexer.h"
-#include "parser/Parser.h"
-#include "evaluator/DefaultEvaluator.h"
+#include <lexer/Lexer.h>
+#include <parser/Parser.h>
+#include <evaluator/DefaultEvaluator.h>
 
 using namespace ninx::lexer;
 using namespace ninx::lexer::token;
@@ -13,13 +13,13 @@ using namespace ninx::evaluator;
 using namespace std;
 
 int main() {
-    std::ifstream source{R"(test/data/test7.txt)", std::ios_base::binary};
+    std::ifstream source{R"(tests/data/test7.txt)", std::ios_base::binary};
 
-    Lexer lexer {source, "test"};
+    Lexer lexer {source, "tests"};
 
     auto tokens = lexer.generate();
 
-    Parser parser{tokens, "test"};
+    Parser parser{tokens, "tests"};
 
     auto ast = parser.parse();
 
