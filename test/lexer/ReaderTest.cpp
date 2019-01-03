@@ -31,11 +31,18 @@ BOOST_AUTO_TEST_SUITE(ninx_lexer_reader)
 
     BOOST_AUTO_TEST_CASE(test_get_next_limiter)
     {
-        std::istringstream ss("Hello");
+        std::istringstream ss("@");
         std::string origin {"test"};
         ninx::lexer::Reader reader(ss, origin);
-        int result = reader.get_next_limiter();
-        BOOST_TEST(result == -1);
+        BOOST_TEST(reader.get_next_limiter() == '@');
+    }
+
+    BOOST_AUTO_TEST_CASE(test_escape_get_next_limiter)
+    {
+        std::istringstream ss("\\@");
+        std::string origin {"test"};
+        ninx::lexer::Reader reader(ss, origin);
+        BOOST_TEST(reader.get_next_limiter() == -2);
     }
 
 BOOST_AUTO_TEST_SUITE_END()
