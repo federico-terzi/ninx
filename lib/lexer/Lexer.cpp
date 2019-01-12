@@ -68,7 +68,10 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
             }
         }else{  // A limiter was not found, it is a simple text
             auto token = std::make_unique<Text>(reader.get_line_number(), reader.read_until_limiter());
-            tokens.push_back(std::move(token));
+            // Only add non-empty tokens
+            if (!token->is_empty()) {
+                tokens.push_back(std::move(token));
+            }
         }
     }
 

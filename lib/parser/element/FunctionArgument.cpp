@@ -39,13 +39,13 @@ void ninx::parser::element::FunctionArgument::accept(ninx::evaluator::Evaluator 
 }
 
 ninx::parser::element::FunctionArgument::FunctionArgument(const std::string &name,
-                                                          std::unique_ptr<ninx::parser::element::Block> default_value)
+                                                          std::unique_ptr<ninx::parser::element::Value> default_value)
         : name(name), default_value(std::move(default_value)) {}
 
 const std::string &ninx::parser::element::FunctionArgument::get_name() const {
     return name;
 }
 
-const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::FunctionArgument::get_default_value() const {
+const std::unique_ptr<ninx::parser::element::Value> &ninx::parser::element::FunctionArgument::get_default_value() const {
     return default_value;
 }

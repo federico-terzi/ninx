@@ -63,10 +63,9 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                     // Skip the = limiter
                     reader.get_token();
 
-                    // Parse the block containing the assignment value
-                    auto block = parse_block();
+                    auto value = parse_value();
 
-                    auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(block));
+                    auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(value));
                     return element;
                 }else{  // Variable used as value
                     auto element = std::make_unique<ninx::parser::element::VariableRead>(name);
@@ -101,6 +100,24 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     return nullptr;
 }
 
+std::unique_ptr<Value> ninx::parser::Parser::parse_value() {
+    std::unique_ptr<Value> value {nullptr};
+
+    // Check if is a block value or a variable read
+    if (reader.check_limiter('{') == 1) {
+        value = parse_block();
+    }else if (reader.peek_token() != nullptr && reader.peek_token()->get_type() == Type::VARIABLE){
+        // Get the variable name
+        auto name {dynamic_cast<ninx::lexer::token::Variable *>(reader.get_token())->get_name()};
+        value = std::make_unique<ninx::parser::element::VariableRead>(name);
+    }else{
+        auto error_token {reader.get_token()};
+        throw ParserException(error_token, this->origin, "Expected Block or Variable.");
+    }
+
+    return std::move(value);
+}
+
 std::unique_ptr<FunctionArgument> ninx::parser::Parser::parse_function_argument() {
     auto raw_token {reader.get_token()};
 
@@ -110,13 +127,13 @@ std::unique_ptr<FunctionArgument> ninx::parser::Parser::parse_function_argument(
                                                             " name?");
     }
 
-    std::unique_ptr<Block> default_value {nullptr};
+    std::unique_ptr<Value> default_value {nullptr};
 
     // Check if the argument does have a default value
     if (reader.check_limiter('=')) {
         reader.get_token();
 
-        default_value = parse_block();
+        default_value = parse_value();
     }
 
     auto argument_token {dynamic_cast<ninx::lexer::token::Variable*>(raw_token)};
@@ -205,7 +222,7 @@ std::unique_ptr<FunctionCallArgument> ninx::parser::Parser::parse_function_call_
         reader.get_token();  // Skip the = limiter
     }
 
-    auto value {parse_block()};
+    auto value {parse_value()};
 
     auto argument = std::make_unique<FunctionCallArgument>(std::move(id), std::move(value));
 

@@ -54,3 +54,13 @@ std::unique_ptr<std::string> ninx::lexer::token::Text::get_identifier() {
 
     return std::make_unique<std::string>(identifier);
 }
+
+bool ninx::lexer::token::Text::is_empty() {
+    // Check if the text is empty or contain only spaces
+    if (this->text.length() == 0) {
+        return true;
+    }
+
+    static const boost::regex emptyValidation("^\\s*$");
+    return regex_match(this->get_text(), emptyValidation);
+}

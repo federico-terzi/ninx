@@ -52,6 +52,11 @@ namespace ninx {
                  * @return the text converted to a valid identifier, or nullptr if not valid
                  */
                 std::unique_ptr<std::string> get_identifier();
+
+                /**
+                 * Check if the text token is only made of text characters.
+                 */
+                bool is_empty();
             };
         }
     }

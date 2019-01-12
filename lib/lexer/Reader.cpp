@@ -84,8 +84,6 @@ std::string ninx::lexer::Reader::read_until_limiter() {
     // Used to prevent more than two consecutive newlines
     int newline_count = 0;
 
-    bool beginning {true}; // Used to trim initial spaces
-
     while (stream) {
         // Check if the next char is one of the limiting ones
         char next_char = static_cast<char>(stream.peek());
@@ -109,12 +107,11 @@ std::string ninx::lexer::Reader::read_until_limiter() {
         }else{
             if (!isspace(current)) {
                 newline_count = 0;
-                beginning = false;
             }
         }
 
         // If the new character is a newline that exceed the maximum number, remove it
-        if (newline_count < MAX_CONSECUTIVE_NEWLINES && !beginning) {
+        if (newline_count < MAX_CONSECUTIVE_NEWLINES) {
             this->buffer.push_back(current);
         }
     }

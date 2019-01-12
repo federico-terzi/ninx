@@ -23,34 +23,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONARGUMENT_H
-#define NINX_FUNCTIONARGUMENT_H
-
-#include <memory>
-#include "ASTElement.h"
 #include "Value.h"
-
-namespace ninx {
-    namespace parser {
-        namespace element {
-            class FunctionArgument : public ASTElement {
-            public:
-                explicit FunctionArgument(const std::string &name, std::unique_ptr<Value> default_value);
-
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::string &get_name() const;
-                const std::unique_ptr<Value> &get_default_value() const;
-
-            private:
-                std::string name;  // Argument name
-                std::unique_ptr<Value> default_value;  // Optional default value of the argument
-            };
-        }
-    }
-}
-
-
-#endif //NINX_FUNCTIONARGUMENT_H

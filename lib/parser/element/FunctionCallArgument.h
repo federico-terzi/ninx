@@ -28,13 +28,14 @@ SOFTWARE.
 
 #include <memory>
 #include "ASTElement.h"
+#include "Value.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
             class FunctionCallArgument : public ASTElement {
             public:
-                explicit FunctionCallArgument(std::unique_ptr<std::string> name, std::unique_ptr<Block> value);
+                explicit FunctionCallArgument(std::unique_ptr<std::string> name, std::unique_ptr<Value> value);
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
@@ -43,11 +44,11 @@ namespace ninx {
                 std::string dump(int level) const override;
 
                 const std::unique_ptr<std::string> &get_name() const;
-                const std::unique_ptr<Block> &get_value() const;
+                const std::unique_ptr<Value> &get_value() const;
 
             private:
                 std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
-                std::unique_ptr<Block> value;  // Argument's value
+                std::unique_ptr<Value> value;  // Argument's value
             };
         }
     }

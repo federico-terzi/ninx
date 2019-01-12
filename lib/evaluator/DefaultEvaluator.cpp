@@ -44,7 +44,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
-    e->get_parent()->set_variable(e->get_name(), e->get_block());
+    e->get_parent()->set_variable(e->get_name(), e->get_value());
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {

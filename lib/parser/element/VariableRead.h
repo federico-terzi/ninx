@@ -27,11 +27,12 @@ SOFTWARE.
 #define NINX_VARIABLEREAD_H
 
 #include "Statement.h"
+#include "Value.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class VariableRead : public Statement {
+            class VariableRead : public Value {
             public:
                 explicit VariableRead(const std::string &name);
 
