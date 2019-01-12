@@ -38,6 +38,8 @@ namespace ninx {
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
+                void set_parent(Block *parent) override;
+
                 std::string dump(int level) const override;
 
                 const std::unique_ptr<std::string> &get_name() const;

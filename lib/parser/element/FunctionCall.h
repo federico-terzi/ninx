@@ -42,6 +42,8 @@ namespace ninx {
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
+                void set_parent(Block *parent) override;
+
                 const std::string &get_name() const;
                 const std::vector<std::unique_ptr<FunctionCallArgument>> &get_arguments() const;
                 const std::unique_ptr<FunctionCallArgument> &get_outer_argument() const;

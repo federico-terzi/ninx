@@ -49,3 +49,9 @@ const std::unique_ptr<std::string> &ninx::parser::element::FunctionCallArgument:
 const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::FunctionCallArgument::get_value() const {
     return value;
 }
+
+void ninx::parser::element::FunctionCallArgument::set_parent(ninx::parser::element::Block *parent) {
+    ASTElement::set_parent(parent);
+
+    this->value->set_parent(parent);
+}

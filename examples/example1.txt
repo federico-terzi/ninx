@@ -1,0 +1,19 @@
+@func h1($header) {
+    \<h1\>$header\<\/h1\>
+}
+
+@func image($width={100}, $path) {
+    \<img src\=\"$path\" width\=\"$width\" \/>
+}
+
+@func smallimage($path) {
+    @image(path={$path}, width={50})
+}
+
+@h1{This is my title}
+
+For this incredible article.
+
+Let's put a nice image here: @image {image.png}
+
+And even a small image: @smallimage {image.png}

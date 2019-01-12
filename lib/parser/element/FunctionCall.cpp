@@ -63,3 +63,11 @@ int ninx::parser::element::FunctionCall::get_argument_count() const {
 
     return count;
 }
+
+void ninx::parser::element::FunctionCall::set_parent(ninx::parser::element::Block *parent) {
+    ASTElement::set_parent(parent);
+
+    for (auto &argument : arguments) {
+        argument->set_parent(parent);
+    }
+}
