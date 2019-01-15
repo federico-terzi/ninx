@@ -57,7 +57,7 @@ ninx::parser::element::Block::get_statements() const {
     return statements;
 }
 
-ninx::parser::element::Value *ninx::parser::element::Block::get_variable(const std::string &name) const {
+ninx::parser::element::Expression *ninx::parser::element::Block::get_variable(const std::string &name) const {
     if (variables.find(name) != variables.end()) {
         return this->variables.at(name);
     }
@@ -70,7 +70,7 @@ ninx::parser::element::Value *ninx::parser::element::Block::get_variable(const s
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_variable(const std::string &name, ninx::parser::element::Value *value) {
+void ninx::parser::element::Block::set_variable(const std::string &name, ninx::parser::element::Expression *value) {
     this->variables[name] = value;
 }
 

@@ -27,10 +27,10 @@ SOFTWARE.
 
 
 ninx::parser::element::Assignment::Assignment(const std::string &name,
-                                              std::unique_ptr<ninx::parser::element::Value> value)
+                                              std::unique_ptr<ninx::parser::element::Expression> value)
                                               : name(name), value(std::move(value)) {}
 
-ninx::parser::element::Value *ninx::parser::element::Assignment::get_value() {
+ninx::parser::element::Expression *ninx::parser::element::Assignment::get_value() {
     return this->value.get();
 }
 

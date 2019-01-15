@@ -173,3 +173,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArg
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCallArgument *e) {
 
 }
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
+
+}

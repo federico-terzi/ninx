@@ -38,6 +38,7 @@ namespace ninx {
             class FunctionDefinition;
             class FunctionArgument;
             class FunctionCallArgument;
+            class AddExpression;
         }
     }
 }
@@ -56,6 +57,7 @@ namespace ninx {
             virtual void visit(ninx::parser::element::FunctionDefinition * e) = 0;
             virtual void visit(ninx::parser::element::FunctionArgument * e) = 0;
             virtual void visit(ninx::parser::element::FunctionCallArgument * e) = 0;
+            virtual void visit(ninx::parser::element::AddExpression * e) = 0;
         };
     }
 }

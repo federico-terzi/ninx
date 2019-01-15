@@ -28,20 +28,20 @@ SOFTWARE.
 
 #include <memory>
 #include "Statement.h"
-#include "Value.h"
+#include "Expression.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
             class Assignment : public Statement {
             public:
-                explicit Assignment(const std::string &name, std::unique_ptr<Value> value);
+                explicit Assignment(const std::string &name, std::unique_ptr<Expression> value);
 
                 std::string dump(int level) const override;
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
-                Value * get_value();
+                Expression * get_value();
 
                 const std::string &get_name() const;
 
@@ -50,7 +50,7 @@ namespace ninx {
             private:
                 std::string name;  // Variable name
 
-                std::unique_ptr<Value> value;   // The content of the variable
+                std::unique_ptr<Expression> value;   // The content of the variable
             };
         }
     }

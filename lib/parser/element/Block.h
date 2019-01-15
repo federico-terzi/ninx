@@ -31,12 +31,12 @@ SOFTWARE.
 #include <unordered_map>
 #include "ASTElement.h"
 #include "Statement.h"
-#include "Value.h"
+#include "Expression.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class Block : public Value {
+            class Block : public Expression {
             public:
                 explicit Block(std::vector<std::unique_ptr<Statement>> statements);
 
@@ -46,8 +46,8 @@ namespace ninx {
 
                 const std::vector<std::unique_ptr<Statement>> &get_statements() const;
 
-                Value * get_variable(const std::string& name) const;
-                void set_variable(const std::string &name, Value * value);
+                Expression * get_variable(const std::string& name) const;
+                void set_variable(const std::string &name, Expression * value);
                 void clear_variables();
 
                 FunctionDefinition * get_function(const std::string &name) const;
@@ -55,7 +55,7 @@ namespace ninx {
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
 
-                std::unordered_map<std::string, Value*> variables;
+                std::unordered_map<std::string, Expression*> variables;
                 std::unordered_map<std::string, FunctionDefinition *> functions;
             };
         }

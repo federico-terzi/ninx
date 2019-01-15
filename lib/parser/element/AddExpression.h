@@ -23,36 +23,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONCALLARGUMENT_H
-#define NINX_FUNCTIONCALLARGUMENT_H
+#ifndef NINX_ADDEXPRESSION_H
+#define NINX_ADDEXPRESSION_H
 
-#include <memory>
-#include "ASTElement.h"
 #include "Expression.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class FunctionCallArgument : public ASTElement {
+            class AddExpression : public Expression {
             public:
-                explicit FunctionCallArgument(std::unique_ptr<std::string> name, std::unique_ptr<Expression> value);
+                explicit AddExpression(std::unique_ptr<Expression> first, std::unique_ptr<Expression> second);
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
-                void set_parent(Block *parent) override;
-
                 std::string dump(int level) const override;
 
-                const std::unique_ptr<std::string> &get_name() const;
-                const std::unique_ptr<Expression> &get_value() const;
-
             private:
-                std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
-                std::unique_ptr<Expression> value;  // Argument's value
+                std::unique_ptr<Expression> first;
+                std::unique_ptr<Expression> second;
             };
         }
     }
 }
 
 
-#endif //NINX_FUNCTIONCALLARGUMENT_H
+#endif //NINX_ADDEXPRESSION_H

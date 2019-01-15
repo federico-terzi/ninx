@@ -1,0 +1,11 @@
+Let's do some math:
+
+$sum = {3} + {4}
+
+The total is $sum
+
+And then why not, let's make it a bit more complex:
+
+$sum = {2} + ({3} + {1})
+
+And now the total is $sum

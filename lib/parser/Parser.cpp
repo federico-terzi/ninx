@@ -1,6 +1,27 @@
-//
-// Created by federico.terzi2 on 08/12/2018.
-//
+/*
+
+MIT License
+
+Copyright (c) 2018 Federico Terzi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 #include "Parser.h"
 #include "element/Block.h"
@@ -13,6 +34,8 @@
 #include "element/VariableRead.h"
 #include "../lexer/token/Variable.h"
 #include "element/Assignment.h"
+#include "element/Expression.h"
+#include "element/AddExpression.h"
 #include "element/FunctionCallArgument.h"
 
 using namespace ninx::parser::exception;
@@ -63,7 +86,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                     // Skip the = limiter
                     reader.get_token();
 
-                    auto value = parse_value();
+                    auto value = parse_expression();
 
                     auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(value));
                     return element;
@@ -100,12 +123,25 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     return nullptr;
 }
 
-std::unique_ptr<Value> ninx::parser::Parser::parse_value() {
-    std::unique_ptr<Value> value {nullptr};
+std::unique_ptr<Expression> ninx::parser::Parser::parse_value() {
+    std::unique_ptr<Expression> value {nullptr};
 
     // Check if is a block value or a variable read
     if (reader.check_limiter('{') == 1) {
         value = parse_block();
+    }else if (reader.check_limiter('(') == 1) {  // Nested expression
+        // Consume the open parenthesis
+        reader.get_token();
+
+        value = parse_expression();
+
+        // Check and consume the closing parenthesis
+        if (reader.check_limiter(')') != 1) {
+            auto error_token {reader.get_token()};
+            throw ParserException(error_token, this->origin, "Expected closing parethesis ')'");
+        }
+        reader.get_token();
+
     }else if (reader.peek_token() != nullptr && reader.peek_token()->get_type() == Type::VARIABLE){
         // Get the variable name
         auto name {dynamic_cast<ninx::lexer::token::Variable *>(reader.get_token())->get_name()};
@@ -118,6 +154,31 @@ std::unique_ptr<Value> ninx::parser::Parser::parse_value() {
     return std::move(value);
 }
 
+std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
+    std::unique_ptr<Expression> expression {nullptr};
+
+    auto first {parse_value()};
+    expression = std::move(first);
+
+    while (true) {
+        if (reader.check_limiter('+') == 1) {
+            // Remove the + token
+            reader.get_token();
+
+            auto second {parse_value()};
+
+            auto add_expr = std::make_unique<AddExpression>(std::move(expression), std::move(second));
+            expression = std::move(add_expr);
+        }else if (reader.check_limiter('-') == 1) {
+            // TODO
+        }else{
+            break;
+        }
+    }
+
+    return std::move(expression);
+}
+
 std::unique_ptr<FunctionArgument> ninx::parser::Parser::parse_function_argument() {
     auto raw_token {reader.get_token()};
 
@@ -127,13 +188,13 @@ std::unique_ptr<FunctionArgument> ninx::parser::Parser::parse_function_argument(
                                                             " name?");
     }
 
-    std::unique_ptr<Value> default_value {nullptr};
+    std::unique_ptr<Expression> default_value {nullptr};
 
     // Check if the argument does have a default value
     if (reader.check_limiter('=')) {
         reader.get_token();
 
-        default_value = parse_value();
+        default_value = parse_expression();
     }
 
     auto argument_token {dynamic_cast<ninx::lexer::token::Variable*>(raw_token)};
@@ -222,7 +283,7 @@ std::unique_ptr<FunctionCallArgument> ninx::parser::Parser::parse_function_call_
         reader.get_token();  // Skip the = limiter
     }
 
-    auto value {parse_value()};
+    auto value {parse_expression()};
 
     auto argument = std::make_unique<FunctionCallArgument>(std::move(id), std::move(value));
 

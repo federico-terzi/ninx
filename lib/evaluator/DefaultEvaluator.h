@@ -41,6 +41,8 @@ namespace ninx {
             void visit(ninx::parser::element::FunctionArgument *e) override;
             void visit(ninx::parser::element::FunctionCallArgument *e) override;
 
+            void visit(ninx::parser::element::AddExpression *e) override;
+
             explicit DefaultEvaluator(std::ostream &output);
         private:
             std::ostream &output;

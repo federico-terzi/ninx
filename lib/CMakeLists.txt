@@ -22,7 +22,7 @@ add_library(ninxlib STATIC lexer/Lexer.cpp lexer/Lexer.h
         parser/element/FunctionCallArgument.cpp parser/element/FunctionCallArgument.h
         evaluator/Evaluator.h
         evaluator/DefaultEvaluator.cpp evaluator/DefaultEvaluator.h
-        evaluator/exception/RuntimeException.cpp evaluator/exception/RuntimeException.h parser/element/Value.cpp parser/element/Value.h)
+        evaluator/exception/RuntimeException.cpp evaluator/exception/RuntimeException.h parser/element/Expression.cpp parser/element/Expression.h parser/element/AddExpression.cpp parser/element/AddExpression.h)
 
 target_include_directories (ninxlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

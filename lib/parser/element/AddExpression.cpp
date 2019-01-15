@@ -23,36 +23,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONCALLARGUMENT_H
-#define NINX_FUNCTIONCALLARGUMENT_H
+#include "AddExpression.h"
 
-#include <memory>
-#include "ASTElement.h"
-#include "Expression.h"
+ninx::parser::element::AddExpression::AddExpression(std::unique_ptr<ninx::parser::element::Expression> first,
+                                                    std::unique_ptr<ninx::parser::element::Expression> second)
+        : first(std::move(first)), second(std::move(second)) {}
 
-namespace ninx {
-    namespace parser {
-        namespace element {
-            class FunctionCallArgument : public ASTElement {
-            public:
-                explicit FunctionCallArgument(std::unique_ptr<std::string> name, std::unique_ptr<Expression> value);
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                void set_parent(Block *parent) override;
-
-                std::string dump(int level) const override;
-
-                const std::unique_ptr<std::string> &get_name() const;
-                const std::unique_ptr<Expression> &get_value() const;
-
-            private:
-                std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
-                std::unique_ptr<Expression> value;  // Argument's value
-            };
-        }
-    }
+void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *evaluator) {
+    evaluator->visit(this);
 }
 
-
-#endif //NINX_FUNCTIONCALLARGUMENT_H
+std::string ninx::parser::element::AddExpression::dump(int level) const {
+    return std::string(level, '\t')+"AddExpression: "+first->dump(level)+" + "+second->dump(level);
+}

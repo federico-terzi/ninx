@@ -27,7 +27,7 @@ SOFTWARE.
 #include "Block.h"
 
 ninx::parser::element::FunctionCallArgument::FunctionCallArgument(std::unique_ptr<std::string> name,
-                                                                  std::unique_ptr<Value> value)
+                                                                  std::unique_ptr<Expression> value)
         : name(std::move(name)), value(std::move(value)) {}
 
 void ninx::parser::element::FunctionCallArgument::accept(ninx::evaluator::Evaluator *evaluator) {
@@ -46,7 +46,7 @@ const std::unique_ptr<std::string> &ninx::parser::element::FunctionCallArgument:
     return name;
 }
 
-const std::unique_ptr<ninx::parser::element::Value> &ninx::parser::element::FunctionCallArgument::get_value() const {
+const std::unique_ptr<ninx::parser::element::Expression> &ninx::parser::element::FunctionCallArgument::get_value() const {
     return value;
 }
 
