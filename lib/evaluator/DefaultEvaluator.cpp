@@ -29,6 +29,7 @@ SOFTWARE.
 #include <algorithm>
 #include <set>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/lexical_cast/bad_lexical_cast.hpp>
 #include "DefaultEvaluator.h"
 #include "../parser/element/TextElement.h"
 #include "../parser/element/Block.h"
@@ -37,21 +38,9 @@ SOFTWARE.
 #include "../parser/element/FunctionDefinition.h"
 #include "../parser/element/FunctionCall.h"
 #include "../parser/element/FunctionCallArgument.h"
+#include "../parser/element/AddExpression.h"
 #include "exception/RuntimeException.h"
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
-    this->output << e->get_text();
-}
-
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
-    e->get_parent()->set_variable(e->get_name(), e->get_value());
-}
-
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
-    for (auto &statement : e->get_statements()) {
-        statement->accept(this);
-    }
-}
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
     auto function {call->get_parent()->get_function(call->get_name())};
@@ -174,6 +163,42 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 
 }
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
 
+// EXPRESSION EVALUATION
+
+double last_evaluation_value = 0;  // Used to keep the current total for the expression evaluation
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
+    this->output << e->get_text();
+
+    // If the text is a numeric value, store the value for the expression evaluation
+    // TODO: make this check more efficient
+    try
+    {
+        last_evaluation_value = e->convert_to_double();
+    }
+    catch(const boost::bad_lexical_cast &)
+    {}
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
+    e->get_parent()->set_variable(e->get_name(), e->get_value());
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
+    for (auto &statement : e->get_statements()) {
+        statement->accept(this);
+    }
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
+    e->get_first()->accept(this);
+    double first_operand {last_evaluation_value};
+
+    e->get_second()->accept(this);
+    double second_operand {last_evaluation_value};
+
+    last_evaluation_value = first_operand + second_operand;
+
+    std::cout<<last_evaluation_value<<std::endl;
 }

@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <boost/lexical_cast.hpp>
 #include "TextElement.h"
 
 ninx::parser::element::TextElement::TextElement(const std::string &text) : text(text) {}
@@ -37,4 +38,8 @@ void ninx::parser::element::TextElement::accept(ninx::evaluator::Evaluator *eval
 
 const std::string &ninx::parser::element::TextElement::get_text() const {
     return text;
+}
+
+double ninx::parser::element::TextElement::convert_to_double() const {
+    return boost::lexical_cast<double>(text);;
 }

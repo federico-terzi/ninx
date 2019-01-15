@@ -39,6 +39,9 @@ namespace ninx {
 
                 std::string dump(int level) const override;
 
+                Expression * get_first() const;
+                Expression * get_second() const;
+
             private:
                 std::unique_ptr<Expression> first;
                 std::unique_ptr<Expression> second;

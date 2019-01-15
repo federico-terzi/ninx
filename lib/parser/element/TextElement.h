@@ -44,6 +44,8 @@ namespace ninx {
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
                 const std::string &get_text() const;
+
+                double convert_to_double() const;
             };
         }
     }

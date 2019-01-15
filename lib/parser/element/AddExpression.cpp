@@ -36,3 +36,11 @@ void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *ev
 std::string ninx::parser::element::AddExpression::dump(int level) const {
     return std::string(level, '\t')+"AddExpression: "+first->dump(level)+" + "+second->dump(level);
 }
+
+ninx::parser::element::Expression * ninx::parser::element::AddExpression::get_first() const {
+    return first.get();
+}
+
+ninx::parser::element::Expression * ninx::parser::element::AddExpression::get_second() const {
+    return second.get();
+}
