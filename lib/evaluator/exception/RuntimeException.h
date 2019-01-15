@@ -27,6 +27,7 @@ SOFTWARE.
 #define NINX_RUNTIMEEXCEPTION_H
 
 #include <stdexcept>
+#include <string>
 
 namespace ninx {
     namespace evaluator {

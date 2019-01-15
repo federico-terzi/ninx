@@ -23,3 +23,12 @@ $one = {3}
 $two = $one
 
 The value should be the same: $two
+
+/*
+@if ($two == {3}) {
+    The value is indeed 3
+}
+@else{
+    The value is not 3
+}
+*/

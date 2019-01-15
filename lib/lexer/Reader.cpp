@@ -54,12 +54,55 @@ bool is_limiter(char c) {
     return found;
 }
 
+bool ninx::lexer::Reader::ignore_comment() {
+    // Verify that this is a comment
+    if (this->stream.peek() != '/') {
+        return false;  // Not a comment
+    }
+
+    this->stream.get();
+
+    if (this->stream.peek() != '*') {
+        this->stream.seekg(-1, std::ios_base::cur);  // Rewind the / character
+        return false;
+    }
+
+    this->stream.get();
+
+    bool is_closing {false};
+
+    while (stream) {
+        int current {stream.get()};
+
+        if (is_closing) {
+            if (current == '/') {
+                return true;
+            }else{
+                is_closing = false;
+            }
+        }else{
+            if (current == '*') {
+                is_closing = true;
+            }
+        }
+    }
+
+    return true;
+}
+
 int ninx::lexer::Reader::get_next_limiter() {
     int next_char = this->stream.peek();
     if (next_char >= 0) {
         if (next_char == '\\') {  // Escape char check
             return -2;
         }else{
+            if (next_char == '/') {  // Comments handling
+                bool comments_ignored { this->ignore_comment() };
+                if (comments_ignored) {
+                    return this->get_next_limiter();
+                }
+            }
+
             // Check if the char is a limiter
             if (is_limiter(static_cast<char>(next_char))) {
                 // If the char is a limiter, consume it
