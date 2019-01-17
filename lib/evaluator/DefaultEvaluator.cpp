@@ -52,6 +52,7 @@ std::unique_ptr<ninx::parser::element::Block> get_owned_return_block() {
     std::unique_ptr<ninx::parser::element::Block> new_obj(current_return_block);
     // Reset the current return block
     current_return_block = nullptr;
+
     return new_obj;
 };
 
@@ -180,17 +181,6 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
     body->accept(this);
 }
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
-    auto variable {e->get_parent()->get_variable(e->get_name())};
-
-    if (!variable) {
-        // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Variable \""+e->get_name()+"\" has not been declared!");
-    }
-
-    variable->accept(this);
-}
-
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {
     e->get_parent()->set_function(e->get_name(), e);
 
@@ -221,21 +211,17 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 }
 
 
-// EXPRESSION EVALUATION
+// VARIABLES
 
-double last_evaluation_value = 0;  // Used to keep the current total for the expression evaluation
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
+    auto variable {e->get_parent()->get_variable(e->get_name())};
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
-    this->output << e->get_text();
-
-    // If the text is a numeric value, store the value for the expression evaluation
-    // TODO: make this check more efficient
-    try
-    {
-        last_evaluation_value = e->convert_to_double();
+    if (!variable) {
+        // TODO: add information of line number and origin
+        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Variable \""+e->get_name()+"\" has not been declared!");
     }
-    catch(const boost::bad_lexical_cast &)
-    {}
+
+    variable->accept(this);
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
@@ -247,6 +233,32 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment 
     auto result {get_owned_return_block()};
     e->get_parent()->set_variable(e->get_name(), std::move(result));
 }
+
+
+
+
+
+// EXPRESSION EVALUATION
+
+double last_evaluation_value = 0;  // Used to keep the current total for the expression evaluation
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
+    // If the parent is echoing, print the text
+    if (e->get_parent()->is_echoing()) {
+        this->output << e->get_text();
+    }
+
+    // If the text is a numeric value, store the value for the expression evaluation
+    // TODO: make this check more efficient
+    try
+    {
+        last_evaluation_value = e->convert_to_double();
+    }
+    catch(const boost::bad_lexical_cast &)
+    {}
+}
+
+
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     for (auto &statement : e->get_statements()) {

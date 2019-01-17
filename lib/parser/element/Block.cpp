@@ -43,6 +43,7 @@ std::string ninx::parser::element::Block::dump(int level) const {
     std::stringstream s;
 
     s << std::string(level, '\t') + "Block {" << std::endl;
+    s << std::string(level+1, '\t') + "echoing " << this->is_echoing() << std::endl;
     for (auto& statement : statements) {
         s << statement->dump(level+1) << std::endl;
     }
@@ -131,4 +132,3 @@ std::unique_ptr<ninx::parser::element::Block> ninx::parser::element::Block::make
 
     return block;
 }
-

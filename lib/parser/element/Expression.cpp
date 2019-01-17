@@ -24,3 +24,13 @@ SOFTWARE.
 */
 
 #include "Expression.h"
+
+
+bool ninx::parser::element::Expression::is_echoing() const {
+    return echoing;
+}
+
+void ninx::parser::element::Expression::set_echoing(bool echoing) {
+    this->echoing = echoing;
+}
+

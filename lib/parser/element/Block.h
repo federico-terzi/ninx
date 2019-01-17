@@ -54,6 +54,7 @@ namespace ninx {
                 void set_function(const std::string &name, FunctionDefinition * func);
 
                 static std::unique_ptr<Block> make_text_block(Block * parent, const std::string& text);
+
             protected:
                 Block *clone_impl() override;
 

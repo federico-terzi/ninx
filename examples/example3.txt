@@ -2,4 +2,6 @@
     \<h1\>$header\<\/h1\>
 }
 
+Let me show you my title:
+
 @h1{This is my title}

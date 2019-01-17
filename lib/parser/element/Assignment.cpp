@@ -28,7 +28,13 @@ SOFTWARE.
 
 ninx::parser::element::Assignment::Assignment(const std::string &name,
                                               std::unique_ptr<ninx::parser::element::Expression> value)
-                                              : name(name), value(std::move(value)) {}
+                                              : name(name), value(std::move(value)) {
+
+    // Assignment blocks are not echoing
+    if (value) {
+        this->value->set_echoing(false);
+    }
+}
 
 ninx::parser::element::Expression *ninx::parser::element::Assignment::get_value() {
     return this->value.get();
