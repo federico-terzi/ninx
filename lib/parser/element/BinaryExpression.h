@@ -23,23 +23,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "AddExpression.h"
+#ifndef NINX_BINARYEXPRESSION_H
+#define NINX_BINARYEXPRESSION_H
 
-ninx::parser::element::AddExpression::AddExpression(std::unique_ptr<ninx::parser::element::Expression> first,
-                                                    std::unique_ptr<ninx::parser::element::Expression> second)
-        : BinaryExpression(std::move(first), std::move(second)) {
+#include "Expression.h"
 
+namespace ninx {
+    namespace parser {
+        namespace element {
+            class BinaryExpression : public Expression {
+            public:
+                explicit BinaryExpression(std::unique_ptr<Expression> first, std::unique_ptr<Expression> second);
 
+                std::string dump(int level) const override;
+
+                Expression * get_first() const;
+                Expression * get_second() const;
+
+                void set_parent(Block *parent) override;
+
+            protected:
+                std::unique_ptr<Expression> first;
+                std::unique_ptr<Expression> second;
+
+                virtual std::string get_dump_name() const = 0;
+            };
+        }
+    }
 }
 
-void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *evaluator) {
-    evaluator->visit(this);
-}
 
-ninx::parser::element::AddExpression *ninx::parser::element::AddExpression::clone_impl() {
-    return new AddExpression(this->first->clone<Expression>(), this->second->clone<Expression>());
-}
-
-std::string ninx::parser::element::AddExpression::get_dump_name() const {
-    return "AddExpression";
-}
+#endif //NINX_BINARYEXPRESSION_H

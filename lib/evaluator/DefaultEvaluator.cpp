@@ -39,7 +39,9 @@ SOFTWARE.
 #include "../parser/element/FunctionDefinition.h"
 #include "../parser/element/FunctionCall.h"
 #include "../parser/element/FunctionCallArgument.h"
+#include "../parser/element/BinaryExpression.h"
 #include "../parser/element/AddExpression.h"
+#include "../parser/element/SubtractExpression.h"
 #include "exception/RuntimeException.h"
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
@@ -89,6 +91,14 @@ void enable_echoing(bool changed) {
     if (changed) {
         is_echoing_disabled = false;
     }
+}
+
+void no_echo(const std::function<void()> &block) {
+    bool changed = disable_echoing();
+
+    block();
+
+    enable_echoing(changed);
 }
 
 
@@ -220,23 +230,19 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDef
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
-    bool changed = disable_echoing();
-
-    // Evaluate the default value if present
-    if (e->get_default_value()) {
-        e->get_default_value()->accept(this);
-    }
-
-    enable_echoing(changed);
+    no_echo([&]{
+        // Evaluate the default value if present
+        if (e->get_default_value()) {
+            e->get_default_value()->accept(this);
+        }
+    });
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCallArgument *e) {
-    bool changed = disable_echoing();
-
-    // Evaluate the argument value
-    e->get_value()->accept(this);
-
-    enable_echoing(changed);
+    no_echo([&]{
+        // Evaluate the argument value
+        e->get_value()->accept(this);
+    });
 }
 
 
@@ -254,17 +260,15 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
-    bool changed = disable_echoing();
+    no_echo([&]{
+        // Evaluate the expression
+        reset_return_block();
+        e->get_value()->accept(this);
 
-    // Evaluate the expression
-    reset_return_block();
-    e->get_value()->accept(this);
-
-    // Get the result as a unique pointer and move it to the block scope
-    auto result {get_owned_return_block()};
-    e->get_parent()->set_variable(e->get_name(), std::move(result));
-
-    enable_echoing(changed);
+        // Get the result as a unique pointer and move it to the block scope
+        auto result {get_owned_return_block()};
+        e->get_parent()->set_variable(e->get_name(), std::move(result));
+    });
 }
 
 
@@ -303,21 +307,32 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
-    bool changed = disable_echoing();
+    visit_binary_expression(e, [](double first, double second) {
+        return first + second;
+    });
+}
 
-    // Reset the return block pointer
-    reset_return_block();
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::SubtractExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first - second;
+    });
+}
 
-    e->get_first()->accept(this);
-    double first_operand {last_evaluation_value};
+void ninx::evaluator::DefaultEvaluator::visit_binary_expression(ninx::parser::element::BinaryExpression *e,
+                                                                std::function<double(double, double)> const &operation) {
+    no_echo([&]{
+        // Reset the return block pointer
+        reset_return_block();
 
-    e->get_second()->accept(this);
-    double second_operand {last_evaluation_value};
+        e->get_first()->accept(this);
+        double first_operand {last_evaluation_value};
 
-    last_evaluation_value = first_operand + second_operand;
+        e->get_second()->accept(this);
+        double second_operand {last_evaluation_value};
 
-    auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), std::to_string(last_evaluation_value))};
-    replace_return_block(std::move(result_block));
+        last_evaluation_value = operation(first_operand, second_operand);
 
-    enable_echoing(changed);
+        auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), std::to_string(last_evaluation_value))};
+        replace_return_block(std::move(result_block));
+    });
 }

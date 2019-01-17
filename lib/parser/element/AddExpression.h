@@ -26,28 +26,20 @@ SOFTWARE.
 #ifndef NINX_ADDEXPRESSION_H
 #define NINX_ADDEXPRESSION_H
 
-#include "Expression.h"
+#include "BinaryExpression.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class AddExpression : public Expression {
+            class AddExpression : public BinaryExpression {
             public:
                 explicit AddExpression(std::unique_ptr<Expression> first, std::unique_ptr<Expression> second);
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                std::string dump(int level) const override;
-
-                Expression * get_first() const;
-                Expression * get_second() const;
-
             protected:
                 AddExpression *clone_impl() override;
 
-            private:
-                std::unique_ptr<Expression> first;
-                std::unique_ptr<Expression> second;
+                std::string get_dump_name() const override;
             };
         }
     }

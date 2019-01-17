@@ -36,6 +36,7 @@ SOFTWARE.
 #include "element/Assignment.h"
 #include "element/Expression.h"
 #include "element/AddExpression.h"
+#include "element/SubtractExpression.h"
 #include "element/FunctionCallArgument.h"
 
 using namespace ninx::parser::exception;
@@ -170,7 +171,13 @@ std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
             auto add_expr = std::make_unique<AddExpression>(std::move(expression), std::move(second));
             expression = std::move(add_expr);
         }else if (reader.check_limiter('-') == 1) {
-            // TODO
+            // Remove the - token
+            reader.get_token();
+
+            auto second {parse_value()};
+
+            auto sub_expr = std::make_unique<SubtractExpression>(std::move(expression), std::move(second));
+            expression = std::move(sub_expr);
         }else{
             break;
         }

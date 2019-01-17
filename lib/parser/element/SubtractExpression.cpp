@@ -23,23 +23,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "AddExpression.h"
+#include "SubtractExpression.h"
 
-ninx::parser::element::AddExpression::AddExpression(std::unique_ptr<ninx::parser::element::Expression> first,
+ninx::parser::element::SubtractExpression::SubtractExpression(std::unique_ptr<ninx::parser::element::Expression> first,
                                                     std::unique_ptr<ninx::parser::element::Expression> second)
         : BinaryExpression(std::move(first), std::move(second)) {
 
 
 }
 
-void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *evaluator) {
+void ninx::parser::element::SubtractExpression::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
 
-ninx::parser::element::AddExpression *ninx::parser::element::AddExpression::clone_impl() {
-    return new AddExpression(this->first->clone<Expression>(), this->second->clone<Expression>());
+ninx::parser::element::SubtractExpression *ninx::parser::element::SubtractExpression::clone_impl() {
+    return new SubtractExpression(this->first->clone<Expression>(), this->second->clone<Expression>());
 }
 
-std::string ninx::parser::element::AddExpression::get_dump_name() const {
-    return "AddExpression";
+std::string ninx::parser::element::SubtractExpression::get_dump_name() const {
+    return "SubtractExpression";
 }

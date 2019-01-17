@@ -12,6 +12,16 @@ The total is $sum
 
 And then why not, let's make it a bit more complex:
 
-$sum = {2} + ({3} + {1})
+$sum = {2} + ({3} - {1})
 
 And now the total is $sum
+
+$i = {0}
+
+Current i $i
+
+Let's increment it:
+
+$i = $i + {1}
+
+Current i $i

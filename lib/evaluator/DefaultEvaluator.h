@@ -26,7 +26,9 @@ SOFTWARE.
 #ifndef NINX_DEFAULTEVALUATOR_H
 #define NINX_DEFAULTEVALUATOR_H
 
+#include <functional>
 #include "Evaluator.h"
+
 
 namespace ninx {
     namespace evaluator {
@@ -40,12 +42,15 @@ namespace ninx {
             void visit(ninx::parser::element::FunctionDefinition *e) override;
             void visit(ninx::parser::element::FunctionArgument *e) override;
             void visit(ninx::parser::element::FunctionCallArgument *e) override;
-
             void visit(ninx::parser::element::AddExpression *e) override;
+            void visit(ninx::parser::element::SubtractExpression *e) override;
+
 
             explicit DefaultEvaluator(std::ostream &output);
         private:
             std::ostream &output;
+
+            void visit_binary_expression(ninx::parser::element::BinaryExpression * e, std::function<double(double, double)> const &operation);
         };
 
     }

@@ -23,23 +23,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "AddExpression.h"
+#include "BinaryExpression.h"
 
-ninx::parser::element::AddExpression::AddExpression(std::unique_ptr<ninx::parser::element::Expression> first,
+ninx::parser::element::BinaryExpression::BinaryExpression(std::unique_ptr<ninx::parser::element::Expression> first,
                                                     std::unique_ptr<ninx::parser::element::Expression> second)
-        : BinaryExpression(std::move(first), std::move(second)) {
+        : first(std::move(first)), second(std::move(second)) {
 
 
 }
 
-void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *evaluator) {
-    evaluator->visit(this);
+std::string ninx::parser::element::BinaryExpression::dump(int level) const {
+    return std::string(level, '\t')+ get_dump_name() + ": "+first->dump(level)+" + "+second->dump(level);
 }
 
-ninx::parser::element::AddExpression *ninx::parser::element::AddExpression::clone_impl() {
-    return new AddExpression(this->first->clone<Expression>(), this->second->clone<Expression>());
+ninx::parser::element::Expression * ninx::parser::element::BinaryExpression::get_first() const {
+    return first.get();
 }
 
-std::string ninx::parser::element::AddExpression::get_dump_name() const {
-    return "AddExpression";
+ninx::parser::element::Expression * ninx::parser::element::BinaryExpression::get_second() const {
+    return second.get();
+}
+
+void ninx::parser::element::BinaryExpression::set_parent(ninx::parser::element::Block *parent) {
+    ASTElement::set_parent(parent);
+
+    this->first->set_parent(parent);
+    this->second->set_parent(parent);
 }
