@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <sstream>
 #include "FunctionCall.h"
 #include "FunctionCallArgument.h"
 #include "Block.h"
@@ -32,7 +33,18 @@ ninx::parser::element::FunctionCall::FunctionCall(const std::string &name, std::
         : name(name), arguments(std::move(arguments)), outer_argument(std::move(outer_argument)) {}
 
 std::string ninx::parser::element::FunctionCall::dump(int level) const {
-    return std::string(level, '\t')+ "FunctionCall: "+this->name;
+    std::stringstream s;
+
+    s << std::string(level, '\t') + "FunctionCall " << this->name << " {" << std::endl;
+    for (auto& argument : arguments) {
+        s << argument->dump(level+1) << std::endl;
+    }
+    if (this->outer_argument) {
+        s << std::string(level+1, '\t') + "OuterArgument-> " << this->outer_argument->dump(level+1) << std::endl;
+    }
+    s << std::string(level, '\t') + "}" << std::endl;
+
+    return s.str();
 }
 
 void ninx::parser::element::FunctionCall::accept(ninx::evaluator::Evaluator *evaluator) {

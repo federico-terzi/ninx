@@ -26,7 +26,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <vector>
+#include <memory>
 #include "Block.h"
+#include "TextElement.h"
 
 ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
         statements)) {
@@ -57,9 +60,9 @@ ninx::parser::element::Block::get_statements() const {
     return statements;
 }
 
-ninx::parser::element::Expression *ninx::parser::element::Block::get_variable(const std::string &name) const {
+ninx::parser::element::Block *ninx::parser::element::Block::get_variable(const std::string &name) const {
     if (variables.find(name) != variables.end()) {
-        return this->variables.at(name);
+        return this->variables.at(name).get();
     }
 
     // Check if the variable is declared in the parent block
@@ -70,8 +73,8 @@ ninx::parser::element::Expression *ninx::parser::element::Block::get_variable(co
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_variable(const std::string &name, ninx::parser::element::Expression *value) {
-    this->variables[name] = value;
+void ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value) {
+    this->variables[name] = std::move(value);
 }
 
 ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_function(const std::string &name) const {
@@ -105,6 +108,27 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
 
     Block * obj { new Block(std::move(statements_copy))};
 
+    // Copy function references
+    obj->functions = this->functions;
+
+    // Copy variables
+    std::unordered_map<std::string, std::unique_ptr<Block>> variables_copy;
+    for (auto& v: this->variables) {
+        variables_copy[v.first] = v.second->clone<Block>();
+    }
+    obj->variables = std::move(variables_copy);
+
     return obj;
+}
+
+std::unique_ptr<ninx::parser::element::Block> ninx::parser::element::Block::make_text_block(Block * parent, const std::string &text) {
+    auto element { std::make_unique<TextElement>(text) };
+    std::vector<std::unique_ptr<Statement>> block_statements;
+    block_statements.push_back(std::move(element));
+
+    auto block {std::make_unique<Block>(std::move(block_statements))};
+    block->set_parent(parent);
+
+    return block;
 }
 

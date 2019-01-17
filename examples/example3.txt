@@ -1,0 +1,5 @@
+@func h1($header) {
+    \<h1\>$header\<\/h1\>
+}
+
+@h1{This is my title}

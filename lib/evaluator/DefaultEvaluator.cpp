@@ -27,6 +27,7 @@ SOFTWARE.
 #include <string>
 #include <unordered_set>
 #include <algorithm>
+#include <memory>
 #include <set>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/lexical_cast/bad_lexical_cast.hpp>
@@ -41,6 +42,36 @@ SOFTWARE.
 #include "../parser/element/AddExpression.h"
 #include "exception/RuntimeException.h"
 
+ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
+
+// RETURN BLOCK MECHANISM
+
+ninx::parser::element::Block * current_return_block;  // This is used to obtain the result block from an expression
+
+std::unique_ptr<ninx::parser::element::Block> get_owned_return_block() {
+    std::unique_ptr<ninx::parser::element::Block> new_obj(current_return_block);
+    // Reset the current return block
+    current_return_block = nullptr;
+    return new_obj;
+};
+
+void reset_return_block() {
+    // Free up the memory if a previous block was used
+    delete current_return_block;
+}
+
+void replace_return_block(std::unique_ptr<ninx::parser::element::Block> new_block) {
+    // Free up the memory if a previous block was used
+    delete current_return_block;
+
+    current_return_block = new_block.release();
+}
+
+
+
+
+
+// FUNCTION RELATED VISITING
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
     auto function {call->get_parent()->get_function(call->get_name())};
@@ -50,13 +81,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" has not been declared!");
     }
 
-    // Clear all the function body local variables
-    function->get_body()->clear_variables();
-
-    // Load all the function argument default as local variables in the function body block
-    for (auto &argument : function->get_arguments()) {
-        function->get_body()->set_variable(argument->get_name(), argument->get_default_value().get());
-    }
+    // Clone the function definition body, to generate a new instance
+    auto body {function->get_body()->clone<ninx::parser::element::Block>()};
 
     // Load all the call arguments
 
@@ -89,8 +115,13 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
                 call_mandatory_arguments.insert(argument_name);
             }
 
+            // Evaluate the argument value and get the result
+            reset_return_block();
+            argument->accept(this);
+            auto result_value {get_owned_return_block()};
+
             // Setup the argument as a local variable
-            function->get_body()->set_variable(argument_name, argument->get_value().get());
+            body->set_variable(argument_name, std::move(result_value));
         }else{
             // Check if an ordinal parameter has been used after a named parameter
             if (named_started) {
@@ -104,8 +135,13 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
                 call_mandatory_arguments.insert(definition_argument->get_name());
             }
 
+            // Evaluate the argument value and get the result
+            reset_return_block();
+            argument->accept(this);
+            auto result_value {get_owned_return_block()};
+
             // Setup the argument as a local variable
-            function->get_body()->set_variable(definition_argument->get_name(), argument->get_value().get());
+            body->set_variable(definition_argument->get_name(), std::move(result_value));
         }
         index++;
     }
@@ -118,7 +154,13 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
             call_mandatory_arguments.insert(last_definition_argument->get_name());
         }
 
-        function->get_body()->set_variable(last_definition_argument->get_name(), call->get_outer_argument()->get_value().get());
+        // Evaluate the argument value and get the result
+        reset_return_block();
+        call->get_outer_argument()->accept(this);
+        auto result_value {get_owned_return_block()};
+
+        // Setup the argument as a local variable
+        body->set_variable(last_definition_argument->get_name(), std::move(result_value));
     }
 
     // Check if all mandatory arguments are been used
@@ -135,7 +177,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Missing required arguments: \""+joined_missing+"\"");
     }
 
-    function->get_body()->accept(this);
+    body->accept(this);
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
@@ -149,18 +191,33 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
     variable->accept(this);
 }
 
-ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
-
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {
     e->get_parent()->set_function(e->get_name(), e);
+
+    // Load all the function argument default as local variables in the function body block
+    for (auto &argument : e->get_arguments()) {
+        // Evaluate the argument
+        reset_return_block();
+        argument->accept(this);
+
+        auto argument_value {get_owned_return_block()};
+        // If the argument is non-null, copy the value
+        if (argument_value) {
+            e->get_body()->set_variable(argument->get_name(), std::move(argument_value));
+        }
+    }
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
-
+    // Evaluate the default value if present
+    if (e->get_default_value()) {
+        e->get_default_value()->accept(this);
+    }
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCallArgument *e) {
-
+    // Evaluate the argument value
+    e->get_value()->accept(this);
 }
 
 
@@ -182,16 +239,28 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
-    e->get_parent()->set_variable(e->get_name(), e->get_value());
+    // Evaluate the expression
+    reset_return_block();
+    e->get_value()->accept(this);
+
+    // Get the result as a unique pointer and move it to the block scope
+    auto result {get_owned_return_block()};
+    e->get_parent()->set_variable(e->get_name(), std::move(result));
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     for (auto &statement : e->get_statements()) {
         statement->accept(this);
     }
+
+    // Clone the block and make it available as a return value
+    replace_return_block(e->clone<ninx::parser::element::Block>());
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
+    // Reset the return block pointer
+    reset_return_block();
+
     e->get_first()->accept(this);
     double first_operand {last_evaluation_value};
 
@@ -200,5 +269,6 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpressi
 
     last_evaluation_value = first_operand + second_operand;
 
-    std::cout<<last_evaluation_value<<std::endl;
+    auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), std::to_string(last_evaluation_value))};
+    replace_return_block(std::move(result_block));
 }

@@ -52,5 +52,10 @@ const std::unique_ptr<ninx::parser::element::Expression> &ninx::parser::element:
 }
 
 ninx::parser::element::FunctionArgument *ninx::parser::element::FunctionArgument::clone_impl() {
-    return new FunctionArgument(this->name, this->default_value->clone<Expression>());
+    std::unique_ptr<Expression> default_value_copy {nullptr};
+    if (this->default_value) {
+        default_value_copy = this->default_value->clone<Expression>();
+    }
+
+    return new FunctionArgument(this->name, std::move(default_value_copy));
 }

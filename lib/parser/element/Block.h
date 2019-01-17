@@ -46,20 +46,21 @@ namespace ninx {
 
                 const std::vector<std::unique_ptr<Statement>> &get_statements() const;
 
-                Expression * get_variable(const std::string& name) const;
-                void set_variable(const std::string &name, Expression * value);
+                Block * get_variable(const std::string& name) const;
+                void set_variable(const std::string &name, std::unique_ptr<Block> value);
                 void clear_variables();
 
                 FunctionDefinition * get_function(const std::string &name) const;
                 void set_function(const std::string &name, FunctionDefinition * func);
 
+                static std::unique_ptr<Block> make_text_block(Block * parent, const std::string& text);
             protected:
                 Block *clone_impl() override;
 
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
 
-                std::unordered_map<std::string, Expression*> variables;
+                std::unordered_map<std::string, std::unique_ptr<Block>> variables;
                 std::unordered_map<std::string, FunctionDefinition *> functions;
             };
         }
