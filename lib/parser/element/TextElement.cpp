@@ -43,3 +43,7 @@ const std::string &ninx::parser::element::TextElement::get_text() const {
 double ninx::parser::element::TextElement::convert_to_double() const {
     return boost::lexical_cast<double>(text);;
 }
+
+ninx::parser::element::TextElement* ninx::parser::element::TextElement::clone_impl() {
+    return new TextElement(this->text);
+}

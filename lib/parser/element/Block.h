@@ -52,6 +52,10 @@ namespace ninx {
 
                 FunctionDefinition * get_function(const std::string &name) const;
                 void set_function(const std::string &name, FunctionDefinition * func);
+
+            protected:
+                Block *clone_impl() override;
+
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
 

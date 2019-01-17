@@ -42,3 +42,7 @@ ninx::parser::element::VariableRead::VariableRead(const std::string &name) : nam
 void ninx::parser::element::VariableRead::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
+
+ninx::parser::element::VariableRead * ninx::parser::element::VariableRead::clone_impl() {
+    return new VariableRead(this->name);
+}

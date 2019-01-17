@@ -53,3 +53,6 @@ void ninx::parser::element::Assignment::set_parent(ninx::parser::element::Block 
     this->value->set_parent(parent);
 }
 
+ninx::parser::element::ASTElement *ninx::parser::element::Assignment::clone_impl() {
+    return new Assignment(this->name, this->value->clone<Expression>());
+}

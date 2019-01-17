@@ -33,9 +33,6 @@ namespace ninx {
     namespace parser {
         namespace element {
             class TextElement : public Statement {
-            private:
-                std::string text;
-
             public:
                 explicit TextElement(const std::string &text);
 
@@ -46,6 +43,12 @@ namespace ninx {
                 const std::string &get_text() const;
 
                 double convert_to_double() const;
+
+            protected:
+                TextElement *clone_impl() override;
+
+            private:
+                std::string text;
             };
         }
     }

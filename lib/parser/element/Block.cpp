@@ -94,3 +94,17 @@ void ninx::parser::element::Block::set_function(const std::string &name, ninx::p
 void ninx::parser::element::Block::clear_variables() {
     this->variables.clear();
 }
+
+ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
+    // Clone all the statements
+    std::vector<std::unique_ptr<Statement>> statements_copy;
+    for (auto &statement : this->statements) {
+        auto statement_copy {statement->clone<Statement>()};
+        statements_copy.push_back(std::move(statement_copy));
+    }
+
+    Block * obj { new Block(std::move(statements_copy))};
+
+    return obj;
+}
+

@@ -39,9 +39,17 @@ namespace ninx {
                 virtual void accept(ninx::evaluator::Evaluator * evaluator) = 0;
 
                 virtual std::string dump(int level) const = 0;
+
                 friend std::ostream& operator<<(std::ostream &strm, const ASTElement &a) {
                     return strm << a.dump(0);
                 }
+
+                template<class T>
+                std::unique_ptr<T> clone() {
+                    std::unique_ptr<T> new_obj(dynamic_cast<T*>(clone_impl()));
+                    new_obj->set_parent(this->get_parent());
+                    return new_obj;
+                };
 
                 Block *get_parent() const {
                     return parent;
@@ -53,6 +61,8 @@ namespace ninx {
 
             protected:
                 Block * parent = nullptr;  // Reference to the parent block
+
+                virtual ASTElement * clone_impl() = 0;
             };
         }
     }

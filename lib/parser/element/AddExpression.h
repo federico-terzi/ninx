@@ -42,6 +42,9 @@ namespace ninx {
                 Expression * get_first() const;
                 Expression * get_second() const;
 
+            protected:
+                AddExpression *clone_impl() override;
+
             private:
                 std::unique_ptr<Expression> first;
                 std::unique_ptr<Expression> second;

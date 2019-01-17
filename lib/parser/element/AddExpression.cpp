@@ -44,3 +44,7 @@ ninx::parser::element::Expression * ninx::parser::element::AddExpression::get_fi
 ninx::parser::element::Expression * ninx::parser::element::AddExpression::get_second() const {
     return second.get();
 }
+
+ninx::parser::element::AddExpression *ninx::parser::element::AddExpression::clone_impl() {
+    return new AddExpression(this->first->clone<AddExpression>(), this->second->clone<AddExpression>());
+}

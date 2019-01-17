@@ -47,6 +47,9 @@ namespace ninx {
 
                 void set_parent(Block *parent) override;
 
+            protected:
+                ASTElement *clone_impl() override;
+
             private:
                 std::string name;  // Variable name
 
