@@ -28,13 +28,7 @@ SOFTWARE.
 
 ninx::parser::element::FunctionArgument::FunctionArgument(const std::string &name,
                                                           std::unique_ptr<ninx::parser::element::Expression> default_value)
-        : name(name), default_value(std::move(default_value)) {
-
-    // Arguments are not echoing
-    if (this->default_value) {
-        this->default_value->set_echoing(false);
-    }
-}
+        : name(name), default_value(std::move(default_value)) {}
 
 std::string ninx::parser::element::FunctionArgument::dump(int level) const {
     std::string value {"null"};

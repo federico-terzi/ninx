@@ -32,16 +32,7 @@ namespace ninx {
     namespace parser {
         namespace element {
             class Expression : public Statement{
-            public:
-                bool is_echoing() const;
-                void set_echoing(bool echoing);
 
-            private:
-                /*
-                 * If this is true, the statements will produce an output, otherwise they will not.
-                 * This property WILL NOT BE COPIED
-                 */
-                bool echoing = true;
             };
         }
     }

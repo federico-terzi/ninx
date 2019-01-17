@@ -132,3 +132,11 @@ std::unique_ptr<ninx::parser::element::Block> ninx::parser::element::Block::make
 
     return block;
 }
+
+bool ninx::parser::element::Block::is_echoing() const {
+    return echoing;
+}
+
+void ninx::parser::element::Block::set_echoing(bool echoing) {
+    this->echoing = echoing;
+}

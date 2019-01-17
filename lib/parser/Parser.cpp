@@ -339,10 +339,6 @@ std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_function_call() {
 
 std::unique_ptr<Block> ninx::parser::Parser::parse() {
     auto main_block {parse_implicit_block()};
-
-    // Main block is echoing by default
-    main_block->set_echoing(true);
-
     return main_block;
 }
 

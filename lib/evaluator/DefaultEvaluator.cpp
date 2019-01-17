@@ -59,16 +59,37 @@ std::unique_ptr<ninx::parser::element::Block> get_owned_return_block() {
 void reset_return_block() {
     // Free up the memory if a previous block was used
     delete current_return_block;
+    current_return_block = nullptr;
 }
 
 void replace_return_block(std::unique_ptr<ninx::parser::element::Block> new_block) {
-    // Free up the memory if a previous block was used
-    delete current_return_block;
+    reset_return_block();
 
     current_return_block = new_block.release();
 }
 
 
+
+// ECHOING MECHANISM
+
+bool is_echoing_disabled = false;
+
+bool disable_echoing() {
+    bool changed = false;
+
+    if (!is_echoing_disabled) {
+        is_echoing_disabled = true;
+        changed = true;
+    }
+
+    return changed;
+}
+
+void enable_echoing(bool changed) {
+    if (changed) {
+        is_echoing_disabled = false;
+    }
+}
 
 
 
@@ -199,15 +220,23 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDef
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
+    bool changed = disable_echoing();
+
     // Evaluate the default value if present
     if (e->get_default_value()) {
         e->get_default_value()->accept(this);
     }
+
+    enable_echoing(changed);
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCallArgument *e) {
+    bool changed = disable_echoing();
+
     // Evaluate the argument value
     e->get_value()->accept(this);
+
+    enable_echoing(changed);
 }
 
 
@@ -225,6 +254,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {
+    bool changed = disable_echoing();
+
     // Evaluate the expression
     reset_return_block();
     e->get_value()->accept(this);
@@ -232,6 +263,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment 
     // Get the result as a unique pointer and move it to the block scope
     auto result {get_owned_return_block()};
     e->get_parent()->set_variable(e->get_name(), std::move(result));
+
+    enable_echoing(changed);
 }
 
 
@@ -244,7 +277,7 @@ double last_evaluation_value = 0;  // Used to keep the current total for the exp
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
     // If the parent is echoing, print the text
-    if (e->get_parent()->is_echoing()) {
+    if (e->get_parent()->is_echoing() && !is_echoing_disabled) {
         this->output << e->get_text();
     }
 
@@ -270,6 +303,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
+    bool changed = disable_echoing();
+
     // Reset the return block pointer
     reset_return_block();
 
@@ -283,4 +318,6 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpressi
 
     auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), std::to_string(last_evaluation_value))};
     replace_return_block(std::move(result_block));
+
+    enable_echoing(changed);
 }

@@ -29,13 +29,7 @@ SOFTWARE.
 
 ninx::parser::element::FunctionCallArgument::FunctionCallArgument(std::unique_ptr<std::string> name,
                                                                   std::unique_ptr<Expression> value)
-        : name(std::move(name)), value(std::move(value)) {
-
-    // Arguments are not echoing
-    if (this->value) {
-        this->value->set_echoing(false);
-    }
-}
+        : name(std::move(name)), value(std::move(value)) {}
 
 void ninx::parser::element::FunctionCallArgument::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);

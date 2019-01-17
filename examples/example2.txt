@@ -1,3 +1,9 @@
+Simple assignment
+
+$x = {2}
+
+So now x is equal to $x
+
 Let's do some math:
 
 $sum = {3} + {4}

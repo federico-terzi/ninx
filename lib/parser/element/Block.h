@@ -55,11 +55,19 @@ namespace ninx {
 
                 static std::unique_ptr<Block> make_text_block(Block * parent, const std::string& text);
 
+                bool is_echoing() const;
+                virtual void set_echoing(bool echoing);
             protected:
                 Block *clone_impl() override;
 
             private:
                 std::vector<std::unique_ptr<Statement>> statements;
+
+                /*
+                 * If this is true, the statements will produce an output, otherwise they will not.
+                 * This property WILL NOT BE COPIED
+                 */
+                bool echoing = true;
 
                 std::unordered_map<std::string, std::unique_ptr<Block>> variables;
                 std::unordered_map<std::string, FunctionDefinition *> functions;

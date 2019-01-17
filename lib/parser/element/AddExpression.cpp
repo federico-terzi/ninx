@@ -27,7 +27,10 @@ SOFTWARE.
 
 ninx::parser::element::AddExpression::AddExpression(std::unique_ptr<ninx::parser::element::Expression> first,
                                                     std::unique_ptr<ninx::parser::element::Expression> second)
-        : first(std::move(first)), second(std::move(second)) {}
+        : first(std::move(first)), second(std::move(second)) {
+
+
+}
 
 void ninx::parser::element::AddExpression::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
@@ -46,5 +49,5 @@ ninx::parser::element::Expression * ninx::parser::element::AddExpression::get_se
 }
 
 ninx::parser::element::AddExpression *ninx::parser::element::AddExpression::clone_impl() {
-    return new AddExpression(this->first->clone<AddExpression>(), this->second->clone<AddExpression>());
+    return new AddExpression(this->first->clone<Expression>(), this->second->clone<Expression>());
 }
