@@ -71,3 +71,20 @@ void ninx::parser::element::FunctionCall::set_parent(ninx::parser::element::Bloc
         argument->set_parent(parent);
     }
 }
+
+ninx::parser::element::FunctionCall *ninx::parser::element::FunctionCall::clone_impl() {
+    // Clone all the arguments
+    std::vector<std::unique_ptr<FunctionCallArgument>> arguments_copy;
+    for (auto &argument : arguments) {
+        auto argument_copy {argument->clone<FunctionCallArgument>()};
+        arguments_copy.push_back(std::move(argument_copy));
+    }
+
+    // Clone the outer argument if present
+    std::unique_ptr<FunctionCallArgument> outer_argument_copy {nullptr};
+    if (this->outer_argument) {
+        outer_argument_copy = outer_argument->clone<FunctionCallArgument>();
+    }
+
+    return new FunctionCall(this->name, std::move(arguments_copy), std::move(outer_argument_copy));
+}

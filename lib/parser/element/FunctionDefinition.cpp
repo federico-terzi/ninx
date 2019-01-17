@@ -90,3 +90,14 @@ bool ninx::parser::element::FunctionDefinition::check_mandatory(const std::strin
 const std::unordered_set<std::string> &ninx::parser::element::FunctionDefinition::get_mandatory_arguments() const {
     return mandatory_arguments;
 }
+
+ninx::parser::element::FunctionDefinition *ninx::parser::element::FunctionDefinition::clone_impl() {
+    // Clone all the arguments
+    std::vector<std::unique_ptr<FunctionArgument>> arguments_copy;
+    for (auto &argument : arguments) {
+        auto argument_copy {argument->clone<FunctionArgument>()};
+        arguments_copy.push_back(std::move(argument_copy));
+    }
+
+    return new FunctionDefinition(this->name, std::move(arguments_copy), this->body->clone<Block>());
+}

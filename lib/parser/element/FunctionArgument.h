@@ -44,6 +44,9 @@ namespace ninx {
                 const std::string &get_name() const;
                 const std::unique_ptr<Expression> &get_default_value() const;
 
+            protected:
+                FunctionArgument *clone_impl() override;
+
             private:
                 std::string name;  // Argument name
                 std::unique_ptr<Expression> default_value;  // Optional default value of the argument

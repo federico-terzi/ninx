@@ -26,6 +26,10 @@ SOFTWARE.
 #include "FunctionArgument.h"
 #include "Block.h"
 
+ninx::parser::element::FunctionArgument::FunctionArgument(const std::string &name,
+                                                          std::unique_ptr<ninx::parser::element::Expression> default_value)
+        : name(name), default_value(std::move(default_value)) {}
+
 std::string ninx::parser::element::FunctionArgument::dump(int level) const {
     std::string value {"null"};
     if (this->default_value) {
@@ -38,9 +42,6 @@ void ninx::parser::element::FunctionArgument::accept(ninx::evaluator::Evaluator 
     evaluator->visit(this);
 }
 
-ninx::parser::element::FunctionArgument::FunctionArgument(const std::string &name,
-                                                          std::unique_ptr<ninx::parser::element::Expression> default_value)
-        : name(name), default_value(std::move(default_value)) {}
 
 const std::string &ninx::parser::element::FunctionArgument::get_name() const {
     return name;
@@ -48,4 +49,8 @@ const std::string &ninx::parser::element::FunctionArgument::get_name() const {
 
 const std::unique_ptr<ninx::parser::element::Expression> &ninx::parser::element::FunctionArgument::get_default_value() const {
     return default_value;
+}
+
+ninx::parser::element::FunctionArgument *ninx::parser::element::FunctionArgument::clone_impl() {
+    return new FunctionArgument(this->name, this->default_value->clone<Expression>());
 }

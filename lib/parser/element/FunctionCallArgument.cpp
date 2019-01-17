@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <memory>
 #include "FunctionCallArgument.h"
 #include "Block.h"
 
@@ -54,4 +55,13 @@ void ninx::parser::element::FunctionCallArgument::set_parent(ninx::parser::eleme
     ASTElement::set_parent(parent);
 
     this->value->set_parent(parent);
+}
+
+ninx::parser::element::FunctionCallArgument *ninx::parser::element::FunctionCallArgument::clone_impl() {
+    std::unique_ptr<std::string> name_copy {nullptr};
+    if (this->name) {
+        name_copy = std::make_unique<std::string>(*(this->name));
+    }
+
+    return new FunctionCallArgument(std::move(name_copy), this->value->clone<Expression>());
 }

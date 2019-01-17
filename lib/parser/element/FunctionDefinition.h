@@ -64,6 +64,10 @@ namespace ninx {
                  * @return true if the argument is mandatory, false otherwise.
                  */
                 bool check_mandatory(const std::string& name);
+
+            protected:
+                FunctionDefinition *clone_impl() override;
+
             private:
                 std::string name;  // Function name
                 std::vector<std::unique_ptr<FunctionArgument>> arguments;  // Function arguments

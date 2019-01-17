@@ -52,10 +52,14 @@ namespace ninx {
                  * @return the number of the arguments of the call, adding 1 for the outer_argument if present.
                  */
                 int get_argument_count() const;
+
+            protected:
+                FunctionCall *clone_impl() override;
+
             private:
                 std::string name; // The name of the function to be called
                 std::vector<std::unique_ptr<FunctionCallArgument>> arguments;  // Function call arguments
-                std::unique_ptr<FunctionCallArgument> outer_argument;  // Function call argument, specified by the block syntax.
+                std::unique_ptr<FunctionCallArgument> outer_argument;  // CAN BE NULL, Function call argument, specified by the block syntax.
             };
         }
     }

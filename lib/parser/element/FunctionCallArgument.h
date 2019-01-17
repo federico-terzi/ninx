@@ -46,6 +46,9 @@ namespace ninx {
                 const std::unique_ptr<std::string> &get_name() const;
                 const std::unique_ptr<Expression> &get_value() const;
 
+            protected:
+                FunctionCallArgument *clone_impl() override;
+
             private:
                 std::unique_ptr<std::string> name;  // Argument name ( could be NULL )
                 std::unique_ptr<Expression> value;  // Argument's value
