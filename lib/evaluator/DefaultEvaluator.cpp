@@ -30,6 +30,7 @@ SOFTWARE.
 #include <memory>
 #include <set>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/bad_lexical_cast.hpp>
 #include "DefaultEvaluator.h"
 #include "../parser/element/TextElement.h"
@@ -332,7 +333,7 @@ void ninx::evaluator::DefaultEvaluator::visit_binary_expression(ninx::parser::el
 
         last_evaluation_value = operation(first_operand, second_operand);
 
-        auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), std::to_string(last_evaluation_value))};
+        auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), boost::lexical_cast<std::string>(last_evaluation_value))};
         replace_return_block(std::move(result_block));
     });
 }
