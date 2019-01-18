@@ -36,6 +36,8 @@ SOFTWARE.
 #include "element/Assignment.h"
 #include "element/Expression.h"
 #include "element/AddExpression.h"
+#include "element/MultiplicationExpression.h"
+#include "element/DivisionExpression.h"
 #include "element/SubtractExpression.h"
 #include "element/FunctionCallArgument.h"
 
@@ -155,10 +157,41 @@ std::unique_ptr<Expression> ninx::parser::Parser::parse_value() {
     return std::move(value);
 }
 
-std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
+std::unique_ptr<Expression> ninx::parser::Parser::parse_factor() {
     std::unique_ptr<Expression> expression {nullptr};
 
     auto first {parse_value()};
+    expression = std::move(first);
+
+    while (true) {
+        if (reader.check_limiter('*') == 1) {
+            // Remove the + token
+            reader.get_token();
+
+            auto second {parse_value()};
+
+            auto mult_expr = std::make_unique<MultiplicationExpression>(std::move(expression), std::move(second));
+            expression = std::move(mult_expr);
+        }else if (reader.check_limiter('/') == 1) {
+            // Remove the - token
+            reader.get_token();
+
+            auto second {parse_value()};
+
+            auto div_expr = std::make_unique<DivisionExpression>(std::move(expression), std::move(second));
+            expression = std::move(div_expr);
+        }else{
+            break;
+        }
+    }
+
+    return std::move(expression);
+}
+
+std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
+    std::unique_ptr<Expression> expression {nullptr};
+
+    auto first {parse_factor()};
     expression = std::move(first);
 
     while (true) {
@@ -166,7 +199,7 @@ std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
             // Remove the + token
             reader.get_token();
 
-            auto second {parse_value()};
+            auto second {parse_factor()};
 
             auto add_expr = std::make_unique<AddExpression>(std::move(expression), std::move(second));
             expression = std::move(add_expr);
@@ -174,7 +207,7 @@ std::unique_ptr<Expression> ninx::parser::Parser::parse_expression() {
             // Remove the - token
             reader.get_token();
 
-            auto second {parse_value()};
+            auto second {parse_factor()};
 
             auto sub_expr = std::make_unique<SubtractExpression>(std::move(expression), std::move(second));
             expression = std::move(sub_expr);

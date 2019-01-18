@@ -33,3 +33,21 @@ Let's try something negative: $k
 $k = $k + {1}
 
 Incremented: $k
+
+Let's try multiplications:
+
+$m = {3}*{2}
+
+Multiplication: $m
+
+And then division:
+
+$d = {9}/{3}
+
+Should be 3 = $d
+
+Then all together:
+
+$tot = {2} + {3} * {2}
+
+Tot should be 8 = $tot

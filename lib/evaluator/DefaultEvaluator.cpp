@@ -42,6 +42,8 @@ SOFTWARE.
 #include "../parser/element/FunctionCallArgument.h"
 #include "../parser/element/BinaryExpression.h"
 #include "../parser/element/AddExpression.h"
+#include "../parser/element/MultiplicationExpression.h"
+#include "../parser/element/DivisionExpression.h"
 #include "../parser/element/SubtractExpression.h"
 #include "exception/RuntimeException.h"
 
@@ -307,18 +309,6 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     replace_return_block(e->clone<ninx::parser::element::Block>());
 }
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
-    visit_binary_expression(e, [](double first, double second) {
-        return first + second;
-    });
-}
-
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::SubtractExpression *e) {
-    visit_binary_expression(e, [](double first, double second) {
-        return first - second;
-    });
-}
-
 void ninx::evaluator::DefaultEvaluator::visit_binary_expression(ninx::parser::element::BinaryExpression *e,
                                                                 std::function<double(double, double)> const &operation) {
     no_echo([&]{
@@ -335,5 +325,29 @@ void ninx::evaluator::DefaultEvaluator::visit_binary_expression(ninx::parser::el
 
         auto result_block {ninx::parser::element::Block::make_text_block(e->get_parent(), boost::lexical_cast<std::string>(last_evaluation_value))};
         replace_return_block(std::move(result_block));
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::AddExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first + second;
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::SubtractExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first - second;
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::MultiplicationExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first * second;
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::DivisionExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first / second;
     });
 }

@@ -41,6 +41,8 @@ namespace ninx {
             class BinaryExpression;
             class AddExpression;
             class SubtractExpression;
+            class MultiplicationExpression;
+            class DivisionExpression;
         }
     }
 }
@@ -61,6 +63,8 @@ namespace ninx {
             virtual void visit(ninx::parser::element::FunctionCallArgument * e) = 0;
             virtual void visit(ninx::parser::element::AddExpression * e) = 0;
             virtual void visit(ninx::parser::element::SubtractExpression * e) = 0;
+            virtual void visit(ninx::parser::element::MultiplicationExpression * e) = 0;
+            virtual void visit(ninx::parser::element::DivisionExpression * e) = 0;
         };
     }
 }

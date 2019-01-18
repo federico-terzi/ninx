@@ -54,6 +54,7 @@ namespace ninx {
             std::unique_ptr<Block> parse_block();
             std::unique_ptr<FunctionCall> parse_function_call();
             std::unique_ptr<Expression> parse_value();
+            std::unique_ptr<Expression> parse_factor();
             std::unique_ptr<Expression> parse_expression();
             std::unique_ptr<FunctionCallArgument> parse_function_call_argument();
             std::unique_ptr<FunctionArgument> parse_function_argument();
