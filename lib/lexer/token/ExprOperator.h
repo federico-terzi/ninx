@@ -23,26 +23,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_TYPE_H
-#define NINX_TYPE_H
+#ifndef NINX_OPERATOR_H
+#define NINX_OPERATOR_H
+
+
+#include "Token.h"
 
 namespace ninx {
+    enum class ExprOperatorType {
+
+    };
+
     namespace lexer {
         namespace token {
-            enum class Type {
-                TEXT,
-                LIMITER,
-                EXPROPERATOR,
-                ID,
-                VARIABLE,
+            class ExprOperator : public Token {
+            public:
+                explicit ExprOperator(int line_number, ExprOperatorType type);
 
-                // KEYWORDS @
-                FUNCNAME,  // Generic keyword type
-                FUNCDEF,   // Definition of a new function
-                OPDEF      // Definition of a new operator
+                Type get_type() override;
+
+                std::string dump() const override;
+
+                ExprOperatorType get_operator_type() const;
+            private:
+                ExprOperatorType type;
             };
         }
     }
 }
 
-#endif //NINX_TYPE_H
+
+#endif //NINX_OPERATOR_H

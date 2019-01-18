@@ -29,6 +29,7 @@ SOFTWARE.
 #include <algorithm>
 #include <memory>
 #include <set>
+#include <limits>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/bad_lexical_cast.hpp>
@@ -295,7 +296,9 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
         last_evaluation_value = e->convert_to_double();
     }
     catch(const boost::bad_lexical_cast &)
-    {}
+    {
+        last_evaluation_value = std::numeric_limits<double>::quiet_NaN();
+    }
 }
 
 
