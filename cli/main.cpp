@@ -13,7 +13,8 @@ using namespace ninx::evaluator;
 using namespace std;
 
 int main() {
-    std::ifstream source{R"(/Users/freddy/Documents/GitHub/ninx/examples/example2.txt)", std::ios_base::binary};
+    //std::ifstream source{R"(/Users/freddy/Documents/GitHub/ninx/examples/example2.txt)", std::ios_base::binary};
+    std::ifstream source{R"(D:\Git\ninx\examples\example2.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "tests"};
 

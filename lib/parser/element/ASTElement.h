@@ -27,6 +27,7 @@ SOFTWARE.
 #define NINX_ASTELEMENT_H
 
 #include <iostream>
+#include <memory>
 #include "../../evaluator/Evaluator.h"
 
 namespace ninx {
