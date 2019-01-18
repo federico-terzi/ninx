@@ -25,3 +25,11 @@ Let's increment it:
 $i = $i + {1}
 
 Current i $i
+
+$k = {-3.5}
+
+Let's try something negative: $k
+
+$k = $k + {1}
+
+Incremented: $k

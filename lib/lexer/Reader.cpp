@@ -96,6 +96,21 @@ int ninx::lexer::Reader::get_next_limiter() {
         if (next_char == '\\') {  // Escape char check
             return -2;
         }else{
+            if(next_char == '-') {  // Negative number handling
+                this->stream.get();
+
+                // Check if the next entry is a digit
+                if (isdigit(this->stream.peek())) {
+                    this->stream.seekg(-1, std::ios_base::cur);
+                    return -2;
+                }
+
+                // Also ignore the trailing spaces
+                this->ignore_spaces();
+
+                return next_char;
+            }
+
             if (next_char == '/') {  // Comments handling
                 bool comments_ignored { this->ignore_comment() };
                 if (comments_ignored) {
@@ -133,7 +148,7 @@ std::string ninx::lexer::Reader::read_until_limiter() {
         if (next_char == '\\') {   // Escaping control
             stream.get();  // Discard the escaping char, and avoid limiter check so char is considered as text
         }else{
-            if (is_limiter(next_char)) {
+            if (is_limiter(next_char) && next_char != '-') {  // Negative number handling
                 break;
             }
         }
@@ -141,6 +156,11 @@ std::string ninx::lexer::Reader::read_until_limiter() {
         // Read the current char
         char current = static_cast<char>(stream.get());
         if (current == -1) {
+            break;
+        }
+
+        if (current == '-' && !isdigit(stream.peek())) {  // Not a negative number, rollback
+            this->stream.seekg(-1, std::ios_base::cur);
             break;
         }
 
