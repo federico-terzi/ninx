@@ -32,7 +32,6 @@ namespace ninx {
             enum class Type {
                 TEXT,
                 LIMITER,
-                EXPROPERATOR,
                 ID,
                 VARIABLE,
 

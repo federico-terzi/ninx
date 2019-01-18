@@ -1,0 +1,7 @@
+Let's test some conditions:
+
+$i = {6}
+
+$result = $i == {6}
+
+Is i equal to 6: $result

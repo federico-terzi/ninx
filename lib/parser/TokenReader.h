@@ -51,6 +51,12 @@ namespace ninx {
              */
             int check_limiter(char limiter);
 
+            /*
+             * Peek the next tokens and verify that there's a limiter sequence equal to the given string.
+             * @return 1 if they match, 0 if they don't and -1 if EOF is reached.
+             */
+            int check_limiter_sequence(const std::string& sequence);
+
             void seek_previous();
         };
     }

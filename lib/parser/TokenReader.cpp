@@ -69,3 +69,36 @@ int ninx::parser::TokenReader::check_limiter(char limiter) {
 
     return 0;
 }
+
+int ninx::parser::TokenReader::check_limiter_sequence(const std::string &sequence) {
+    int result = 1;
+
+    int count = 0;
+
+    for(char c : sequence) {
+        auto token = get_token();
+        count++;
+
+        if (!token) {
+            result = -1;
+            break;
+        }
+
+        if (token->get_type() != Type::LIMITER) {
+            result = 0;
+            break;
+        }
+
+        if (dynamic_cast<ninx::lexer::token::Limiter*>(token)->get_limiter() != c) {
+            result = 0;
+            break;
+        }
+    }
+
+    // Rewind
+    for (int i = 0; i<count; i++) {
+        seek_previous();
+    }
+
+    return result;
+}

@@ -94,7 +94,7 @@ int ninx::lexer::Reader::get_next_limiter() {
     int next_char = this->stream.peek();
     if (next_char >= 0) {
         if (next_char == '\\') {  // Escape char check
-            return -2;
+            return FOUND_TEXT;
         }else{
             if(next_char == '-') {  // Negative number handling
                 this->stream.get();
@@ -102,7 +102,7 @@ int ninx::lexer::Reader::get_next_limiter() {
                 // Check if the next entry is a digit
                 if (isdigit(this->stream.peek())) {
                     this->stream.seekg(-1, std::ios_base::cur);
-                    return -2;
+                    return FOUND_TEXT;
                 }
 
                 // Also ignore the trailing spaces
@@ -128,11 +128,11 @@ int ninx::lexer::Reader::get_next_limiter() {
 
                 return next_char;
             }else{
-                return -2;
+                return FOUND_TEXT;
             }
         }
     }else{  // EOF
-        return -1;
+        return FOUND_EOF;
     }
 }
 

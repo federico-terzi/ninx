@@ -60,7 +60,12 @@ namespace ninx {
             void ignore_spaces();
             bool ignore_comment();
 
+
+            static const int FOUND_EOF = -1;
+            static const int FOUND_TEXT = -2;
             int get_next_limiter();
+
+
             std::string read_until_limiter();
             std::string read_identifier();
         };
