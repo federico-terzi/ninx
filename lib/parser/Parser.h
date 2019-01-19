@@ -29,6 +29,7 @@ SOFTWARE.
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 #include "../lexer/token/Token.h"
 #include "exception/ParserException.h"
 #include "element/Statement.h"
@@ -44,6 +45,11 @@ using namespace ninx::parser::element;
 
 namespace ninx {
     namespace parser {
+        struct OperatorCaseDefinition {
+            std::string op;
+            std::function<std::unique_ptr<Expression>(std::unique_ptr<Expression>, std::unique_ptr<Expression>)> builder;
+        };
+
         class Parser {
         private:
             std::string origin;
@@ -53,13 +59,20 @@ namespace ninx {
             std::unique_ptr<Block> parse_implicit_block();
             std::unique_ptr<Block> parse_block();
             std::unique_ptr<FunctionCall> parse_function_call();
-            std::unique_ptr<Expression> parse_value();
-            std::unique_ptr<Expression> parse_product_division_expression();
-            std::unique_ptr<Expression> parse_add_minus_expression();
-            std::unique_ptr<Expression> parse_expression();
             std::unique_ptr<FunctionCallArgument> parse_function_call_argument();
             std::unique_ptr<FunctionArgument> parse_function_argument();
             std::unique_ptr<FunctionDefinition> parse_function_definition();
+
+            // Expression parsing
+            std::unique_ptr<Expression> parse_value();
+            std::unique_ptr<Expression> parse_sub_expression(std::function<std::unique_ptr<Expression>()> term_parser,
+                    std::vector<OperatorCaseDefinition> operators);
+            std::unique_ptr<Expression> parse_level_1_expression();
+            std::unique_ptr<Expression> parse_level_2_expression();
+            std::unique_ptr<Expression> parse_level_3_expression();
+            std::unique_ptr<Expression> parse_expression();
+
+
         public:
             explicit Parser(std::vector<std::unique_ptr<ninx::lexer::token::Token>> &tokens, const std::string &origin);
 

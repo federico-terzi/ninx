@@ -46,6 +46,9 @@ namespace ninx {
             void visit(ninx::parser::element::SubtractExpression *e) override;
             void visit(ninx::parser::element::MultiplicationExpression *e) override;
             void visit(ninx::parser::element::DivisionExpression *e) override;
+            void visit(ninx::parser::element::EqualExpression *e) override;
+            void visit(ninx::parser::element::NotEqualExpression *e) override;
+
 
             explicit DefaultEvaluator(std::ostream &output);
         private:

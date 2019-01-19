@@ -46,6 +46,8 @@ SOFTWARE.
 #include "../parser/element/MultiplicationExpression.h"
 #include "../parser/element/DivisionExpression.h"
 #include "../parser/element/SubtractExpression.h"
+#include "../parser/element/EqualExpression.h"
+#include "../parser/element/NotEqualExpression.h"
 #include "exception/RuntimeException.h"
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
@@ -352,5 +354,17 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Multiplicat
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::DivisionExpression *e) {
     visit_binary_expression(e, [](double first, double second) {
         return first / second;
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::EqualExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first == second;
+    });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::NotEqualExpression *e) {
+    visit_binary_expression(e, [](double first, double second) {
+        return first != second;
     });
 }
