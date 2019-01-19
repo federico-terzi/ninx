@@ -42,6 +42,8 @@ SOFTWARE.
 #include "parser/element/expression/EqualExpression.h"
 #include "parser/element/expression/NotEqualExpression.h"
 #include "element/FunctionCallArgument.h"
+#include "element/IfCase.h"
+#include "element/IfCondition.h"
 
 using namespace ninx::parser::exception;
 
@@ -114,6 +116,10 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 reader.seek_previous();  // Seek to the previous token to make the function able to read it again
                 return parse_function_call();
             }
+            case Type::IF: {
+                reader.seek_previous();  // Rewind the if block
+                return parse_if_condition();
+            }
             case Type::TEXT: {
                 auto element = std::make_unique<TextElement>(
                         dynamic_cast<ninx::lexer::token::Text *>(token)->get_text());
@@ -126,6 +132,44 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
 
     // End of the document
     return nullptr;
+}
+
+std::unique_ptr<IfCondition> ninx::parser::Parser::parse_if_condition() {
+    if (reader.check_type(Type::IF) != 1) {
+        generate_exception("Expected If statement");
+    }
+    reader.get_token();
+
+    std::vector<std::unique_ptr<IfCase>> cases;
+
+    // Parse the main condition
+    auto condition {parse_expression()};
+    auto body {parse_block()};
+    auto main_case = std::make_unique<IfCase>(std::move(condition), std::move(body));
+    cases.push_back(std::move(main_case));
+
+    // Parse optional else if statements
+    while(reader.check_type(Type::ELSEIF) == 1) {
+        reader.get_token();
+
+        auto elseif_condition {parse_expression()};
+        auto elseif_body {parse_block()};
+        auto elseif_case = std::make_unique<IfCase>(std::move(elseif_condition), std::move(elseif_body));
+        cases.push_back(std::move(elseif_case));
+    }
+
+    // Parse optional else statement
+    std::unique_ptr<Block> else_body {nullptr};
+    if (reader.check_type(Type::ELSE) == 1){
+        reader.get_token();
+
+        else_body = parse_block();
+    }
+
+
+    auto if_condition = std::make_unique<IfCondition>(std::move(cases), std::move(else_body));
+
+    return if_condition;
 }
 
 std::unique_ptr<Expression> ninx::parser::Parser::parse_value() {
@@ -428,6 +472,11 @@ std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
 
     auto block = std::make_unique<Block>(std::move(statements));
     return std::move(block);
+}
+
+void ninx::parser::Parser::generate_exception(const std::string &message) {
+    auto error_token{reader.get_token()};
+    throw ParserException(error_token, this->origin, message);
 }
 
 

@@ -26,8 +26,9 @@ SOFTWARE.
 #include <sstream>
 #include "IfCondition.h"
 
-ninx::parser::element::IfCondition::IfCondition(std::vector<std::unique_ptr<ninx::parser::element::IfCase>> cases)
-: cases(std::move(cases)){}
+ninx::parser::element::IfCondition::IfCondition(std::vector<std::unique_ptr<ninx::parser::element::IfCase>> cases,
+        std::unique_ptr<Block> else_body)
+: cases(std::move(cases)), else_body(std::move(else_body)){}
 
 std::string ninx::parser::element::IfCondition::dump(int level) const {
     std::stringstream s;
@@ -35,6 +36,10 @@ std::string ninx::parser::element::IfCondition::dump(int level) const {
     s << std::string(level, '\t') + "IfCondition {" << std::endl;
     for (auto& c : cases) {
         s << c->dump(level+1) << std::endl;
+    }
+    if (this->else_body) {
+        s << std::string(level, '\t') + "} Else {" << std::endl;
+        s << this->else_body->dump(level+1) << std::endl;
     }
     s << std::string(level, '\t') + "}" << std::endl;
 
@@ -46,6 +51,10 @@ void ninx::parser::element::IfCondition::set_parent(ninx::parser::element::Block
 
     for (auto &c : cases) {
         c->set_parent(parent);
+    }
+
+    if (this->else_body) {
+        this->else_body->set_parent(parent);
     }
 }
 
@@ -61,10 +70,20 @@ ninx::parser::element::IfCondition *ninx::parser::element::IfCondition::clone_im
         cases_copy.push_back(std::move(case_copy));
     }
 
-    return new IfCondition(std::move(cases_copy));
+    // Clone the else body if present
+    std::unique_ptr<Block> else_body_copy {nullptr};
+    if (this->else_body){
+        else_body_copy = else_body->clone<Block>();
+    }
+
+    return new IfCondition(std::move(cases_copy), std::move(else_body_copy));
 }
 
 const std::vector<std::unique_ptr<ninx::parser::element::IfCase>> &
 ninx::parser::element::IfCondition::get_cases() const {
     return cases;
+}
+
+const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::IfCondition::get_else_body() const {
+    return else_body;
 }

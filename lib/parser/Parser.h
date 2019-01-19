@@ -39,6 +39,7 @@ SOFTWARE.
 #include "element/FunctionDefinition.h"
 #include "element/FunctionCallArgument.h"
 #include "element/FunctionCall.h"
+#include "element/IfCondition.h"
 #include "parser/element/expression/Expression.h"
 
 using namespace ninx::parser::element;
@@ -58,6 +59,11 @@ namespace ninx {
             std::unique_ptr<Statement> parse_statement();
             std::unique_ptr<Block> parse_implicit_block();
             std::unique_ptr<Block> parse_block();
+
+            // Conditions
+            std::unique_ptr<IfCondition> parse_if_condition();
+
+            // Functions
             std::unique_ptr<FunctionCall> parse_function_call();
             std::unique_ptr<FunctionCallArgument> parse_function_call_argument();
             std::unique_ptr<FunctionArgument> parse_function_argument();
@@ -72,6 +78,8 @@ namespace ninx {
             std::unique_ptr<Expression> parse_level_3_expression();
             std::unique_ptr<Expression> parse_expression();
 
+            // Exceptions
+            void generate_exception(const std::string &message);
 
         public:
             explicit Parser(std::vector<std::unique_ptr<ninx::lexer::token::Token>> &tokens, const std::string &origin);

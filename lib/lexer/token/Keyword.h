@@ -33,7 +33,12 @@ namespace ninx {
     namespace lexer {
         namespace token {
             // Reserved keywords, associated with their Type
-            const std::map<std::string, Type> RESERVED_KEYWORDS = {{"func", Type::FUNCDEF}, {"operator", Type::OPDEF}};
+            const std::map<std::string, Type> RESERVED_KEYWORDS = {{"func",     Type::FUNCDEF},
+                                                                   {"operator", Type::OPDEF},
+                                                                   {"if",       Type::IF},
+                                                                   {"elseif",   Type::ELSEIF},
+                                                                   {"else",     Type::ELSE}
+            };
 
             class Keyword : public Token {
             private:

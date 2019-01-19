@@ -57,6 +57,12 @@ namespace ninx {
              */
             int check_limiter_sequence(const std::string& sequence);
 
+            /*
+             * Peek the next token and verify that is of the given type.
+             * @return 1 if they match, 0 if they don't and -1 if EOF is reached.
+             */
+            int check_type(Type type);
+
             void seek_previous();
         };
     }

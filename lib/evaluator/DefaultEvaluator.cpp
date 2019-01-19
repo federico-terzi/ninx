@@ -41,6 +41,8 @@ SOFTWARE.
 #include "../parser/element/FunctionDefinition.h"
 #include "../parser/element/FunctionCall.h"
 #include "../parser/element/FunctionCallArgument.h"
+#include "../parser/element/IfCase.h"
+#include "../parser/element/IfCondition.h"
 #include "parser/element/expression/BinaryExpression.h"
 #include "parser/element/expression/AddExpression.h"
 #include "parser/element/expression/MultiplicationExpression.h"
@@ -367,4 +369,32 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::NotEqualExp
     visit_binary_expression(e, [](double first, double second) {
         return first != second;
     });
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCondition *e) {
+    bool condition_fulfilled {false};  // Becomes true if at least one case of the if is correct, used to trigger the else body.
+
+    for (auto &if_case : e->get_cases()) {
+        // Evaluate the condition
+        if_case->accept(this);
+
+        if (last_evaluation_value == 1) {
+            condition_fulfilled = true;
+
+            auto body { if_case->get_body()->clone<ninx::parser::element::Block>() };
+            body->accept(this);
+
+            break;
+        }
+    }
+
+    if (!condition_fulfilled && e->get_else_body()) {  // No conditions where fulfilled, execute the else block
+        auto body { e->get_else_body()->clone<ninx::parser::element::Block>() };
+        body->accept(this);
+    }
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCase *e) {
+    // Evaluate the condition
+    e->get_condition()->accept(this);
 }

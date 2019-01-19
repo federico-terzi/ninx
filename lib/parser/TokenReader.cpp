@@ -102,3 +102,12 @@ int ninx::parser::TokenReader::check_limiter_sequence(const std::string &sequenc
 
     return result;
 }
+
+int ninx::parser::TokenReader::check_type(Type type) {
+    auto token = peek_token();
+    if (!token) {
+        return -1;
+    }
+
+    return token->get_type() == type;
+}

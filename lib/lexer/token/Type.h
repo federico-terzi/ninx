@@ -38,7 +38,10 @@ namespace ninx {
                 // KEYWORDS @
                 FUNCNAME,  // Generic keyword type
                 FUNCDEF,   // Definition of a new function
-                OPDEF      // Definition of a new operator
+                OPDEF,     // Definition of a new operator
+                IF,        // If statement
+                ELSEIF,    // Elseif statement
+                ELSE       // Else statement
             };
         }
     }

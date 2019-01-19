@@ -35,7 +35,7 @@ namespace ninx {
         namespace element {
             class IfCondition : public Statement {
             public:
-                explicit IfCondition(std::vector<std::unique_ptr<IfCase>> cases);
+                explicit IfCondition(std::vector<std::unique_ptr<IfCase>> cases, std::unique_ptr<Block> else_body);
 
                 std::string dump(int level) const override;
 
@@ -44,12 +44,14 @@ namespace ninx {
                 void set_parent(Block *parent) override;
 
                 const std::vector<std::unique_ptr<IfCase>> &get_cases() const;
+                const std::unique_ptr<Block> &get_else_body() const;
 
             protected:
                 IfCondition *clone_impl() override;
 
             private:
                 std::vector<std::unique_ptr<IfCase>> cases;
+                std::unique_ptr<Block> else_body;  // CAN BE NULL
             };
         }
     }

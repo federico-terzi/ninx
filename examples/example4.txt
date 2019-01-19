@@ -2,10 +2,11 @@ Let's test some conditions:
 
 $i = {6}
 
-$result = $i == {6}
+Let me check if i is equal to 6
 
-Is i equal to 6: $result
-
-$wrong = $i == {-1}
-
-Is i equal to -1? $wrong
+@if $i == {6} {
+    Yes it is
+}
+@else{
+    No it isn't
+}
