@@ -23,37 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONARGUMENT_H
-#define NINX_FUNCTIONARGUMENT_H
+#ifndef NINX_EXPRESSION_H
+#define NINX_EXPRESSION_H
 
-#include <memory>
-#include "ASTElement.h"
-#include "parser/element/expression/Expression.h"
+#include "parser/element/Statement.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class FunctionArgument : public ASTElement {
-            public:
-                explicit FunctionArgument(const std::string &name, std::unique_ptr<Expression> default_value);
+            class Expression : public Statement{
 
-                std::string dump(int level) const override;
-
-                void accept(ninx::evaluator::Evaluator *evaluator) override;
-
-                const std::string &get_name() const;
-                const std::unique_ptr<Expression> &get_default_value() const;
-
-            protected:
-                FunctionArgument *clone_impl() override;
-
-            private:
-                std::string name;  // Argument name
-                std::unique_ptr<Expression> default_value;  // Optional default value of the argument
             };
         }
     }
 }
 
 
-#endif //NINX_FUNCTIONARGUMENT_H
+#endif //NINX_EXPRESSION_H

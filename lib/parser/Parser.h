@@ -39,7 +39,7 @@ SOFTWARE.
 #include "element/FunctionDefinition.h"
 #include "element/FunctionCallArgument.h"
 #include "element/FunctionCall.h"
-#include "parser/element/Expression.h"
+#include "parser/element/expression/Expression.h"
 
 using namespace ninx::parser::element;
 

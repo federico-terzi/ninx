@@ -23,20 +23,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_EXPRESSION_H
-#define NINX_EXPRESSION_H
+#ifndef NINX_IFCONDITIONAL_H
+#define NINX_IFCONDITIONAL_H
 
+#include <vector>
 #include "Statement.h"
+#include "IfCase.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class Expression : public Statement{
+            class IfCondition : public Statement {
+            public:
+                explicit IfCondition(std::vector<std::unique_ptr<IfCase>> cases);
 
+                std::string dump(int level) const override;
+
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
+                void set_parent(Block *parent) override;
+
+                const std::vector<std::unique_ptr<IfCase>> &get_cases() const;
+
+            protected:
+                IfCondition *clone_impl() override;
+
+            private:
+                std::vector<std::unique_ptr<IfCase>> cases;
             };
         }
     }
 }
 
 
-#endif //NINX_EXPRESSION_H
+#endif //NINX_IFCONDITIONAL_H

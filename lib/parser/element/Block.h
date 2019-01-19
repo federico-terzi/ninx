@@ -31,7 +31,7 @@ SOFTWARE.
 #include <unordered_map>
 #include "ASTElement.h"
 #include "Statement.h"
-#include "Expression.h"
+#include "parser/element/expression/Expression.h"
 
 namespace ninx {
     namespace parser {

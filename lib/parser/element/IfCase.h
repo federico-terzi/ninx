@@ -23,37 +23,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_FUNCTIONARGUMENT_H
-#define NINX_FUNCTIONARGUMENT_H
+#ifndef NINX_IFCASE_H
+#define NINX_IFCASE_H
 
 #include <memory>
 #include "ASTElement.h"
-#include "parser/element/expression/Expression.h"
+#include "Block.h"
+#include "expression/Expression.h"
 
 namespace ninx {
     namespace parser {
         namespace element {
-            class FunctionArgument : public ASTElement {
+            class IfCase : public ASTElement {
             public:
-                explicit FunctionArgument(const std::string &name, std::unique_ptr<Expression> default_value);
-
-                std::string dump(int level) const override;
+                explicit IfCase(std::unique_ptr<Expression> condition, std::unique_ptr<Block> body);
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
-                const std::string &get_name() const;
-                const std::unique_ptr<Expression> &get_default_value() const;
+                void set_parent(Block *parent) override;
+
+                std::string dump(int level) const override;
+
+                const std::unique_ptr<Expression> &get_condition() const;
+                const std::unique_ptr<Block> &get_body() const;
 
             protected:
-                FunctionArgument *clone_impl() override;
+                IfCase *clone_impl() override;
 
             private:
-                std::string name;  // Argument name
-                std::unique_ptr<Expression> default_value;  // Optional default value of the argument
+                std::unique_ptr<Expression> condition;
+                std::unique_ptr<Block> body;
             };
         }
     }
 }
 
 
-#endif //NINX_FUNCTIONARGUMENT_H
+#endif //NINX_IFCASE_H

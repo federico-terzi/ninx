@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <memory>
 #include "Statement.h"
-#include "Expression.h"
+#include "parser/element/expression/Expression.h"
 
 namespace ninx {
     namespace parser {
