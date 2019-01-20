@@ -30,6 +30,7 @@ SOFTWARE.
 #include <memory>
 #include <set>
 #include <limits>
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/lexical_cast/bad_lexical_cast.hpp>
@@ -114,7 +115,23 @@ void no_echo(const std::function<void()> &block) {
 // FUNCTION RELATED VISITING
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
-    auto function {call->get_parent()->get_function(call->get_name())};
+    // Resolve the name, navigating the call hierarchy.
+    std::vector<std::string> hierarchy;
+    boost::split(hierarchy, call->get_name(), boost::is_any_of("."));
+    ninx::parser::element::Block * current_object {call->get_parent()};
+    for (int i = 0; i<hierarchy.size()-1; i++) {
+        auto object {current_object->get_variable(hierarchy[i])};
+
+        if (!object) {
+            // TODO: add information of line number and origin
+            throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Object \""+hierarchy[i]+"\" does not have child '"+hierarchy[i]+"'!");
+        }
+
+        current_object = object;
+    }
+
+    // Get the target function
+    auto function {current_object->get_function(hierarchy[hierarchy.size()-1])};
 
     if (!function) {
         // TODO: add information of line number and origin

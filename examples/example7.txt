@@ -1,0 +1,14 @@
+Let's see how blocks can be used to define custom objects:
+
+$prototype = {
+    $name = {Federico}
+
+    @func test() {
+        Your name is $name
+    }
+}
+
+$obj1 = $prototype
+$obj2 = $prototype
+
+@obj1.test
