@@ -458,15 +458,20 @@ std::unique_ptr<Block> ninx::parser::Parser::parse() {
 std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
     std::vector<std::unique_ptr<Statement>> statements;
 
-    std::unique_ptr<Statement> current;
-    while ((current = parse_statement())) {
-        statements.push_back(std::move(current));
+    // Make sure this is not an empty block
+    if (reader.check_limiter('}') != 1) {
+
+        // Not empty, cycle to get all the statements
+        std::unique_ptr<Statement> current;
+        while ((current = parse_statement())) {
+            statements.push_back(std::move(current));
 
 
-        // Check if the block will be closed
-        if (reader.check_limiter('}') > 0) {
-            // Exit the cycle, because the next token marks the end of a block
-            break;
+            // Check if the block will be closed
+            if (reader.check_limiter('}') > 0) {
+                // Exit the cycle, because the next token marks the end of a block
+                break;
+            }
         }
     }
 

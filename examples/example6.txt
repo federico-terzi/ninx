@@ -1,0 +1,15 @@
+Let me show you how you can use a list.
+
+A list is a normal block, so you can initialize it like this:
+
+$list = {}
+
+Then you can add elements:
+
+/*
+@list.add{3}
+@list.add{2}
+@list.add{1}
+*/
+
+Now the list has @list.size elements
