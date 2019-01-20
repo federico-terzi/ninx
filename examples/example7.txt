@@ -6,9 +6,23 @@ $prototype = {
     @func test() {
         Your name is $name
     }
+
+    @func setName($n) {
+        $name = $n
+    }
 }
 
 $obj1 = $prototype
+$obj1.name = {Bob}
+
 $obj2 = $prototype
 
+$obj3 = $prototype
+@obj3.setName {Jerry}
+
 @obj1.test
+@obj2.test
+@obj3.test
+
+
+Read: $obj1.name

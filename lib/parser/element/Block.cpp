@@ -29,6 +29,7 @@ SOFTWARE.
 #include <vector>
 #include <memory>
 #include "Block.h"
+#include "FunctionDefinition.h"
 #include "TextElement.h"
 
 ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
@@ -80,7 +81,7 @@ void ninx::parser::element::Block::set_variable(const std::string &name, std::un
 
 ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_function(const std::string &name) const {
     if (functions.find(name) != functions.end()) {
-        return this->functions.at(name);
+        return this->functions.at(name).get();
     }
 
     // Check if the function is declared in the parent block
@@ -91,8 +92,8 @@ ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_fun
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_function(const std::string &name, ninx::parser::element::FunctionDefinition *func) {
-    this->functions[name] = func;
+void ninx::parser::element::Block::set_function(const std::string &name, std::unique_ptr<ninx::parser::element::FunctionDefinition> func) {
+    this->functions[name] = std::move(func);
 }
 
 void ninx::parser::element::Block::clear_variables() {
@@ -110,12 +111,20 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
     Block * obj { new Block(std::move(statements_copy))};
 
     // Copy function references
-    obj->functions = this->functions;
+    std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> functions_copy;
+    for (auto& v: this->functions) {
+        auto function_copy {v.second->clone<FunctionDefinition>()};
+        function_copy->set_parent(obj);  // Make the new object the new parent
+        functions_copy[v.first] = std::move(function_copy);
+    }
+    obj->functions = std::move(functions_copy);
 
     // Copy variables
     std::unordered_map<std::string, std::unique_ptr<Block>> variables_copy;
     for (auto& v: this->variables) {
-        variables_copy[v.first] = v.second->clone<Block>();
+        auto variable_copy {v.second->clone<Block>()};
+        variable_copy->set_parent(obj);  // Make the new object the new parent
+        variables_copy[v.first] = std::move(variable_copy);
     }
     obj->variables = std::move(variables_copy);
 

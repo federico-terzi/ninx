@@ -31,6 +31,7 @@ SOFTWARE.
 #include <unordered_map>
 #include "ASTElement.h"
 #include "Statement.h"
+#include "FunctionDefinition.h"
 #include "parser/element/expression/Expression.h"
 
 namespace ninx {
@@ -51,7 +52,7 @@ namespace ninx {
                 void clear_variables();
 
                 FunctionDefinition * get_function(const std::string &name) const;
-                void set_function(const std::string &name, FunctionDefinition * func);
+                void set_function(const std::string &name, std::unique_ptr<FunctionDefinition> func);
 
                 static std::unique_ptr<Block> make_text_block(Block * parent, const std::string& text);
 
@@ -70,7 +71,7 @@ namespace ninx {
                 bool echoing = true;
 
                 std::unordered_map<std::string, std::unique_ptr<Block>> variables;
-                std::unordered_map<std::string, FunctionDefinition *> functions;
+                std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> functions;
             };
         }
     }

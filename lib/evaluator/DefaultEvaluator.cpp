@@ -110,15 +110,13 @@ void no_echo(const std::function<void()> &block) {
     enable_echoing(changed);
 }
 
+// NAVIGATING OBJECT TREES
 
-
-// FUNCTION RELATED VISITING
-
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
+ninx::parser::element::Block * navigate_object_tree(ninx::parser::element::Block * parent, const std::string &target, std::string &field_name) {
     // Resolve the name, navigating the call hierarchy.
     std::vector<std::string> hierarchy;
-    boost::split(hierarchy, call->get_name(), boost::is_any_of("."));
-    ninx::parser::element::Block * current_object {call->get_parent()};
+    boost::split(hierarchy, target, boost::is_any_of("."));
+    ninx::parser::element::Block * current_object {parent};
     for (int i = 0; i<hierarchy.size()-1; i++) {
         auto object {current_object->get_variable(hierarchy[i])};
 
@@ -130,8 +128,20 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         current_object = object;
     }
 
+    field_name = hierarchy[hierarchy.size()-1];
+
+    return current_object;
+}
+
+// FUNCTION RELATED VISITING
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCall *call) {
+    // Obtain the referenced object by navigating the name structure
+    std::string field_name;
+    auto target_object { navigate_object_tree(call->get_parent(), call->get_name(), field_name) };
+
     // Get the target function
-    auto function {current_object->get_function(hierarchy[hierarchy.size()-1])};
+    auto function {target_object->get_function(field_name)};
 
     if (!function) {
         // TODO: add information of line number and origin
@@ -238,10 +248,10 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {
-    e->get_parent()->set_function(e->get_name(), e);
+    auto definition_copy {e->clone<ninx::parser::element::FunctionDefinition>()};
 
     // Load all the function argument default as local variables in the function body block
-    for (auto &argument : e->get_arguments()) {
+    for (auto &argument : definition_copy->get_arguments()) {
         // Evaluate the argument
         reset_return_block();
         argument->accept(this);
@@ -249,9 +259,11 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDef
         auto argument_value {get_owned_return_block()};
         // If the argument is non-null, copy the value
         if (argument_value) {
-            e->get_body()->set_variable(argument->get_name(), std::move(argument_value));
+            definition_copy->get_body()->set_variable(argument->get_name(), std::move(argument_value));
         }
     }
+
+    e->get_parent()->set_function(e->get_name(), std::move(definition_copy));
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionArgument *e) {
@@ -274,7 +286,11 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 // VARIABLES
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRead *e) {
-    auto variable {e->get_parent()->get_variable(e->get_name())};
+    // Obtain the referenced object by navigating the name structure
+    std::string field_name;
+    auto target_object { navigate_object_tree(e->get_parent(), e->get_name(), field_name) };
+
+    auto variable {target_object->get_variable(field_name)};
 
     if (!variable) {
         // TODO: add information of line number and origin
@@ -292,7 +308,12 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment 
 
         // Get the result as a unique pointer and move it to the block scope
         auto result {get_owned_return_block()};
-        e->get_parent()->set_variable(e->get_name(), std::move(result));
+
+        // Obtain the correct object by traversing the name structure
+        std::string field_name;
+        auto target_object { navigate_object_tree(e->get_parent(), e->get_name(), field_name) };
+
+        target_object->set_variable(field_name, std::move(result));
     });
 }
 

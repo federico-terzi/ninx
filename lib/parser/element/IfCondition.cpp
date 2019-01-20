@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 #include <sstream>
+#include "Block.h"
 #include "IfCondition.h"
 
 ninx::parser::element::IfCondition::IfCondition(std::vector<std::unique_ptr<ninx::parser::element::IfCase>> cases,
