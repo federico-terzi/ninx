@@ -7,6 +7,9 @@ Let me check if i is equal to 6
 @if $i == {6} {
     Yes it is
 }
+@elseif $i == {5} {
+    Not as much
+}
 @else{
     No it isn't
 }

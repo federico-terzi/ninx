@@ -51,3 +51,7 @@ Then all together:
 $tot = {2} + {3} * {2}
 
 Tot should be 8 = $tot
+
+$min = {3} - {2} - {1}
+
+Res: $min
