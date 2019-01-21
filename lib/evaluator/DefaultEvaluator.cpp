@@ -258,7 +258,9 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         }
     }
 
-    body->accept(this);
+    if (body) {
+        body->accept(this);
+    }
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDefinition *e) {

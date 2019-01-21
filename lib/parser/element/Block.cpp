@@ -211,9 +211,16 @@ std::unordered_map<std::string, std::function<std::unique_ptr<ninx::parser::elem
             auto body {ninx::parser::element::Block::make_text_block(call->get_parent(), boost::lexical_cast<std::string>(
                     self->get_children_count()))};
             return std::move(body);
+        }},
+
+        // Add children to a block
+        {"add", [](ninx::parser::element::Block *self, ninx::parser::element::FunctionCall *call) {
+            std::vector<std::unique_ptr<Block>> children;
+            for (auto &argument : call->get_arguments()) {
+                children.push_back(argument->)
+            }
+            return nullptr;
         }}
-
-
 };
 
 
