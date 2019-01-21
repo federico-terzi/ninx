@@ -143,105 +143,119 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
     // Get the target function
     auto function {target_object->get_function(field_name)};
 
+    std::unique_ptr<ninx::parser::element::Block> body {nullptr};
+    bool need_evaluation {true};
+
     if (!function) {
-        // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" has not been declared!");
+        // The function is not defined, check if it is a builtin one.
+        auto builtin_result{target_object->evaluate_builtin(field_name, call)};
+
+        if (builtin_result) { // Builtin function has been evaluated.
+            body = std::move(builtin_result);
+            need_evaluation = false;   // Has already been evaluated
+        } else {  // Not a builtin either
+            // TODO: add information of line number and origin
+            throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \"" + call->get_name() +
+                                                                          "\" has not been declared!");
+        }
     }
 
-    // Clone the function definition body, to generate a new instance
-    auto body {function->get_body()->clone<ninx::parser::element::Block>()};
+    if (need_evaluation) {  // Not a builtin one, so needs evaluation
+        // Clone the function definition body, to generate a new instance
+        body = std::move(function->get_body()->clone<ninx::parser::element::Block>());
 
-    // Load all the call arguments
+        // Load all the call arguments
 
-    // Check if the call arguments are too many
-    if (call->get_argument_count() > function->get_arguments().size()) {
-        // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" is called with too many parameters!");
-    }
+        // Check if the call arguments are too many
+        if (call->get_argument_count() > function->get_arguments().size()) {
+            // TODO: add information of line number and origin
+            throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Function \""+call->get_name()+"\" is called with too many parameters!");
+        }
 
-    // Check if the named call arguments are present in the function definition and make sure that
-    // after a named parameter, no ordinal parameters can be used.
-    // Then populate the call arguments as function body block local variables
-    bool named_started {false};
-    int index {0};  // Current ordinal parameter index
+        // Check if the named call arguments are present in the function definition and make sure that
+        // after a named parameter, no ordinal parameters can be used.
+        // Then populate the call arguments as function body block local variables
+        bool named_started {false};
+        int index {0};  // Current ordinal parameter index
 
-    std::unordered_set<std::string> call_mandatory_arguments;
+        std::unordered_set<std::string> call_mandatory_arguments;
 
-    for (auto &argument : call->get_arguments()) {
-        if (argument->get_name()) {
-            auto argument_name {*(argument->get_name())};
-            named_started = true;
+        for (auto &argument : call->get_arguments()) {
+            if (argument->get_name()) {
+                auto argument_name {*(argument->get_name())};
+                named_started = true;
 
-            if (!function->check_argument(argument_name)){
-                // TODO: add information of line number and origin
-                throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Argument \"" + *(argument->get_name()) +
-                "\" is not a valid for function \""+call->get_name()+"\"");
+                if (!function->check_argument(argument_name)){
+                    // TODO: add information of line number and origin
+                    throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Argument \"" + *(argument->get_name()) +
+                                                                                  "\" is not a valid for function \""+call->get_name()+"\"");
+                }
+
+                if (function->check_mandatory(argument_name)) {
+                    call_mandatory_arguments.insert(argument_name);
+                }
+
+                // Evaluate the argument value and get the result
+                reset_return_block();
+                argument->accept(this);
+                auto result_value {get_owned_return_block()};
+
+                // Setup the argument as a local variable
+                body->set_variable(argument_name, std::move(result_value), true);
+            }else{
+                // Check if an ordinal parameter has been used after a named parameter
+                if (named_started) {
+                    // TODO: add information of line number and origin
+                    throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Cannot use ordinals arguments after a named argument");
+                }
+
+                auto definition_argument {function->get_arguments().at(static_cast<unsigned long long int>(index)).get()};
+
+                if (function->check_mandatory(definition_argument->get_name())) {
+                    call_mandatory_arguments.insert(definition_argument->get_name());
+                }
+
+                // Evaluate the argument value and get the result
+                reset_return_block();
+                argument->accept(this);
+                auto result_value {get_owned_return_block()};
+
+                // Setup the argument as a local variable
+                body->set_variable(definition_argument->get_name(), std::move(result_value), true);
             }
+            index++;
+        }
 
-            if (function->check_mandatory(argument_name)) {
-                call_mandatory_arguments.insert(argument_name);
+        // Add also the outer_argument
+        if (call->get_outer_argument()) {
+            auto last_definition_argument {function->get_arguments().at(function->get_arguments().size()-1).get()};
+
+            if (function->check_mandatory(last_definition_argument->get_name())) {
+                call_mandatory_arguments.insert(last_definition_argument->get_name());
             }
 
             // Evaluate the argument value and get the result
             reset_return_block();
-            argument->accept(this);
+            call->get_outer_argument()->accept(this);
             auto result_value {get_owned_return_block()};
 
             // Setup the argument as a local variable
-            body->set_variable(argument_name, std::move(result_value), true);
-        }else{
-            // Check if an ordinal parameter has been used after a named parameter
-            if (named_started) {
-                // TODO: add information of line number and origin
-                throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Cannot use ordinals arguments after a named argument");
-            }
-
-            auto definition_argument {function->get_arguments().at(static_cast<unsigned long long int>(index)).get()};
-
-            if (function->check_mandatory(definition_argument->get_name())) {
-                call_mandatory_arguments.insert(definition_argument->get_name());
-            }
-
-            // Evaluate the argument value and get the result
-            reset_return_block();
-            argument->accept(this);
-            auto result_value {get_owned_return_block()};
-
-            // Setup the argument as a local variable
-            body->set_variable(definition_argument->get_name(), std::move(result_value), true);
-        }
-        index++;
-    }
-
-    // Add also the outer_argument
-    if (call->get_outer_argument()) {
-        auto last_definition_argument {function->get_arguments().at(function->get_arguments().size()-1).get()};
-
-        if (function->check_mandatory(last_definition_argument->get_name())) {
-            call_mandatory_arguments.insert(last_definition_argument->get_name());
+            body->set_variable(last_definition_argument->get_name(), std::move(result_value), true);
         }
 
-        // Evaluate the argument value and get the result
-        reset_return_block();
-        call->get_outer_argument()->accept(this);
-        auto result_value {get_owned_return_block()};
+        // Check if all mandatory arguments are been used
+        if (call_mandatory_arguments.size() != function->get_mandatory_arguments().size()) {
+            std::set<std::string> missing;
 
-        // Setup the argument as a local variable
-        body->set_variable(last_definition_argument->get_name(), std::move(result_value), true);
-    }
+            // Find the missing parameters by calculating the difference between the definition and the call
+            std::set_difference(function->get_mandatory_arguments().begin(), function->get_mandatory_arguments().end(),
+                                call_mandatory_arguments.begin(), call_mandatory_arguments.end(),
+                                std::inserter(missing, missing.end()));
 
-    // Check if all mandatory arguments are been used
-    if (call_mandatory_arguments.size() != function->get_mandatory_arguments().size()) {
-        std::set<std::string> missing;
-
-        // Find the missing parameters by calculating the difference between the definition and the call
-        std::set_difference(function->get_mandatory_arguments().begin(), function->get_mandatory_arguments().end(),
-                call_mandatory_arguments.begin(), call_mandatory_arguments.end(),
-                std::inserter(missing, missing.end()));
-
-        auto joined_missing {boost::algorithm::join(missing, ", ")};
-        // TODO: add information of line number and origin
-        throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Missing required arguments: \""+joined_missing+"\"");
+            auto joined_missing {boost::algorithm::join(missing, ", ")};
+            // TODO: add information of line number and origin
+            throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Missing required arguments: \""+joined_missing+"\"");
+        }
     }
 
     body->accept(this);
@@ -346,7 +360,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
 
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
-    for (auto &statement : e->get_statements()) {
+    for (auto &statement : e->get_children()) {
         statement->accept(this);
     }
 

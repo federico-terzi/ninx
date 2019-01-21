@@ -28,6 +28,7 @@ SOFTWARE.
 
 #include <vector>
 #include <memory>
+#include <boost/lexical_cast.hpp>
 #include "Block.h"
 #include "FunctionDefinition.h"
 #include "TextElement.h"
@@ -44,9 +45,9 @@ std::string ninx::parser::element::Block::dump(int level) const {
     std::stringstream s;
 
     s << std::string(level, '\t') + "Block {" << std::endl;
-    s << std::string(level+1, '\t') + "echoing " << this->is_echoing() << std::endl;
-    for (auto& statement : statements) {
-        s << statement->dump(level+1) << std::endl;
+    s << std::string(level + 1, '\t') + "echoing " << this->is_echoing() << std::endl;
+    for (auto &statement : statements) {
+        s << statement->dump(level + 1) << std::endl;
     }
     s << std::string(level, '\t') + "}" << std::endl;
 
@@ -58,7 +59,7 @@ void ninx::parser::element::Block::accept(ninx::evaluator::Evaluator *evaluator)
 }
 
 const std::vector<std::unique_ptr<ninx::parser::element::Statement>> &
-ninx::parser::element::Block::get_statements() const {
+ninx::parser::element::Block::get_children() const {
     return statements;
 }
 
@@ -81,7 +82,8 @@ ninx::parser::element::Block::get_variable(const std::string &name, bool only_lo
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local) {
+void
+ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local) {
     if (force_local) {
         this->variables[name] = std::move(value);
         return;
@@ -89,11 +91,11 @@ void ninx::parser::element::Block::set_variable(const std::string &name, std::un
 
     // Navigate the parent structure to determine if the variable is already defined in an outer block.
     // If so, the assignment will take effect on that entity.
-    Block * current_block {this};
-    while(current_block != nullptr) {
+    Block *current_block{this};
+    while (current_block != nullptr) {
         if (current_block->get_variable(name, true) != nullptr) {
             break;
-        }else{
+        } else {
             current_block = current_block->parent;
         }
     }
@@ -118,7 +120,8 @@ ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_fun
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_function(const std::string &name, std::unique_ptr<ninx::parser::element::FunctionDefinition> func) {
+void ninx::parser::element::Block::set_function(const std::string &name,
+                                                std::unique_ptr<ninx::parser::element::FunctionDefinition> func) {
     this->functions[name] = std::move(func);
 }
 
@@ -130,16 +133,16 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
     // Clone all the statements
     std::vector<std::unique_ptr<Statement>> statements_copy;
     for (auto &statement : this->statements) {
-        auto statement_copy {statement->clone<Statement>()};
+        auto statement_copy{statement->clone<Statement>()};
         statements_copy.push_back(std::move(statement_copy));
     }
 
-    Block * obj { new Block(std::move(statements_copy))};
+    Block *obj{new Block(std::move(statements_copy))};
 
     // Copy function references
     std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> functions_copy;
-    for (auto& v: this->functions) {
-        auto function_copy {v.second->clone<FunctionDefinition>()};
+    for (auto &v: this->functions) {
+        auto function_copy{v.second->clone<FunctionDefinition>()};
         function_copy->set_parent(obj);  // Make the new object the new parent
         functions_copy[v.first] = std::move(function_copy);
     }
@@ -147,8 +150,8 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
 
     // Copy variables
     std::unordered_map<std::string, std::unique_ptr<Block>> variables_copy;
-    for (auto& v: this->variables) {
-        auto variable_copy {v.second->clone<Block>()};
+    for (auto &v: this->variables) {
+        auto variable_copy{v.second->clone<Block>()};
         variable_copy->set_parent(obj);  // Make the new object the new parent
         variables_copy[v.first] = std::move(variable_copy);
     }
@@ -157,12 +160,13 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
     return obj;
 }
 
-std::unique_ptr<ninx::parser::element::Block> ninx::parser::element::Block::make_text_block(Block * parent, const std::string &text) {
-    auto element { std::make_unique<TextElement>(text) };
+std::unique_ptr<ninx::parser::element::Block>
+ninx::parser::element::Block::make_text_block(Block *parent, const std::string &text) {
+    auto element{std::make_unique<TextElement>(text)};
     std::vector<std::unique_ptr<Statement>> block_statements;
     block_statements.push_back(std::move(element));
 
-    auto block {std::make_unique<Block>(std::move(block_statements))};
+    auto block{std::make_unique<Block>(std::move(block_statements))};
     block->set_parent(parent);
 
     return block;
@@ -175,3 +179,41 @@ bool ninx::parser::element::Block::is_echoing() const {
 void ninx::parser::element::Block::set_echoing(bool echoing) {
     this->echoing = echoing;
 }
+
+int ninx::parser::element::Block::get_children_count() const {
+    return static_cast<int>(statements.size());
+}
+
+void ninx::parser::element::Block::add_child(std::unique_ptr<ninx::parser::element::Statement> statement) {
+    statements.push_back(std::move(statement));
+}
+
+// BUILT-IN METHODS
+
+std::unique_ptr<ninx::parser::element::Block>
+ninx::parser::element::Block::evaluate_builtin(const std::string &name, ninx::parser::element::FunctionCall *call) {
+    // Check if it is a built in function
+    if (builtin_functions.find(name) == builtin_functions.end()) {
+        return nullptr;
+    }
+
+    // Evaluate the function
+    auto evaluator {builtin_functions[name]};
+    return std::move(evaluator(this, call));
+}
+
+std::unordered_map<std::string, std::function<std::unique_ptr<ninx::parser::element::Block>(
+        ninx::parser::element::Block *self,
+        ninx::parser::element::FunctionCall *call)>> ninx::parser::element::Block::builtin_functions = {
+
+        // Return the block's children count
+        {"size", [](ninx::parser::element::Block *self, ninx::parser::element::FunctionCall *call) {
+            auto body {ninx::parser::element::Block::make_text_block(call->get_parent(), boost::lexical_cast<std::string>(
+                    self->get_children_count()))};
+            return std::move(body);
+        }}
+
+
+};
+
+

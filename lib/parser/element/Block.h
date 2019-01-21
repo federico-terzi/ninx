@@ -29,9 +29,11 @@ SOFTWARE.
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 #include "ASTElement.h"
 #include "Statement.h"
 #include "FunctionDefinition.h"
+#include "FunctionCall.h"
 #include "parser/element/expression/Expression.h"
 
 namespace ninx {
@@ -45,20 +47,35 @@ namespace ninx {
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
 
-                const std::vector<std::unique_ptr<Statement>> &get_statements() const;
+                Block *get_variable(const std::string &name) const;
 
-                Block * get_variable(const std::string& name) const;
-                Block * get_variable(const std::string& name, bool only_local) const;
+                Block *get_variable(const std::string &name, bool only_local) const;
+
                 void set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local);
+
                 void clear_variables();
 
-                FunctionDefinition * get_function(const std::string &name) const;
+                FunctionDefinition *get_function(const std::string &name) const;
+
                 void set_function(const std::string &name, std::unique_ptr<FunctionDefinition> func);
 
-                static std::unique_ptr<Block> make_text_block(Block * parent, const std::string& text);
+                int get_children_count() const;
+
+                void add_child(std::unique_ptr<Statement> statement);
+
+                const std::vector<std::unique_ptr<Statement>> &get_children() const;
 
                 bool is_echoing() const;
+
                 virtual void set_echoing(bool echoing);
+
+                static std::unique_ptr<Block> make_text_block(Block *parent, const std::string &text);
+
+                // BUILT-IN METHODS
+                std::unique_ptr<Block> evaluate_builtin(const std::string &name, FunctionCall *call);
+
+                static std::unordered_map<std::string, std::function<std::unique_ptr<Block>(Block *self,
+                                                                                            FunctionCall *call)>> builtin_functions;
             protected:
                 Block *clone_impl() override;
 
