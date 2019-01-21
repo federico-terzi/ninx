@@ -48,7 +48,8 @@ namespace ninx {
                 const std::vector<std::unique_ptr<Statement>> &get_statements() const;
 
                 Block * get_variable(const std::string& name) const;
-                void set_variable(const std::string &name, std::unique_ptr<Block> value);
+                Block * get_variable(const std::string& name, bool only_local) const;
+                void set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local);
                 void clear_variables();
 
                 FunctionDefinition * get_function(const std::string &name) const;

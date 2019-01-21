@@ -7,8 +7,8 @@ $prototype = {
         Your name is $name
     }
 
-    @func setName($n) {
-        $name = $n
+    @func setName($_name) {
+        $name = $_name
     }
 }
 

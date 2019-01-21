@@ -63,20 +63,46 @@ ninx::parser::element::Block::get_statements() const {
 }
 
 ninx::parser::element::Block *ninx::parser::element::Block::get_variable(const std::string &name) const {
+    return this->get_variable(name, false);
+}
+
+
+ninx::parser::element::Block *
+ninx::parser::element::Block::get_variable(const std::string &name, bool only_local) const {
     if (variables.find(name) != variables.end()) {
         return this->variables.at(name).get();
     }
 
     // Check if the variable is declared in the parent block
-    if (this->parent) {
+    if (this->parent && !only_local) {
         return this->parent->get_variable(name);
     }
 
     return nullptr;
 }
 
-void ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value) {
-    this->variables[name] = std::move(value);
+void ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local) {
+    if (force_local) {
+        this->variables[name] = std::move(value);
+        return;
+    }
+
+    // Navigate the parent structure to determine if the variable is already defined in an outer block.
+    // If so, the assignment will take effect on that entity.
+    Block * current_block {this};
+    while(current_block != nullptr) {
+        if (current_block->get_variable(name, true) != nullptr) {
+            break;
+        }else{
+            current_block = current_block->parent;
+        }
+    }
+
+    if (current_block == nullptr) {
+        current_block = this;
+    }
+
+    current_block->set_variable(name, std::move(value), true);
 }
 
 ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_function(const std::string &name) const {

@@ -188,7 +188,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
             auto result_value {get_owned_return_block()};
 
             // Setup the argument as a local variable
-            body->set_variable(argument_name, std::move(result_value));
+            body->set_variable(argument_name, std::move(result_value), true);
         }else{
             // Check if an ordinal parameter has been used after a named parameter
             if (named_started) {
@@ -208,7 +208,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
             auto result_value {get_owned_return_block()};
 
             // Setup the argument as a local variable
-            body->set_variable(definition_argument->get_name(), std::move(result_value));
+            body->set_variable(definition_argument->get_name(), std::move(result_value), true);
         }
         index++;
     }
@@ -227,7 +227,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         auto result_value {get_owned_return_block()};
 
         // Setup the argument as a local variable
-        body->set_variable(last_definition_argument->get_name(), std::move(result_value));
+        body->set_variable(last_definition_argument->get_name(), std::move(result_value), true);
     }
 
     // Check if all mandatory arguments are been used
@@ -259,7 +259,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionDef
         auto argument_value {get_owned_return_block()};
         // If the argument is non-null, copy the value
         if (argument_value) {
-            definition_copy->get_body()->set_variable(argument->get_name(), std::move(argument_value));
+            definition_copy->get_body()->set_variable(argument->get_name(), std::move(argument_value), true);
         }
     }
 
@@ -313,7 +313,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment 
         std::string field_name;
         auto target_object { navigate_object_tree(e->get_parent(), e->get_name(), field_name) };
 
-        target_object->set_variable(field_name, std::move(result));
+        target_object->set_variable(field_name, std::move(result), false);
     });
 }
 

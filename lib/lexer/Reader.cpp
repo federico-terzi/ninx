@@ -190,7 +190,7 @@ std::string ninx::lexer::Reader::read_identifier() {
     while (stream) {
         // An identifier is valid until a space or a limiter is found
         char next_char = static_cast<char>(stream.peek());
-        if (isspace(next_char) || is_limiter(next_char)) {
+        if (isspace(next_char) || (is_limiter(next_char) && next_char != '_')) {
             break;
         }
 
@@ -200,8 +200,9 @@ std::string ninx::lexer::Reader::read_identifier() {
             break;
         }
 
-        // If the current char is not alphanumeric or dot ( used to call nested methods and variables ), raise an exception
-        if (isalpha(current) == 0 && isdigit(current) == 0 && current != '.') {
+        // If the current char is not alphanumeric, underscore or dot ( used to call nested methods and variables ),
+        // raise an exception
+        if (isalpha(current) == 0 && isdigit(current) == 0 && current != '.' && current != '_') {
             throw LexerException(this->line_number, this->origin,
                                  "Identifier can only contain alphanumeric characters.");
         }
