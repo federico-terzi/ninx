@@ -373,7 +373,7 @@ std::unique_ptr<FunctionCallArgument> ninx::parser::Parser::parse_function_call_
 
     std::unique_ptr<std::string> id{nullptr}; // Argument name
 
-    if (reader.check_limiter('{') == 0) {
+    if (reader.check_limiter('{') == 0 && reader.peek_token()->get_type() != Type::VARIABLE) {
         auto raw_token{reader.get_token()};
 
         if (raw_token->get_type() != Type::TEXT) {

@@ -6,8 +6,14 @@ $list = {}
 
 Then you can add elements:
 
-@list.add{3}
+@list.add({3}+{2})
 @list.add{2}
 @list.add{1}
 
+$x = {7}
+
+@list.add($x)
+
 Now the list has @list.size elements
+
+And which elements? $list
