@@ -101,3 +101,15 @@ ninx::parser::element::FunctionDefinition *ninx::parser::element::FunctionDefini
 
     return new FunctionDefinition(this->name, std::move(arguments_copy), this->body->clone<Block>());
 }
+
+std::unique_ptr<ninx::parser::element::Block>
+ninx::parser::element::FunctionDefinition::evaluate(ninx::parser::element::Block *target,
+                                                    std::unique_ptr<ninx::parser::element::Block> body) {
+    return evaluator(target, std::move(body));
+}
+
+void ninx::parser::element::FunctionDefinition::set_evaluator(
+        std::function<std::unique_ptr<ninx::parser::element::Block>(ninx::parser::element::Block *,
+                                                                    std::unique_ptr<ninx::parser::element::Block>)> evaluator) {
+    this->evaluator = evaluator;
+}

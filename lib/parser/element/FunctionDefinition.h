@@ -29,6 +29,7 @@ SOFTWARE.
 #include <vector>
 #include <memory>
 #include <unordered_set>
+#include <functional>
 #include "FunctionArgument.h"
 #include "Statement.h"
 
@@ -44,26 +45,33 @@ namespace ninx {
                 std::string dump(int level) const override;
 
                 void accept(ninx::evaluator::Evaluator *evaluator) override;
+
                 void set_parent(Block *parent) override;
 
                 const std::string &get_name() const;
+
                 const std::vector<std::unique_ptr<FunctionArgument>> &get_arguments() const;
+
                 const std::unique_ptr<Block> &get_body() const;
+
                 const std::unordered_set<std::string> &get_mandatory_arguments() const;
+
+                void set_evaluator(std::function<std::unique_ptr<Block>(Block *target, std::unique_ptr<Block> body)> evaluator);
+                std::unique_ptr<Block> evaluate(Block *target, std::unique_ptr<Block> args);
 
                 /**
                  * Efficiently check if the given argument is present in the function definition
                  * @param name of the argument
                  * @return true if the argument is valid, false otherwise.
                  */
-                bool check_argument(const std::string& name);
+                bool check_argument(const std::string &name);
 
                 /**
                  * Efficiently check if the given argument is one of the mandatory of the function definition
                  * @param name of the argument
                  * @return true if the argument is mandatory, false otherwise.
                  */
-                bool check_mandatory(const std::string& name);
+                bool check_mandatory(const std::string &name);
 
             protected:
                 FunctionDefinition *clone_impl() override;
@@ -72,6 +80,12 @@ namespace ninx {
                 std::string name;  // Function name
                 std::vector<std::unique_ptr<FunctionArgument>> arguments;  // Function arguments
                 std::unique_ptr<Block> body;  // Function body block
+
+                std::function<std::unique_ptr<Block>(Block *target, std::unique_ptr<Block> body)> evaluator = [](
+                        Block *target, std::unique_ptr<Block> args) {
+                    // Default NOOP
+                    return std::move(args);
+                };
 
                 std::unordered_set<std::string> mandatory_arguments;  // Used to efficiently check if an argument is mandatory
                 std::unordered_set<std::string> _argument_name_cache;  // Used to efficiently check if an argument is valid

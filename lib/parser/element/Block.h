@@ -70,12 +70,11 @@ namespace ninx {
                 virtual void set_echoing(bool echoing);
 
                 static std::unique_ptr<Block> make_text_block(Block *parent, const std::string &text);
+                static std::unique_ptr<Block> make_empty(Block *parent);
 
                 // BUILT-IN METHODS
-                std::unique_ptr<Block> evaluate_builtin(const std::string &name, FunctionCall *call);
-
-                static std::unordered_map<std::string, std::function<std::unique_ptr<Block>(Block *self,
-                                                                                            FunctionCall *call)>> builtin_functions;
+                FunctionDefinition * get_builtin(const std::string &name) const;
+                static std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> builtin_functions;
             protected:
                 Block *clone_impl() override;
 

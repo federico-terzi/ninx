@@ -1,6 +1,3 @@
-#include <utility>
-#include <sstream>
-
 /*
 
 MIT License
@@ -28,9 +25,11 @@ SOFTWARE.
 
 #include <vector>
 #include <memory>
+#include <sstream>
 #include <boost/lexical_cast.hpp>
 #include "Block.h"
 #include "FunctionDefinition.h"
+#include "FunctionArgument.h"
 #include "TextElement.h"
 
 ninx::parser::element::Block::Block(std::vector<std::unique_ptr<Statement>> statements) : statements(std::move(
@@ -172,6 +171,15 @@ ninx::parser::element::Block::make_text_block(Block *parent, const std::string &
     return block;
 }
 
+std::unique_ptr<ninx::parser::element::Block>
+ninx::parser::element::Block::make_empty(ninx::parser::element::Block *parent) {
+    std::vector<std::unique_ptr<Statement>> block_statements;
+    auto block{std::make_unique<Block>(std::move(block_statements))};
+    block->set_parent(parent);
+
+    return block;
+}
+
 bool ninx::parser::element::Block::is_echoing() const {
     return echoing;
 }
@@ -190,37 +198,50 @@ void ninx::parser::element::Block::add_child(std::unique_ptr<ninx::parser::eleme
 
 // BUILT-IN METHODS
 
-std::unique_ptr<ninx::parser::element::Block>
-ninx::parser::element::Block::evaluate_builtin(const std::string &name, ninx::parser::element::FunctionCall *call) {
-    // Check if it is a built in function
-    if (builtin_functions.find(name) == builtin_functions.end()) {
-        return nullptr;
-    }
-
-    // Evaluate the function
-    auto evaluator {builtin_functions[name]};
-    return std::move(evaluator(this, call));
+std::unique_ptr<ninx::parser::element::FunctionDefinition> build_size_definition() {
+    std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments;
+    auto body{ninx::parser::element::Block::make_empty(nullptr)};
+    auto definition = std::make_unique<ninx::parser::element::FunctionDefinition>("size", std::move(arguments),
+                                                                                  std::move(body));
+    definition->set_evaluator(
+            [](ninx::parser::element::Block *target, std::unique_ptr<ninx::parser::element::Block> args) {
+                return ninx::parser::element::Block::make_text_block(target, boost::lexical_cast<std::string>(
+                        target->get_children_count()));
+            });
+    return std::move(definition);
 }
 
-std::unordered_map<std::string, std::function<std::unique_ptr<ninx::parser::element::Block>(
-        ninx::parser::element::Block *self,
-        ninx::parser::element::FunctionCall *call)>> ninx::parser::element::Block::builtin_functions = {
+std::unique_ptr<ninx::parser::element::FunctionDefinition> build_add_definition() {
+    std::vector<std::unique_ptr<ninx::parser::element::FunctionArgument>> arguments;
+    auto argument{std::make_unique<ninx::parser::element::FunctionArgument>("item", nullptr)};
+    arguments.push_back(std::move(argument));
+    auto body{ninx::parser::element::Block::make_empty(nullptr)};
+    auto definition = std::make_unique<ninx::parser::element::FunctionDefinition>("add", std::move(arguments),
+                                                                                  std::move(body));
+    definition->set_evaluator(
+            [](ninx::parser::element::Block *target, std::unique_ptr<ninx::parser::element::Block> args) {
+                target->add_child(args->get_variable("item")->clone<ninx::parser::element::Statement>());
+                return nullptr;
+            });
+    return std::move(definition);
+}
 
-        // Return the block's children count
-        {"size", [](ninx::parser::element::Block *self, ninx::parser::element::FunctionCall *call) {
-            auto body {ninx::parser::element::Block::make_text_block(call->get_parent(), boost::lexical_cast<std::string>(
-                    self->get_children_count()))};
-            return std::move(body);
-        }},
+std::unordered_map<std::string, std::unique_ptr<ninx::parser::element::FunctionDefinition>>
+initialize_builtin_methods() {
+    std::unordered_map<std::string, std::unique_ptr<ninx::parser::element::FunctionDefinition>> methods;
+    methods["size"] = build_size_definition();
+    methods["add"] = build_add_definition();
+    return std::move(methods);
+}
 
-        // Add children to a block
-        {"add", [](ninx::parser::element::Block *self, ninx::parser::element::FunctionCall *call) {
-            std::vector<std::unique_ptr<Block>> children;
-            for (auto &argument : call->get_arguments()) {
-                children.push_back(argument->)
-            }
-            return nullptr;
-        }}
-};
+std::unordered_map<std::string, std::unique_ptr<ninx::parser::element::FunctionDefinition>> ninx::parser::element::Block::builtin_functions = initialize_builtin_methods();
+
+ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_builtin(const std::string &name) const {
+    if (builtin_functions.find(name) != builtin_functions.end()) {
+        return builtin_functions.at(name).get();
+    }
+
+    return nullptr;
+}
 
 
