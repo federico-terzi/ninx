@@ -42,8 +42,9 @@ namespace ninx {
             void visit(ninx::parser::element::FunctionDefinition *e) override;
             void visit(ninx::parser::element::FunctionArgument *e) override;
             void visit(ninx::parser::element::FunctionCallArgument *e) override;
-            void visit(ninx::parser::element::IfCondition *e) override;
+            void visit(ninx::parser::element::IfStatement *e) override;
             void visit(ninx::parser::element::IfCase *e) override;
+            void visit(ninx::parser::element::ForStatement *e) override;
             void visit(ninx::parser::element::AddExpression *e) override;
             void visit(ninx::parser::element::SubtractExpression *e) override;
             void visit(ninx::parser::element::MultiplicationExpression *e) override;

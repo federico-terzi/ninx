@@ -37,7 +37,8 @@ namespace ninx {
                                                                    {"operator", Type::OPDEF},
                                                                    {"if",       Type::IF},
                                                                    {"elseif",   Type::ELSEIF},
-                                                                   {"else",     Type::ELSE}
+                                                                   {"else",     Type::ELSE},
+                                                                   {"for",     Type::FOR}
             };
 
             class Keyword : public Token {

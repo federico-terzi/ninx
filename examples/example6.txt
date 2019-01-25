@@ -16,4 +16,10 @@ $x = {7}
 
 Now the list has @list.size elements
 
-And which elements? $list
+And now we can iterate
+
+@for $element : $list {
+    Current Element $element
+    Current Index $index0
+    Current Index starting from one $index1
+}

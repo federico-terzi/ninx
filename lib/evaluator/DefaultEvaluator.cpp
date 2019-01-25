@@ -43,7 +43,8 @@ SOFTWARE.
 #include "../parser/element/FunctionCall.h"
 #include "../parser/element/FunctionCallArgument.h"
 #include "../parser/element/IfCase.h"
-#include "../parser/element/IfCondition.h"
+#include "parser/element/IfStatement.h"
+#include "parser/element/ForStatement.h"
 #include "parser/element/expression/BinaryExpression.h"
 #include "parser/element/expression/AddExpression.h"
 #include "parser/element/expression/MultiplicationExpression.h"
@@ -422,7 +423,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::NotEqualExp
     });
 }
 
-void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCondition *e) {
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfStatement *e) {
     bool condition_fulfilled {false};  // Becomes true if at least one case of the if is correct, used to trigger the else body.
 
     for (auto &if_case : e->get_cases()) {
@@ -448,4 +449,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCondition
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCase *e) {
     // Evaluate the condition
     e->get_condition()->accept(this);
+}
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::ForStatement *e) {
+
 }

@@ -23,29 +23,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef NINX_TYPE_H
-#define NINX_TYPE_H
+#ifndef NINX_FORSTATEMENT_H
+#define NINX_FORSTATEMENT_H
+
+#include <memory>
+#include "Statement.h"
+#include "Block.h"
+#include "expression/Expression.h"
 
 namespace ninx {
-    namespace lexer {
-        namespace token {
-            enum class Type {
-                TEXT,
-                LIMITER,
-                ID,
-                VARIABLE,
+    namespace parser {
+        namespace element {
+            class ForStatement : public Statement {
+            public:
+                explicit ForStatement(const std::string &iterator_name, std::unique_ptr<Expression> range, std::unique_ptr<Block> body);
 
-                // KEYWORDS @
-                FUNCNAME,  // Generic keyword type
-                FUNCDEF,   // Definition of a new function
-                OPDEF,     // Definition of a new operator
-                IF,        // If statement
-                ELSEIF,    // Elseif statement
-                ELSE,       // Else statement
-                FOR       // For statement
+                std::string dump(int level) const override;
+
+                void accept(ninx::evaluator::Evaluator *evaluator) override;
+
+                void set_parent(Block *parent) override;
+
+                const std::string &get_iterator_name() const;
+                const std::unique_ptr<Expression> &get_range() const;
+                const std::unique_ptr<Block> &get_body() const;
+            protected:
+                ForStatement *clone_impl() override;
+
+            private:
+                std::string iterator_name;
+                std::unique_ptr<Expression> range;
+                std::unique_ptr<Block> body;
             };
         }
     }
 }
 
-#endif //NINX_TYPE_H
+#endif //NINX_FORSTATEMENT_H

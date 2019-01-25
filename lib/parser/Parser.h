@@ -39,7 +39,8 @@ SOFTWARE.
 #include "element/FunctionDefinition.h"
 #include "element/FunctionCallArgument.h"
 #include "element/FunctionCall.h"
-#include "element/IfCondition.h"
+#include "parser/element/IfStatement.h"
+#include "parser/element/ForStatement.h"
 #include "parser/element/expression/Expression.h"
 
 using namespace ninx::parser::element;
@@ -61,7 +62,10 @@ namespace ninx {
             std::unique_ptr<Block> parse_block();
 
             // Conditions
-            std::unique_ptr<IfCondition> parse_if_condition();
+            std::unique_ptr<IfStatement> parse_if_statement();
+
+            // Cycles
+            std::unique_ptr<ForStatement> parse_for_statement();
 
             // Functions
             std::unique_ptr<FunctionCall> parse_function_call();

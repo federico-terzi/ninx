@@ -25,16 +25,16 @@ SOFTWARE.
 
 #include <sstream>
 #include "Block.h"
-#include "IfCondition.h"
+#include "IfStatement.h"
 
-ninx::parser::element::IfCondition::IfCondition(std::vector<std::unique_ptr<ninx::parser::element::IfCase>> cases,
+ninx::parser::element::IfStatement::IfStatement(std::vector<std::unique_ptr<ninx::parser::element::IfCase>> cases,
         std::unique_ptr<Block> else_body)
 : cases(std::move(cases)), else_body(std::move(else_body)){}
 
-std::string ninx::parser::element::IfCondition::dump(int level) const {
+std::string ninx::parser::element::IfStatement::dump(int level) const {
     std::stringstream s;
 
-    s << std::string(level, '\t') + "IfCondition {" << std::endl;
+    s << std::string(level, '\t') + "IfStatement {" << std::endl;
     for (auto& c : cases) {
         s << c->dump(level+1) << std::endl;
     }
@@ -47,7 +47,7 @@ std::string ninx::parser::element::IfCondition::dump(int level) const {
     return s.str();
 }
 
-void ninx::parser::element::IfCondition::set_parent(ninx::parser::element::Block *parent) {
+void ninx::parser::element::IfStatement::set_parent(ninx::parser::element::Block *parent) {
     ASTElement::set_parent(parent);
 
     for (auto &c : cases) {
@@ -59,11 +59,11 @@ void ninx::parser::element::IfCondition::set_parent(ninx::parser::element::Block
     }
 }
 
-void ninx::parser::element::IfCondition::accept(ninx::evaluator::Evaluator *evaluator) {
+void ninx::parser::element::IfStatement::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
 
-ninx::parser::element::IfCondition *ninx::parser::element::IfCondition::clone_impl() {
+ninx::parser::element::IfStatement *ninx::parser::element::IfStatement::clone_impl() {
     // Clone all the cases
     std::vector<std::unique_ptr<IfCase>> cases_copy;
     for (auto &c : cases) {
@@ -77,14 +77,14 @@ ninx::parser::element::IfCondition *ninx::parser::element::IfCondition::clone_im
         else_body_copy = else_body->clone<Block>();
     }
 
-    return new IfCondition(std::move(cases_copy), std::move(else_body_copy));
+    return new IfStatement(std::move(cases_copy), std::move(else_body_copy));
 }
 
 const std::vector<std::unique_ptr<ninx::parser::element::IfCase>> &
-ninx::parser::element::IfCondition::get_cases() const {
+ninx::parser::element::IfStatement::get_cases() const {
     return cases;
 }
 
-const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::IfCondition::get_else_body() const {
+const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::IfStatement::get_else_body() const {
     return else_body;
 }

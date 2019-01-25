@@ -33,9 +33,9 @@ SOFTWARE.
 namespace ninx {
     namespace parser {
         namespace element {
-            class IfCondition : public Statement {
+            class IfStatement : public Statement {
             public:
-                explicit IfCondition(std::vector<std::unique_ptr<IfCase>> cases, std::unique_ptr<Block> else_body);
+                explicit IfStatement(std::vector<std::unique_ptr<IfCase>> cases, std::unique_ptr<Block> else_body);
 
                 std::string dump(int level) const override;
 
@@ -47,7 +47,7 @@ namespace ninx {
                 const std::unique_ptr<Block> &get_else_body() const;
 
             protected:
-                IfCondition *clone_impl() override;
+                IfStatement *clone_impl() override;
 
             private:
                 std::vector<std::unique_ptr<IfCase>> cases;

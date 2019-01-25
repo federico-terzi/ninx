@@ -43,7 +43,7 @@ SOFTWARE.
 #include "parser/element/expression/NotEqualExpression.h"
 #include "element/FunctionCallArgument.h"
 #include "element/IfCase.h"
-#include "element/IfCondition.h"
+#include "parser/element/IfStatement.h"
 
 using namespace ninx::parser::exception;
 
@@ -118,7 +118,11 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
             }
             case Type::IF: {
                 reader.seek_previous();  // Rewind the if block
-                return parse_if_condition();
+                return parse_if_statement();
+            }
+            case Type::FOR: {
+                reader.seek_previous();  // Rewind the for block
+                return parse_for_statement();
             }
             case Type::TEXT: {
                 auto element = std::make_unique<TextElement>(
@@ -134,7 +138,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
     return nullptr;
 }
 
-std::unique_ptr<IfCondition> ninx::parser::Parser::parse_if_condition() {
+std::unique_ptr<IfStatement> ninx::parser::Parser::parse_if_statement() {
     if (reader.check_type(Type::IF) != 1) {
         generate_exception("Expected If statement");
     }
@@ -167,9 +171,39 @@ std::unique_ptr<IfCondition> ninx::parser::Parser::parse_if_condition() {
     }
 
 
-    auto if_condition = std::make_unique<IfCondition>(std::move(cases), std::move(else_body));
+    auto if_condition = std::make_unique<IfStatement>(std::move(cases), std::move(else_body));
 
     return if_condition;
+}
+
+std::unique_ptr<ForStatement> ninx::parser::Parser::parse_for_statement() {
+    if (reader.check_type(Type::FOR) != 1) {
+        generate_exception("Expected for statement");
+    }
+    reader.get_token();
+
+    // Read the iterator name
+    if (reader.check_type(Type::VARIABLE) != 1) {
+        generate_exception("Expected iterator name ( as variable, for example $i )");
+    }
+    auto iterator_name_token {reader.get_token()};
+    std::string iterator_name {dynamic_cast<ninx::lexer::token::Variable*>(iterator_name_token)->get_name()};
+
+    // Expect : separator
+    if (reader.check_limiter(':') != 1) {
+        generate_exception("Expected :");
+    }
+    reader.get_token();
+
+    // Parse the expression
+    auto expression {parse_expression()};
+
+    // Parse the for body
+    auto body {parse_block()};
+
+    auto for_condition = std::make_unique<ForStatement>(iterator_name, std::move(expression), std::move(body));
+
+    return for_condition;
 }
 
 std::unique_ptr<Expression> ninx::parser::Parser::parse_value() {

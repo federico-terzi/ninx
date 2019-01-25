@@ -39,7 +39,8 @@ namespace ninx {
             class FunctionArgument;
             class FunctionCallArgument;
             class IfCase;
-            class IfCondition;
+            class IfStatement;
+            class ForStatement;
             class BinaryExpression;
             class AddExpression;
             class SubtractExpression;
@@ -65,8 +66,9 @@ namespace ninx {
             virtual void visit(ninx::parser::element::FunctionDefinition * e) = 0;
             virtual void visit(ninx::parser::element::FunctionArgument * e) = 0;
             virtual void visit(ninx::parser::element::FunctionCallArgument * e) = 0;
-            virtual void visit(ninx::parser::element::IfCondition * e) = 0;
+            virtual void visit(ninx::parser::element::IfStatement * e) = 0;
             virtual void visit(ninx::parser::element::IfCase * e) = 0;
+            virtual void visit(ninx::parser::element::ForStatement * e) = 0;
             virtual void visit(ninx::parser::element::AddExpression * e) = 0;
             virtual void visit(ninx::parser::element::SubtractExpression * e) = 0;
             virtual void visit(ninx::parser::element::MultiplicationExpression * e) = 0;
