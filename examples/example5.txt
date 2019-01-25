@@ -1,5 +1,5 @@
 Let me show you some cycles:
 
-@for $i : @range(0, 10) {
+@for $i : @range_expr(0, 10) {
     Counting $i
 }

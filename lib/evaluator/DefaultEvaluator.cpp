@@ -452,5 +452,25 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfCase *e) 
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::ForStatement *e) {
+    // Evaluate the condition and get the range_expr list
+    no_echo([&]{
+        e->get_range_expr()->accept(this);
+    });
+    auto range_expr {std::move(get_owned_return_block())};
 
+    int index = 0;
+    for (auto &element : range_expr->get_children()) {
+        // Clone the body
+        auto body {e->get_body()->clone<ninx::parser::element::Block>()};
+
+        // Inject all the variables
+        body->set_variable(e->get_iterator_name(), element->clone<ninx::parser::element::Block>(), true);
+        body->set_variable("index0", ninx::parser::element::Block::make_text_block(body.get(), boost::lexical_cast<std::string>(index)), true);
+        body->set_variable("index1", ninx::parser::element::Block::make_text_block(body.get(), boost::lexical_cast<std::string>(index+1)), true);
+
+        // Now execute the body
+        body->accept(this);
+
+        index++;
+    }
 }

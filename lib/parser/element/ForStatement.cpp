@@ -26,9 +26,9 @@ SOFTWARE.
 #include <sstream>
 #include "ForStatement.h"
 
-ninx::parser::element::ForStatement::ForStatement(const std::string &iterator_name, std::unique_ptr<ninx::parser::element::Expression> range,
+ninx::parser::element::ForStatement::ForStatement(const std::string &iterator_name, std::unique_ptr<ninx::parser::element::Expression> range_expr,
                                                   std::unique_ptr<ninx::parser::element::Block> body)
-        : iterator_name(iterator_name), range(std::move(range)), body(std::move(body)) {}
+        : iterator_name(iterator_name), range_expr(std::move(range_expr)), body(std::move(body)) {}
 
 std::string ninx::parser::element::ForStatement::dump(int level) const {
     std::stringstream s;
@@ -41,8 +41,8 @@ std::string ninx::parser::element::ForStatement::dump(int level) const {
     return s.str();
 }
 
-const std::unique_ptr<ninx::parser::element::Expression> &ninx::parser::element::ForStatement::get_range() const {
-    return range;
+const std::unique_ptr<ninx::parser::element::Expression> &ninx::parser::element::ForStatement::get_range_expr() const {
+    return range_expr;
 }
 
 const std::unique_ptr<ninx::parser::element::Block> &ninx::parser::element::ForStatement::get_body() const {
@@ -56,7 +56,7 @@ const std::string &ninx::parser::element::ForStatement::get_iterator_name() cons
 void ninx::parser::element::ForStatement::set_parent(ninx::parser::element::Block *parent) {
     ASTElement::set_parent(parent);
 
-    this->range->set_parent(parent);
+    this->range_expr->set_parent(parent);
     this->body->set_parent(parent);
 }
 
@@ -65,7 +65,7 @@ void ninx::parser::element::ForStatement::accept(ninx::evaluator::Evaluator *eva
 }
 
 ninx::parser::element::ForStatement *ninx::parser::element::ForStatement::clone_impl() {
-    return new ForStatement(this->iterator_name, this->range->clone<Expression>(), this->body->clone<Block>());
+    return new ForStatement(this->iterator_name, this->range_expr->clone<Expression>(), this->body->clone<Block>());
 }
 
 

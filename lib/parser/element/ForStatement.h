@@ -36,7 +36,7 @@ namespace ninx {
         namespace element {
             class ForStatement : public Statement {
             public:
-                explicit ForStatement(const std::string &iterator_name, std::unique_ptr<Expression> range, std::unique_ptr<Block> body);
+                explicit ForStatement(const std::string &iterator_name, std::unique_ptr<Expression> range_expr, std::unique_ptr<Block> body);
 
                 std::string dump(int level) const override;
 
@@ -45,14 +45,14 @@ namespace ninx {
                 void set_parent(Block *parent) override;
 
                 const std::string &get_iterator_name() const;
-                const std::unique_ptr<Expression> &get_range() const;
+                const std::unique_ptr<Expression> &get_range_expr() const;
                 const std::unique_ptr<Block> &get_body() const;
             protected:
                 ForStatement *clone_impl() override;
 
             private:
                 std::string iterator_name;
-                std::unique_ptr<Expression> range;
+                std::unique_ptr<Expression> range_expr;
                 std::unique_ptr<Block> body;
             };
         }
