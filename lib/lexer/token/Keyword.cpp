@@ -40,10 +40,18 @@ ninx::lexer::token::Type ninx::lexer::token::Keyword::get_type() {
 
 std::string ninx::lexer::token::Keyword::dump() const {
     std::stringstream s;
-    s << "KEYWORD ( type " << static_cast<int>(this-> type) << " ): '" << this->keyword << "'";
+    s << "KEYWORD ( type " << static_cast<int>(this-> type) << " late:" << this->late << " ): '" << this->keyword << "'";
     return s.str();
 }
 
 const std::string &ninx::lexer::token::Keyword::get_keyword() const {
     return keyword;
+}
+
+bool ninx::lexer::token::Keyword::is_late() const {
+    return late;
+}
+
+void ninx::lexer::token::Keyword::set_late(bool late) {
+    Keyword::late = late;
 }

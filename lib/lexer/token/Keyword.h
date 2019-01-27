@@ -42,10 +42,6 @@ namespace ninx {
             };
 
             class Keyword : public Token {
-            private:
-                std::string keyword;
-                Type type;
-
             public:
                 explicit Keyword(int line_number, const std::string &keyword);
 
@@ -54,6 +50,15 @@ namespace ninx {
                 std::string dump() const override;
 
                 const std::string &get_keyword() const;
+
+                bool is_late() const;
+                void set_late(bool late);
+
+            private:
+                std::string keyword;
+                Type type;
+
+                bool late = false; // True if the keyword was used with the ? late options
             };
         }
     }

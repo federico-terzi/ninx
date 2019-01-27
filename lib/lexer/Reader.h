@@ -38,7 +38,7 @@ namespace ninx {
         // Chars that have a special meaning, such ascan be used in operator definition and the @ keyword prefix.
         // NOTE: place them based on the priority and on probability of occurrence.
         //       The first ones are the most used.
-        const char LIMITER_CHARS[] = {'@', '{', '}', '*', '_', '$', '=', '(', ')', ',', '<', '>', '\\', '/', '+', '-', ':'};
+        const char LIMITER_CHARS[] = {'@', '{', '}', '*', '_', '$', '=', '(', ')', ',', '<', '>', '\\', '/', '+', '-', ':', '?'};
 
         const int MAX_CONSECUTIVE_NEWLINES = 2;
 
@@ -68,6 +68,7 @@ namespace ninx {
 
             std::string read_until_limiter();
             std::string read_identifier();
+            std::string read_identifier(int targetSuffix, bool &found);
         };
     }
 }

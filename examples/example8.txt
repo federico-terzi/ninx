@@ -1,0 +1,12 @@
+This is a short demonstration of late calls:
+
+$x = {1}
+
+@func test() {
+    Right now the value is $x
+}
+
+This is NOT a late call: @test
+This is a late call: @test?
+
+$x = {1}

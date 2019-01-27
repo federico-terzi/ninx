@@ -50,7 +50,13 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
             switch (next_limiter) {
                 case '@':  // Keyword beginning
                 {
-                    auto keywordToken = std::make_unique<Keyword>(reader.get_line_number(), reader.read_identifier());
+                    bool lateSelectorFound = false;
+                    auto keywordToken = std::make_unique<Keyword>(reader.get_line_number(), reader.read_identifier('?', lateSelectorFound));
+
+                    if (lateSelectorFound) {
+                        keywordToken->set_late(true);
+                    }
+
                     tokens.push_back(std::move(keywordToken));
                     break;
                 }

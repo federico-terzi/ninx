@@ -185,6 +185,11 @@ std::string ninx::lexer::Reader::read_until_limiter() {
 }
 
 std::string ninx::lexer::Reader::read_identifier() {
+    bool found;
+    return this->read_identifier(-1, found);
+}
+
+std::string ninx::lexer::Reader::read_identifier(int targetSuffix, bool &found) {
     this->buffer.clear();
 
     while (stream) {
@@ -211,6 +216,12 @@ std::string ninx::lexer::Reader::read_identifier() {
     }
 
     this->buffer.push_back(0);
+
+    found = false;
+    if (targetSuffix != -1 && stream.peek() == targetSuffix) {
+        stream.get();
+        found = true;
+    }
 
     // Eat all the following spaces
     this->ignore_spaces();
