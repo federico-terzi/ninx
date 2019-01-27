@@ -56,6 +56,10 @@ SOFTWARE.
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
 
+void ninx::evaluator::DefaultEvaluator::evaluate(ninx::parser::element::Block *e) {
+    this->visit(e);
+}
+
 // RETURN BLOCK MECHANISM
 
 ninx::parser::element::Block * current_return_block;  // This is used to obtain the result block from an expression
@@ -159,6 +163,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
 
     // Clone the function definition body, to generate a new instance
     auto body {function->get_body()->clone<ninx::parser::element::Block>()};
+
+    body->__set_output_block(call->__get_output_block());
 
     // Load all the call arguments
 
@@ -311,6 +317,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
         throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Variable \""+e->get_name()+"\" has not been declared!");
     }
 
+    variable->__set_output_block(e->get_parent());
     variable->accept(this);
 }
 
@@ -342,7 +349,7 @@ double last_evaluation_value = 0;  // Used to keep the current total for the exp
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement *e) {
     // If the parent is echoing, print the text
     if (e->get_parent()->is_echoing() && !is_echoing_disabled) {
-        this->output << e->get_text();
+        e->__get_output_block()->__add_output_segment(e->get_text());
     }
 
     // If the text is a numeric value, store the value for the expression evaluation
@@ -361,7 +368,17 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     for (auto &statement : e->get_children()) {
+//        std::cout << statement->dump(0) << std::endl << std::endl;
+        statement->__set_output_block(e);
         statement->accept(this);
+    }
+
+    auto block_output {e->__render_output()};
+
+    if (e->__get_output_block()) {
+        e->__get_output_block()->__add_output_segment(block_output);
+    }else{
+        this->output << block_output;
     }
 
     // Clone the block and make it available as a return value
@@ -434,6 +451,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfStatement
             condition_fulfilled = true;
 
             auto body { if_case->get_body()->clone<ninx::parser::element::Block>() };
+            body->__set_output_block(e->__get_output_block());
+
             body->accept(this);
 
             break;
@@ -442,6 +461,8 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::IfStatement
 
     if (!condition_fulfilled && e->get_else_body()) {  // No conditions where fulfilled, execute the else block
         auto body { e->get_else_body()->clone<ninx::parser::element::Block>() };
+        body->__set_output_block(e->__get_output_block());
+
         body->accept(this);
     }
 }
@@ -462,6 +483,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::ForStatemen
     for (auto &element : range_expr->get_children()) {
         // Clone the body
         auto body {e->get_body()->clone<ninx::parser::element::Block>()};
+        body->__set_output_block(e->__get_output_block());
 
         // Inject all the variables
         body->set_variable(e->get_iterator_name(), element->clone<ninx::parser::element::Block>(), true);

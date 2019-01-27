@@ -49,6 +49,7 @@ namespace ninx {
                 std::unique_ptr<T> clone() {
                     std::unique_ptr<T> new_obj(dynamic_cast<T*>(clone_impl()));
                     new_obj->set_parent(this->get_parent());
+                    new_obj->__set_output_block(this->__get_output_block());
                     return new_obj;
                 };
 
@@ -60,10 +61,21 @@ namespace ninx {
                     this->parent = parent;
                 }
 
+                Block *__get_output_block() const {
+                    return __output_block;
+                }
+
+                virtual void __set_output_block(Block *__output_block) {
+                    ASTElement::__output_block = __output_block;
+                }
+
             protected:
                 Block * parent = nullptr;  // Reference to the parent block
 
                 virtual ASTElement * clone_impl() = 0;
+
+                // RUNTIME METHODS, SHOULD NOT BE USED DIRECTLY
+                Block * __output_block = nullptr;
             };
         }
     }

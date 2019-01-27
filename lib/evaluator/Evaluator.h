@@ -75,6 +75,8 @@ namespace ninx {
             virtual void visit(ninx::parser::element::DivisionExpression * e) = 0;
             virtual void visit(ninx::parser::element::EqualExpression * e) = 0;
             virtual void visit(ninx::parser::element::NotEqualExpression * e) = 0;
+
+            virtual void evaluate(ninx::parser::element::Block * e) = 0;
         };
     }
 }

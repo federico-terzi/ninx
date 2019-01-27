@@ -52,6 +52,7 @@ namespace ninx {
             void visit(ninx::parser::element::EqualExpression *e) override;
             void visit(ninx::parser::element::NotEqualExpression *e) override;
 
+            void evaluate(ninx::parser::element::Block *e) override;
 
             explicit DefaultEvaluator(std::ostream &output);
         private:

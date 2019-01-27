@@ -29,13 +29,16 @@ SOFTWARE.
 #include "Block.h"
 
 ninx::parser::element::FunctionCall::FunctionCall(const std::string &name, std::vector<std::unique_ptr<FunctionCallArgument>> arguments,
-                                                  std::unique_ptr<FunctionCallArgument> outer_argument)
-        : name(name), arguments(std::move(arguments)), outer_argument(std::move(outer_argument)) {}
+                                                  std::unique_ptr<FunctionCallArgument> outer_argument, bool late_call)
+        : name(name), arguments(std::move(arguments)), outer_argument(std::move(outer_argument)), late_call(late_call) {}
 
 std::string ninx::parser::element::FunctionCall::dump(int level) const {
     std::stringstream s;
 
     s << std::string(level, '\t') + "FunctionCall " << this->name << " {" << std::endl;
+    if (this->late_call){
+        s << std::string(level+1, '\t') + "LATE CALL" << std::endl;
+    }
     for (auto& argument : arguments) {
         s << argument->dump(level+1) << std::endl;
     }
@@ -98,5 +101,9 @@ ninx::parser::element::FunctionCall *ninx::parser::element::FunctionCall::clone_
         outer_argument_copy = outer_argument->clone<FunctionCallArgument>();
     }
 
-    return new FunctionCall(this->name, std::move(arguments_copy), std::move(outer_argument_copy));
+    return new FunctionCall(this->name, std::move(arguments_copy), std::move(outer_argument_copy), late_call);
+}
+
+bool ninx::parser::element::FunctionCall::is_late_call() const {
+    return late_call;
 }

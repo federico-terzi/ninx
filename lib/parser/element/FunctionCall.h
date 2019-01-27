@@ -36,7 +36,7 @@ namespace ninx {
             class FunctionCall : public Statement {
             public:
                 explicit FunctionCall(const std::string &name, std::vector<std::unique_ptr<FunctionCallArgument>> arguments,
-                                                      std::unique_ptr<FunctionCallArgument> outer_argument);
+                                                      std::unique_ptr<FunctionCallArgument> outer_argument, bool late_call);
 
                 std::string dump(int level) const override;
 
@@ -47,6 +47,7 @@ namespace ninx {
                 const std::string &get_name() const;
                 const std::vector<std::unique_ptr<FunctionCallArgument>> &get_arguments() const;
                 const std::unique_ptr<FunctionCallArgument> &get_outer_argument() const;
+                bool is_late_call() const;
 
                 /**
                  * @return the number of the arguments of the call, adding 1 for the outer_argument if present.
@@ -60,6 +61,8 @@ namespace ninx {
                 std::string name; // The name of the function to be called
                 std::vector<std::unique_ptr<FunctionCallArgument>> arguments;  // Function call arguments
                 std::unique_ptr<FunctionCallArgument> outer_argument;  // CAN BE NULL, Function call argument, specified by the block syntax.
+
+                bool late_call = false;  // If true, the call will be executed after all the parent's statements have been evaluated.
             };
         }
     }

@@ -28,6 +28,7 @@ SOFTWARE.
 
 #include <vector>
 #include <memory>
+#include <map>
 #include <unordered_map>
 #include <functional>
 #include "ASTElement.h"
@@ -75,6 +76,12 @@ namespace ninx {
                 // BUILT-IN METHODS
                 FunctionDefinition * get_builtin(const std::string &name) const;
                 static std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> builtin_functions;
+
+                // RUNTIME METHODS, THEY SHOULD NOT BE USED DIRECTLY
+                std::string __render_output();
+                size_t __add_output_segment(const std::string &text);
+                size_t __add_late_call(std::unique_ptr<Block> body);
+
             protected:
                 Block *clone_impl() override;
 
@@ -89,6 +96,10 @@ namespace ninx {
 
                 std::unordered_map<std::string, std::unique_ptr<Block>> variables;
                 std::unordered_map<std::string, std::unique_ptr<FunctionDefinition>> functions;
+
+                // RUNTIME DATA STRUCTURES, THEY SHOULD NOT BE USED DIRECTLY
+                std::vector<std::string> __output_segments;
+                std::map<size_t, std::unique_ptr<Block>> __late_calls;
             };
         }
     }

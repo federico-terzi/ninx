@@ -479,7 +479,7 @@ std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_function_call() {
     }
 
     auto function_call = std::make_unique<FunctionCall>(call_token->get_keyword(), std::move(arguments),
-                                                        std::move(outer_argument));
+                                                        std::move(outer_argument), call_token->is_late());
 
     return function_call;
 }

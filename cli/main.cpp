@@ -14,7 +14,7 @@ using namespace std;
 
 int main() {
     //std::ifstream source{R"(/Users/freddy/Documents/GitHub/ninx/examples/example6.txt)", std::ios_base::binary};
-    std::ifstream source{R"(D:\Git\ninx\examples\example8.txt)", std::ios_base::binary};
+    std::ifstream source{R"(D:\Git\ninx\examples\example6.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "tests"};
 
@@ -30,7 +30,7 @@ int main() {
 
     std::stringstream output;
     DefaultEvaluator eval {output};
-    ast->accept(&eval);
+    eval.evaluate(ast.get());
 
     std::cout << output.str() << std::endl;
 

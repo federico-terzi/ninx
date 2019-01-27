@@ -9,4 +9,4 @@ $x = {1}
 This is NOT a late call: @test
 This is a late call: @test?
 
-$x = {1}
+$x = {5}

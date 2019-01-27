@@ -1,0 +1,5 @@
+@func test($x) {
+    Print $x yeah
+}
+
+Simple read @test({5})

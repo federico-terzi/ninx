@@ -84,6 +84,7 @@ ninx::parser::element::Block::get_variable(const std::string &name, bool only_lo
 void
 ninx::parser::element::Block::set_variable(const std::string &name, std::unique_ptr<Block> value, bool force_local) {
     if (force_local) {
+        value->set_parent(this);
         this->variables[name] = std::move(value);
         return;
     }
@@ -242,6 +243,36 @@ ninx::parser::element::FunctionDefinition *ninx::parser::element::Block::get_bui
     }
 
     return nullptr;
+}
+
+std::string ninx::parser::element::Block::__render_output() {
+    std::stringstream output;
+    for (auto &segment : __output_segments) {
+        output << segment;
+    }
+    __output_segments.clear();
+    return std::move(output.str());
+}
+
+size_t ninx::parser::element::Block::__add_late_call(std::unique_ptr<ninx::parser::element::Block> body) {
+    size_t segment_position = __output_segments.size();
+
+    // Add an empty string
+    __output_segments.push_back(std::move(std::string()));
+
+    // Add the late call reference
+    __late_calls[segment_position] = std::move(body);
+
+    return segment_position;
+}
+
+size_t ninx::parser::element::Block::__add_output_segment(const std::string &text) {
+    size_t segment_position = __output_segments.size();
+
+    // Add an empty string
+    __output_segments.push_back(text);
+
+    return segment_position;
 }
 
 

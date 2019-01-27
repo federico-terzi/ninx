@@ -1,0 +1,27 @@
+$x = {1}
+
+@func name() {
+	Third $x
+}
+
+@func test() {
+	First
+	$x
+	@name?
+	$x = {2}
+	Second
+}
+
+Prova
+@test?
+
+$x = {3}
+End
+
+OUTPUT:
+Prova
+First
+3
+Third 2
+Second
+End
