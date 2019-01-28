@@ -52,6 +52,7 @@ SOFTWARE.
 #include "parser/element/expression/SubtractExpression.h"
 #include "parser/element/expression/EqualExpression.h"
 #include "parser/element/expression/NotEqualExpression.h"
+#include "parser/util/LateCallDescriptor.h"
 #include "exception/RuntimeException.h"
 
 ninx::evaluator::DefaultEvaluator::DefaultEvaluator(std::ostream &output) : output(output) {}
@@ -259,6 +260,18 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::FunctionCal
         throw ninx::evaluator::exception::RuntimeException(0, "TODO", "Missing required arguments: \""+joined_missing+"\"");
     }
 
+    if (!call->is_late_call()) {  // Not a late call, evaluate immediately
+        evaluate_function(target_object, function, std::move(body));
+    }else{  // Late call, register it to be called later.
+        // Create the late call descriptor
+        auto descriptor = std::make_unique<ninx::parser::util::LateCallDescriptor>(std::move(body), function, target_object);
+        call->get_parent()->__add_late_call(std::move(descriptor));
+    }
+}
+
+void ninx::evaluator::DefaultEvaluator::evaluate_function(ninx::parser::element::Block *target_object,
+                                                          ninx::parser::element::FunctionDefinition *function,
+                                                          std::unique_ptr<ninx::parser::element::Block> body) {
     // Evaluate the result. ( Used for builtin functions, otherwise it is a noop ).
     auto result {function->evaluate(target_object, std::move(body))};
 
@@ -368,9 +381,17 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::TextElement
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Block *e) {
     for (auto &statement : e->get_children()) {
-//        std::cout << statement->dump(0) << std::endl << std::endl;
         statement->__set_output_block(e);
         statement->accept(this);
+    }
+
+    // Evaluate late calls
+    for (auto& call : e->__get_late_calls()) {
+        size_t position {call.first};
+
+        e->__set_output_segment_position(position);
+
+        evaluate_function(call.second->get_target_object(), call.second->get_function(), call.second->get_body()->clone<ninx::parser::element::Block>());
     }
 
     auto block_output {e->__render_output()};
@@ -496,3 +517,5 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::ForStatemen
         index++;
     }
 }
+
+

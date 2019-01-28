@@ -31,6 +31,7 @@ SOFTWARE.
 #include <map>
 #include <unordered_map>
 #include <functional>
+#include <parser/util/LateCallDescriptor.h>
 #include "ASTElement.h"
 #include "Statement.h"
 #include "FunctionDefinition.h"
@@ -80,7 +81,9 @@ namespace ninx {
                 // RUNTIME METHODS, THEY SHOULD NOT BE USED DIRECTLY
                 std::string __render_output();
                 size_t __add_output_segment(const std::string &text);
-                size_t __add_late_call(std::unique_ptr<Block> body);
+                void __set_output_segment_position(int position);
+                size_t __add_late_call(std::unique_ptr<ninx::parser::util::LateCallDescriptor> descriptor);
+                const std::map<size_t, std::unique_ptr<ninx::parser::util::LateCallDescriptor>> &__get_late_calls() const;
 
             protected:
                 Block *clone_impl() override;
@@ -99,7 +102,8 @@ namespace ninx {
 
                 // RUNTIME DATA STRUCTURES, THEY SHOULD NOT BE USED DIRECTLY
                 std::vector<std::string> __output_segments;
-                std::map<size_t, std::unique_ptr<Block>> __late_calls;
+                int __current_output_segment_position = -1;
+                std::map<size_t, std::unique_ptr<ninx::parser::util::LateCallDescriptor>> __late_calls;
             };
         }
     }

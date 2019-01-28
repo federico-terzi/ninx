@@ -32,33 +32,55 @@ SOFTWARE.
 
 namespace ninx {
     namespace evaluator {
-        class DefaultEvaluator : public Evaluator{
+        class DefaultEvaluator : public Evaluator {
         public:
             void visit(ninx::parser::element::TextElement *e) override;
+
             void visit(ninx::parser::element::Assignment *e) override;
+
             void visit(ninx::parser::element::Block *e) override;
+
             void visit(ninx::parser::element::FunctionCall *call) override;
+
             void visit(ninx::parser::element::VariableRead *e) override;
+
             void visit(ninx::parser::element::FunctionDefinition *e) override;
+
             void visit(ninx::parser::element::FunctionArgument *e) override;
+
             void visit(ninx::parser::element::FunctionCallArgument *e) override;
+
             void visit(ninx::parser::element::IfStatement *e) override;
+
             void visit(ninx::parser::element::IfCase *e) override;
+
             void visit(ninx::parser::element::ForStatement *e) override;
+
             void visit(ninx::parser::element::AddExpression *e) override;
+
             void visit(ninx::parser::element::SubtractExpression *e) override;
+
             void visit(ninx::parser::element::MultiplicationExpression *e) override;
+
             void visit(ninx::parser::element::DivisionExpression *e) override;
+
             void visit(ninx::parser::element::EqualExpression *e) override;
+
             void visit(ninx::parser::element::NotEqualExpression *e) override;
+
+            void evaluate_function(ninx::parser::element::Block *target_object,
+                                   ninx::parser::element::FunctionDefinition *function,
+                                   std::unique_ptr<ninx::parser::element::Block> body);
 
             void evaluate(ninx::parser::element::Block *e) override;
 
             explicit DefaultEvaluator(std::ostream &output);
+
         private:
             std::ostream &output;
 
-            void visit_binary_expression(ninx::parser::element::BinaryExpression * e, std::function<double(double, double)> const &operation);
+            void visit_binary_expression(ninx::parser::element::BinaryExpression *e,
+                                         std::function<double(double, double)> const &operation);
         };
 
     }

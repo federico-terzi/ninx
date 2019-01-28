@@ -254,14 +254,14 @@ std::string ninx::parser::element::Block::__render_output() {
     return std::move(output.str());
 }
 
-size_t ninx::parser::element::Block::__add_late_call(std::unique_ptr<ninx::parser::element::Block> body) {
+size_t ninx::parser::element::Block::__add_late_call(std::unique_ptr<ninx::parser::util::LateCallDescriptor> descriptor) {
     size_t segment_position = __output_segments.size();
 
     // Add an empty string
     __output_segments.push_back(std::move(std::string()));
 
     // Add the late call reference
-    __late_calls[segment_position] = std::move(body);
+    __late_calls[segment_position] = std::move(descriptor);
 
     return segment_position;
 }
@@ -269,10 +269,23 @@ size_t ninx::parser::element::Block::__add_late_call(std::unique_ptr<ninx::parse
 size_t ninx::parser::element::Block::__add_output_segment(const std::string &text) {
     size_t segment_position = __output_segments.size();
 
-    // Add an empty string
-    __output_segments.push_back(text);
+    // Check whether to add the segment to the bottom or to a previous segment ( the latter used for late calls )
+    if (__current_output_segment_position < 0) {
+        __output_segments.push_back(text);
+    }else{
+        __output_segments[__current_output_segment_position] = text;
+    }
 
     return segment_position;
+}
+
+const std::map<size_t, std::unique_ptr<ninx::parser::util::LateCallDescriptor>> &
+ninx::parser::element::Block::__get_late_calls() const {
+    return __late_calls;
+}
+
+void ninx::parser::element::Block::__set_output_segment_position(int position) {
+    __current_output_segment_position = position;
 }
 
 

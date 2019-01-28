@@ -18,6 +18,7 @@ Prova
 $x = {3}
 End
 
+/*
 OUTPUT:
 Prova
 First
@@ -25,3 +26,4 @@ First
 Third 2
 Second
 End
+*/
