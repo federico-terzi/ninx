@@ -32,9 +32,6 @@ namespace ninx {
     namespace lexer {
         namespace token {
             class Variable : public Token {
-            private:
-                std::string name;
-
             public:
                 explicit Variable(int line_number, const std::string &name);
 
@@ -43,6 +40,17 @@ namespace ninx {
                 std::string dump() const override;
 
                 const std::string &get_name() const;
+
+                int get_trailing_spaces() const;
+                void set_trailing_spaces(int trailing_spaces);
+
+            private:
+                std::string name;
+
+                // The number of spaces after the variable that were removed. This is necessary to recover
+                // them in a VariableRead, but to ignore them in an assignment.
+                int trailing_spaces = 0;
+
             };
         }
     }

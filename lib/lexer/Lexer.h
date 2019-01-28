@@ -38,16 +38,22 @@ using namespace ninx::lexer::token;
 namespace ninx {
     namespace lexer {
         class Lexer {
-        private:
-            std::istream &stream;
-            std::string origin;
-
-            Reader reader;
         public:
             explicit Lexer(std::istream &stream, std::string origin);
             explicit Lexer(std::istream &stream);
 
             std::vector<std::unique_ptr<Token>> generate();
+
+            bool is_verbose() const;
+            void set_verbose(bool verbose);
+
+        private:
+            std::istream &stream;
+            std::string origin;
+
+            Reader reader;
+
+            bool verbose = false;
         };
     }
 }

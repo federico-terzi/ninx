@@ -35,10 +35,19 @@ ninx::lexer::Reader::Reader(std::istream &stream, std::string &origin) : stream{
     this->buffer.reserve(READER_BUFFER_INITIAL_SIZE);
 }
 
-void ninx::lexer::Reader::ignore_spaces() {
+int ninx::lexer::Reader::ignore_spaces() {
+    int count = 0;
     int current;
     // Skip all the spaces except the newline
     while (isspace(current = this->stream.peek()) && current != '\n') {
+        this->stream.get();
+        count++;
+    }
+    return count;
+}
+
+void ninx::lexer::Reader::ignore_spaces_and_newline() {
+    while (isspace(this->stream.peek())) {
         this->stream.get();
     }
 }
@@ -76,7 +85,7 @@ bool ninx::lexer::Reader::ignore_comment() {
 
         if (is_closing) {
             if (current == '/') {
-                return true;
+                break;
             }else{
                 is_closing = false;
             }
@@ -86,6 +95,9 @@ bool ninx::lexer::Reader::ignore_comment() {
             }
         }
     }
+
+    // Eat all the following spaces
+    this->ignore_spaces_and_newline();
 
     return true;
 }
@@ -184,12 +196,12 @@ std::string ninx::lexer::Reader::read_until_limiter() {
     return std::move(std::string{buffer.data()});
 }
 
-std::string ninx::lexer::Reader::read_identifier() {
+std::string ninx::lexer::Reader::read_identifier(int &trailing_spaces) {
     bool found;
-    return this->read_identifier(-1, found);
+    return this->read_identifier(trailing_spaces, -1, found);
 }
 
-std::string ninx::lexer::Reader::read_identifier(int targetSuffix, bool &found) {
+std::string ninx::lexer::Reader::read_identifier(int &trailing_spaces, int target_suffix, bool &found) {
     this->buffer.clear();
 
     while (stream) {
@@ -218,13 +230,12 @@ std::string ninx::lexer::Reader::read_identifier(int targetSuffix, bool &found) 
     this->buffer.push_back(0);
 
     found = false;
-    if (targetSuffix != -1 && stream.peek() == targetSuffix) {
+    if (target_suffix != -1 && stream.peek() == target_suffix) {
         stream.get();
         found = true;
     }
 
-    // Eat all the following spaces
-    this->ignore_spaces();
+    trailing_spaces = ignore_spaces();
 
     return std::move(std::string{buffer.data()});
 }

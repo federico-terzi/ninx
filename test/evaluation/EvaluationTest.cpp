@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include "lexer/Lexer.h"
 #include "parser/Parser.h"
@@ -42,6 +43,22 @@ std::string eval(const std::string &command) {
     ninx::evaluator::DefaultEvaluator eval{output};
     eval.evaluate(ast.get());
     return output.str();
+}
+
+std::string string_to_hex(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
 }
 
 BOOST_AUTO_TEST_SUITE(ninx_evaluation)
@@ -82,6 +99,19 @@ $x$y
         BOOST_CHECK_EQUAL(output, "32");
     }
 
+    BOOST_AUTO_TEST_CASE(test_variable_formatting) {
+        auto output{eval(
+                R"NINX(
+$x={2}
+$y=$x
+$x = {3}
+$x $y
+)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "3 2");  // Notice the space between
+    }
+
     BOOST_AUTO_TEST_CASE(test_variable_reference_read) {
         auto output{eval(
                 R"NINX(
@@ -117,6 +147,98 @@ $x
         )};
 
         BOOST_CHECK_EQUAL(output, "Hello");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_function_indent_removing_spaces) {
+        auto output{eval(
+                R"NINX(
+@func test() {
+    Indented with spaces!
+}
+@test
+)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "Indented with spaces!");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_function_reference_read) {
+        auto output{eval(
+                R"NINX(
+$x={2}
+@func test() {
+$x
+}
+@test
+)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "2");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_function_reference_write) {
+        auto output{eval(
+                R"NINX(
+$i={0}
+@func test() {
+$i={2}
+}
+@test
+$i
+)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "2");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_function_reference_multiple_write) {
+        auto output{eval(
+                R"NINX(
+$i={0}
+@func test() {
+$i=$i+{1}
+}
+@test
+@test
+$i
+)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "2");
+    }
+
+
+    // Comments
+
+    BOOST_AUTO_TEST_CASE(test_comment) {
+        auto output{eval(
+                R"NINX(
+First
+/* Commented line */
+Second
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "First\nSecond");  // Notice the space between
+    }
+
+    BOOST_AUTO_TEST_CASE(test_multiline_comment) {
+        auto output{eval(
+                R"NINX(
+First
+/*
+Multiple comment
+lines
+*/
+Second
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "First\nSecond");  // Notice the space between
     }
 
 BOOST_AUTO_TEST_SUITE_END()

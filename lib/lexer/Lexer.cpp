@@ -51,7 +51,8 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
                 case '@':  // Keyword beginning
                 {
                     bool lateSelectorFound = false;
-                    auto keywordToken = std::make_unique<Keyword>(reader.get_line_number(), reader.read_identifier('?', lateSelectorFound));
+                    int trailing_spaces;
+                    auto keywordToken = std::make_unique<Keyword>(reader.get_line_number(), reader.read_identifier(trailing_spaces, '?', lateSelectorFound));
 
                     if (lateSelectorFound) {
                         keywordToken->set_late(true);
@@ -62,7 +63,10 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
                 }
                 case '$':  // Variable beginning
                 {
-                    auto variableToken = std::make_unique<Variable>(reader.get_line_number(), reader.read_identifier());
+                    int trailing_spaces;
+                    auto variableToken = std::make_unique<Variable>(reader.get_line_number(),
+                                                                    reader.read_identifier(trailing_spaces));
+                    variableToken->set_trailing_spaces(trailing_spaces);
                     tokens.push_back(std::move(variableToken));
                     break;
                 }
@@ -81,9 +85,19 @@ std::vector<std::unique_ptr<Token>> ninx::lexer::Lexer::generate() {
         }
     }
 
-    for (auto &token : tokens) {
-        std::cout << *token << std::endl;
+    if (verbose) {
+        for (auto &token : tokens) {
+            std::cout << *token << std::endl;
+        }
     }
 
     return std::move(tokens);
+}
+
+bool ninx::lexer::Lexer::is_verbose() const {
+    return verbose;
+}
+
+void ninx::lexer::Lexer::set_verbose(bool verbose) {
+    Lexer::verbose = verbose;
 }

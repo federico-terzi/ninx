@@ -57,7 +57,8 @@ namespace ninx {
 
             int get_line_number() const;
 
-            void ignore_spaces();
+            int ignore_spaces();
+            void ignore_spaces_and_newline();
             bool ignore_comment();
 
 
@@ -67,8 +68,8 @@ namespace ninx {
 
 
             std::string read_until_limiter();
-            std::string read_identifier();
-            std::string read_identifier(int targetSuffix, bool &found);
+            std::string read_identifier(int &trailing_spaces);
+            std::string read_identifier(int &trailing_spaces, int target_suffix, bool &found);
         };
     }
 }

@@ -84,8 +84,9 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 break;
             }
             case Type::VARIABLE: {
+                auto variable_token {dynamic_cast<ninx::lexer::token::Variable *>(token)};
                 // Get the variable name
-                auto name{dynamic_cast<ninx::lexer::token::Variable *>(token)->get_name()};
+                auto name{variable_token->get_name()};
 
                 // Determine if the variable is used in an assignment by peeking the next
                 // token and checking if it is a limiter equal to =

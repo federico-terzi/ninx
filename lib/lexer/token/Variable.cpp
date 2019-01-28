@@ -38,3 +38,11 @@ std::string ninx::lexer::token::Variable::dump() const {
 const std::string &ninx::lexer::token::Variable::get_name() const {
     return name;
 }
+
+int ninx::lexer::token::Variable::get_trailing_spaces() const {
+    return trailing_spaces;
+}
+
+void ninx::lexer::token::Variable::set_trailing_spaces(int trailing_spaces) {
+    Variable::trailing_spaces = trailing_spaces;
+}
