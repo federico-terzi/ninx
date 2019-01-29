@@ -136,7 +136,12 @@ int ninx::lexer::Reader::get_next_limiter() {
                 this->stream.get();
 
                 // Also ignore the trailing spaces
-                this->ignore_spaces();
+                // Check if it is the beginning of a block, in that case remove also the new lines
+                if (next_char == '{') {
+                    this->ignore_spaces_and_newline();
+                }else{
+                    this->ignore_spaces();
+                }
 
                 return next_char;
             }else{
@@ -151,8 +156,7 @@ int ninx::lexer::Reader::get_next_limiter() {
 std::string ninx::lexer::Reader::read_until_limiter() {
     this->buffer.clear();
 
-    // Used to prevent more than two consecutive newlines
-    int newline_count = 0;
+    bool line_started {true};  // Used to discard indentations
 
     while (stream) {
         // Check if the next char is one of the limiting ones
@@ -160,7 +164,7 @@ std::string ninx::lexer::Reader::read_until_limiter() {
         if (next_char == '\\') {   // Escaping control
             stream.get();  // Discard the escaping char, and avoid limiter check so char is considered as text
         }else{
-            if (is_limiter(next_char) && next_char != '-') {  // Negative number handling
+            if (is_limiter(next_char) && next_char != '-') {  // Exception is for negative number handling
                 break;
             }
         }
@@ -178,15 +182,15 @@ std::string ninx::lexer::Reader::read_until_limiter() {
 
         if (current == '\n') { // Increment the line count if a newline was found
             this->increment_line();
-            newline_count++;
+            line_started = true;
         }else{
             if (!isspace(current)) {
-                newline_count = 0;
+                line_started = false;
             }
         }
 
-        // If the new character is a newline that exceed the maximum number, remove it
-        if (newline_count < MAX_CONSECUTIVE_NEWLINES) {
+        // Allow newlines and chars only if they are not the first space ( indentation )
+        if ( current == '\n' || !line_started ) {
             this->buffer.push_back(current);
         }
     }

@@ -33,8 +33,6 @@ namespace ninx {
     namespace lexer {
         namespace token {
             class Text : public Token {
-            private:
-                std::string text;
             public:
                 explicit Text(int line_number, const std::string &text);
 
@@ -57,6 +55,11 @@ namespace ninx {
                  * Check if the text token is only made of text characters.
                  */
                 bool is_empty();
+
+            private:
+                std::string text;
+
+                bool valid_newline = false;
             };
         }
     }

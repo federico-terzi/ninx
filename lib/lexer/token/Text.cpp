@@ -31,7 +31,14 @@ ninx::lexer::token::Type ninx::lexer::token::Text::get_type() {
     return Type::TEXT;
 }
 
-ninx::lexer::token::Text::Text(int line_number, const std::string &text) : Token(line_number), text(text) {}
+ninx::lexer::token::Text::Text(int line_number, const std::string &text) : Token(line_number), text(text) {
+    // Check if there are multiple spaces
+    static const boost::regex multiple_newline_validation("\\s*[\\n]{2,}\\s*");
+    if (regex_match(this->text, multiple_newline_validation)) {
+        this->text = "\n";
+        valid_newline = true;
+    }
+}
 
 const std::string &ninx::lexer::token::Text::get_text() const {
     return text;
@@ -61,6 +68,10 @@ bool ninx::lexer::token::Text::is_empty() {
         return true;
     }
 
-    static const boost::regex emptyValidation("^[\\n\\t\\r]*$");
+    if (valid_newline) {
+        return false;
+    }
+
+    static const boost::regex emptyValidation("^[\\n\\t\\r]$");
     return regex_match(this->get_text(), emptyValidation);
 }

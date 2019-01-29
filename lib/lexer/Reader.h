@@ -40,8 +40,6 @@ namespace ninx {
         //       The first ones are the most used.
         const char LIMITER_CHARS[] = {'@', '{', '}', '*', '_', '$', '=', '(', ')', ',', '<', '>', '\\', '/', '+', '-', ':', '?'};
 
-        const int MAX_CONSECUTIVE_NEWLINES = 2;
-
         class Reader {
         private:
             std::istream &stream;

@@ -13,9 +13,7 @@
 @h1{This is my title}
 
 For this incredible article.
-
 Let's put a nice image here: @image {image.png}
-
 And even a small image: @smallimage {image.png}
 
 $one = {3}

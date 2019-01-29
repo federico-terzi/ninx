@@ -36,6 +36,7 @@ std::string eval(const std::string &command) {
     );
     std::string origin{"test"};
     ninx::lexer::Lexer lexer{ss, "tests"};
+    //lexer.set_verbose(true);
     auto tokens = lexer.generate();
     ninx::parser::Parser parser{tokens, "tests"};
     auto ast{parser.parse()};
@@ -159,7 +160,7 @@ $x
 )NINX"
         )};
 
-        BOOST_CHECK_EQUAL(output, "Indented with spaces!");
+        BOOST_CHECK_EQUAL(output, "Indented with spaces!\n");
     }
 
     BOOST_AUTO_TEST_CASE(test_function_reference_read) {
@@ -207,6 +208,26 @@ $i
         BOOST_CHECK_EQUAL(output, "2");
     }
 
+    BOOST_AUTO_TEST_CASE(test_function_late_call) {
+        auto output{eval(
+                R"NINX(
+$i={0}
+@func test() {
+    Current $i
+}
+@test
+
+@test?
+$i = {3}
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "Current 0\nCurrent 3");
+    }
+
+    // TODO: TEST LATE CALL BUILTIN
 
     // Comments
 
