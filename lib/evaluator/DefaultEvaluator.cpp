@@ -332,6 +332,11 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::VariableRea
 
     variable->__set_output_block(e->get_parent());
     variable->accept(this);
+
+    // Recover the trailing spaces
+    if (e->get_parent()->is_echoing() && !is_echoing_disabled) {
+        e->get_parent()->__add_output_segment(std::string(e->get_trailing_spaces(), ' '));
+    }
 }
 
 void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::Assignment *e) {

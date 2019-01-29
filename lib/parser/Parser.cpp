@@ -99,7 +99,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                     auto element = std::make_unique<ninx::parser::element::Assignment>(name, std::move(value));
                     return element;
                 } else {  // Variable used as value
-                    auto element = std::make_unique<ninx::parser::element::VariableRead>(name);
+                    auto element = std::make_unique<ninx::parser::element::VariableRead>(name, variable_token->get_trailing_spaces());
                     return element;
                 }
             }
@@ -228,8 +228,9 @@ std::unique_ptr<Expression> ninx::parser::Parser::parse_value() {
 
     } else if (reader.peek_token() != nullptr && reader.peek_token()->get_type() == Type::VARIABLE) {
         // Get the variable name
-        auto name{dynamic_cast<ninx::lexer::token::Variable *>(reader.get_token())->get_name()};
-        value = std::make_unique<ninx::parser::element::VariableRead>(name);
+        auto variable_token {dynamic_cast<ninx::lexer::token::Variable *>(reader.get_token())};
+        auto name{variable_token->get_name()};
+        value = std::make_unique<ninx::parser::element::VariableRead>(name, variable_token->get_trailing_spaces());
     } else {
         auto error_token{reader.get_token()};
         throw ParserException(error_token, this->origin, "Expected Block or Variable.");

@@ -34,7 +34,7 @@ namespace ninx {
         namespace element {
             class VariableRead : public Expression {
             public:
-                explicit VariableRead(const std::string &name);
+                explicit VariableRead(const std::string &name, int suffix_spaces);
 
                 std::string dump(int level) const override;
 
@@ -43,11 +43,14 @@ namespace ninx {
                 const std::string &get_name() const;
                 void set_name(const std::string &name);
 
+                int get_trailing_spaces() const;
+
             protected:
                 VariableRead * clone_impl() override;
 
             private:
                 std::string name;   // Variable name
+                int trailing_spaces;  // Number of trailing spaces removed by the lexer, that should be restored.
             };
         }
     }

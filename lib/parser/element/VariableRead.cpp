@@ -37,12 +37,17 @@ void ninx::parser::element::VariableRead::set_name(const std::string &name) {
     VariableRead::name = name;
 }
 
-ninx::parser::element::VariableRead::VariableRead(const std::string &name) : name(name) {}
+ninx::parser::element::VariableRead::VariableRead(const std::string &name, int suffix_spaces)
+        : name(name), trailing_spaces(suffix_spaces) {}
 
 void ninx::parser::element::VariableRead::accept(ninx::evaluator::Evaluator *evaluator) {
     evaluator->visit(this);
 }
 
 ninx::parser::element::VariableRead * ninx::parser::element::VariableRead::clone_impl() {
-    return new VariableRead(this->name);
+    return new VariableRead(this->name, 0);
+}
+
+int ninx::parser::element::VariableRead::get_trailing_spaces() const {
+    return trailing_spaces;
 }
