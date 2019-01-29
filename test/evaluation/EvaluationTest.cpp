@@ -246,6 +246,39 @@ $i = {3}
         BOOST_CHECK_EQUAL(output, "First 0\nSecond 3");
     }
 
+    BOOST_AUTO_TEST_CASE(test_function_late_call_nested_late_calls) {
+        auto output{eval(
+                R"NINX(
+$x = {1}
+@func name() {
+	Third $x
+}
+@func test() {
+	First
+	$x
+
+	@name?
+
+	$x = {2}
+	Second
+}
+Test
+@test?
+$x = {3}
+End
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, R"(Test
+First
+3
+Third 2
+Second
+End)");
+    }
+
     BOOST_AUTO_TEST_CASE(test_function_late_call_builtin) {
         auto output{eval(
                 R"NINX(

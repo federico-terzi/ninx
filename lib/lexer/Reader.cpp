@@ -47,8 +47,17 @@ int ninx::lexer::Reader::ignore_spaces() {
 }
 
 void ninx::lexer::Reader::ignore_spaces_and_newline() {
-    while (isspace(this->stream.peek())) {
+    ignore_spaces_and_newline(-1);
+}
+
+void ninx::lexer::Reader::ignore_spaces_and_newline(int newline_limit) {
+    int newline_count = 0;
+    int current;
+    while (isspace(current = this->stream.peek()) && (newline_count < newline_limit || newline_limit <0)) {
         this->stream.get();
+        if (current == '\n') {
+            newline_count++;
+        }
     }
 }
 
@@ -139,6 +148,8 @@ int ninx::lexer::Reader::get_next_limiter() {
                 // Check if it is the beginning of a block, in that case remove also the new lines
                 if (next_char == '{') {
                     this->ignore_spaces_and_newline();
+                }else if (next_char == '}') {
+                    this->ignore_spaces_and_newline(1);
                 }else{
                     this->ignore_spaces();
                 }

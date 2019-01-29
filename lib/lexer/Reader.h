@@ -57,6 +57,7 @@ namespace ninx {
 
             int ignore_spaces();
             void ignore_spaces_and_newline();
+            void ignore_spaces_and_newline(int newline_limit);
             bool ignore_comment();
 
 
