@@ -53,6 +53,7 @@ namespace ninx {
 
                 Block *get_target_object() const;
 
+                std::unique_ptr<LateCallDescriptor> clone();
             private:
                 std::unique_ptr<Block> body;
                 FunctionDefinition * function;

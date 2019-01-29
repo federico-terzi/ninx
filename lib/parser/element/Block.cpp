@@ -157,6 +157,17 @@ ninx::parser::element::Block *ninx::parser::element::Block::clone_impl() {
     }
     obj->variables = std::move(variables_copy);
 
+    // Copy late call internals
+    obj->__set_output_block(this->__output_block);
+    obj->__output_segments = this->__output_segments;
+    obj->__current_output_segment_position = this->__current_output_segment_position;
+    std::map<size_t, std::unique_ptr<ninx::parser::util::LateCallDescriptor>> late_calls_copy;
+    for (auto &l: this->__late_calls) {
+        auto late_call_copy{l.second->clone()};
+        late_calls_copy[l.first] = std::move(late_call_copy);
+    }
+    obj->__late_calls = std::move(late_calls_copy);
+
     return obj;
 }
 

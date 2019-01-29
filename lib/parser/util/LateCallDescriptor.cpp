@@ -42,3 +42,7 @@ FunctionDefinition *ninx::parser::util::LateCallDescriptor::get_function() const
 Block *ninx::parser::util::LateCallDescriptor::get_target_object() const {
     return target_object;
 }
+
+std::unique_ptr<ninx::parser::util::LateCallDescriptor> ninx::parser::util::LateCallDescriptor::clone() {
+    return std::make_unique<LateCallDescriptor>(body->clone<ninx::parser::element::Block>(), function, target_object);
+}

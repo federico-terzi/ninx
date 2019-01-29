@@ -105,7 +105,16 @@ ninx::parser::element::FunctionDefinition *ninx::parser::element::FunctionDefini
 std::unique_ptr<ninx::parser::element::Block>
 ninx::parser::element::FunctionDefinition::evaluate(ninx::parser::element::Block *target,
                                                     std::unique_ptr<ninx::parser::element::Block> body) {
-    return evaluator(target, std::move(body));
+    ninx::parser::element::Block * __output_block {nullptr};
+    if (body) {
+        __output_block = body->__get_output_block();
+    }
+
+    auto result_block {evaluator(target, std::move(body))};
+    if (result_block) {
+        result_block->__set_output_block(__output_block);
+    }
+    return result_block;
 }
 
 void ninx::parser::element::FunctionDefinition::set_evaluator(

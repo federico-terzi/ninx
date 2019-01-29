@@ -213,21 +213,54 @@ $i
                 R"NINX(
 $i={0}
 @func test() {
-    Current $i
+    $i
 }
-@test
-
-@test?
+First @test
+Second @test?
 $i = {3}
 )NINX"
         )};
 
         boost::trim(output);
 
-        BOOST_CHECK_EQUAL(output, "Current 0\nCurrent 3");
+        BOOST_CHECK_EQUAL(output, "First 0\nSecond 3");
     }
 
-    // TODO: TEST LATE CALL BUILTIN
+    BOOST_AUTO_TEST_CASE(test_function_late_call_nested_function) {
+        auto output{eval(
+                R"NINX(
+$i={0}
+$test = {
+    @func inner() {
+         $i
+    }
+}
+First @test.inner
+Second @test.inner?
+$i = {3}
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "First 0\nSecond 3");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_function_late_call_builtin) {
+        auto output{eval(
+                R"NINX(
+$i={}
+@i.add({3})
+First @i.size
+Second @i.size?
+@i.add({2})
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "First 1\nSecond 2");
+    }
 
     // Comments
 
