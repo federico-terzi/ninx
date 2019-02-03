@@ -52,6 +52,7 @@ SOFTWARE.
 #include "parser/element/expression/SubtractExpression.h"
 #include "parser/element/expression/EqualExpression.h"
 #include "parser/element/expression/NotEqualExpression.h"
+#include "parser/element/NoopStatement.h"
 #include "parser/util/LateCallDescriptor.h"
 #include "exception/RuntimeException.h"
 
@@ -522,5 +523,7 @@ void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::ForStatemen
         index++;
     }
 }
+
+void ninx::evaluator::DefaultEvaluator::visit(ninx::parser::element::NoopStatement *e) {}  // NOOP
 
 

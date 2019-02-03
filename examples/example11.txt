@@ -1,0 +1,7 @@
+@operator bold *
+
+@func bold($body) {
+    \<b\>$body\<\/b\>
+}
+
+This text can be *bold*

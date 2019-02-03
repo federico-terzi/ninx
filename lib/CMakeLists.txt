@@ -34,7 +34,7 @@ add_library(ninxlib STATIC lexer/Lexer.cpp lexer/Lexer.h
         parser/util/LateCallDescriptor.cpp parser/util/LateCallDescriptor.h
         evaluator/Evaluator.h
         evaluator/DefaultEvaluator.cpp evaluator/DefaultEvaluator.h
-        evaluator/exception/RuntimeException.cpp evaluator/exception/RuntimeException.h)
+        evaluator/exception/RuntimeException.cpp evaluator/exception/RuntimeException.h parser/element/NoopStatement.cpp parser/element/NoopStatement.h)
 
 target_include_directories (ninxlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

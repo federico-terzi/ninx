@@ -68,6 +68,8 @@ namespace ninx {
 
             void visit(ninx::parser::element::NotEqualExpression *e) override;
 
+            void visit(ninx::parser::element::NoopStatement *e) override;
+
             void evaluate_function(ninx::parser::element::Block *target_object,
                                    ninx::parser::element::FunctionDefinition *function,
                                    std::unique_ptr<ninx::parser::element::Block> body);

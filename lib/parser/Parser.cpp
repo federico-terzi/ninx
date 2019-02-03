@@ -80,8 +80,7 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 return parse_function_definition();
             }
             case Type::OPDEF: {
-                // TODO: parse_operator_definition
-                break;
+                return parse_operator_definition();
             }
             case Type::VARIABLE: {
                 auto variable_token {dynamic_cast<ninx::lexer::token::Variable *>(token)};
@@ -104,13 +103,15 @@ std::unique_ptr<Statement> ninx::parser::Parser::parse_statement() {
                 }
             }
             case Type::LIMITER: {
-                auto limiter = dynamic_cast<ninx::lexer::token::Limiter *>(token);
-                switch (limiter->get_limiter()) {
-                    default:  // Not defined as an operator
-                    {
-                        auto element = std::make_unique<TextElement>(std::string(1, limiter->get_limiter()));
-                        return element;
-                    }
+                auto limiter_token { dynamic_cast<ninx::lexer::token::Limiter *>(token) };
+                char limiter {limiter_token->get_limiter()};
+
+                if (operators.find(limiter) != operators.end()) {  // Operator found, parse it
+                    reader.seek_previous();
+                    return parse_operator_call(limiter);
+                }else{  // Limiter not registered, default to a text element
+                    auto element = std::make_unique<TextElement>(std::string(1, limiter));
+                    return element;
                 }
             }
             case Type::FUNCNAME: {
@@ -486,25 +487,87 @@ std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_function_call() {
     return function_call;
 }
 
+std::unique_ptr<NoopStatement> ninx::parser::Parser::parse_operator_definition() {
+    // Extract the alias identifier
+    auto id_token{reader.get_token()};
+    if (!id_token) {
+        throw ParserException(id_token, this->origin, "Expected alias target, but could not find one.");
+    }
+    if (id_token->get_type() != Type::TEXT) {
+        throw ParserException(id_token, this->origin, "Alias target name must be alphanumeric, and begin with a letter.");
+    }
+    auto id_ptr{dynamic_cast<ninx::lexer::token::Text *>(id_token)->get_identifier()};
+    if (!id_ptr) {
+        throw ParserException(id_token, this->origin,
+                              "Invalid function name. It must be alphanumeric, and begin with a letter.");
+    }
+    std::string id{*id_ptr};
+
+    // Extract the operator limiter
+    if (reader.check_type(Type::LIMITER) != 1) {
+        generate_exception("Expected operator, but could not find one.");
+    }
+
+    char limiter {dynamic_cast<ninx::lexer::token::Limiter*>(reader.get_token())->get_limiter()};
+
+    // Register the limiter in the operator table
+    operators[limiter] = id;
+
+    return std::make_unique<NoopStatement>();
+}
+
+std::unique_ptr<FunctionCall> ninx::parser::Parser::parse_operator_call(char limiter) {
+    if (reader.check_limiter(limiter) != 1) {
+        generate_exception("Expected operator '" + std::string(1, limiter) + "', but could not find one.");
+    }
+    reader.get_token();
+
+    auto body {parse_implicit_block_until(limiter)};
+
+    if (reader.check_limiter(limiter) != 1) {
+        generate_exception("Expected closing operator '" + std::string(1, limiter) + "', but could not find one.");
+    }
+    reader.get_token();
+
+    // Get the name of the function the operator refers to
+    auto name {operators.at(limiter)};
+
+    // Create the function call
+    std::vector<std::unique_ptr<FunctionCallArgument>> arguments;
+    auto argument = std::make_unique<FunctionCallArgument>(std::make_unique<std::string>("body"), std::move(body));
+    arguments.push_back(std::move(argument));
+
+    auto function_call = std::make_unique<FunctionCall>(name, std::move(arguments),
+                                                        nullptr, false);
+
+    return function_call;
+}
+
+
 std::unique_ptr<Block> ninx::parser::Parser::parse() {
     auto main_block{parse_implicit_block()};
     return main_block;
 }
 
 std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block() {
+    return parse_implicit_block_until('}');
+}
+
+std::unique_ptr<Block> ninx::parser::Parser::parse_implicit_block_until(char end_limiter) {
     std::vector<std::unique_ptr<Statement>> statements;
 
     // Make sure this is not an empty block
-    if (reader.check_limiter('}') != 1) {
+    if (reader.check_limiter(end_limiter) != 1) {
 
         // Not empty, cycle to get all the statements
         std::unique_ptr<Statement> current;
         while ((current = parse_statement())) {
-            statements.push_back(std::move(current));
-
+            if (current != nullptr) {
+                statements.push_back(std::move(current));
+            }
 
             // Check if the block will be closed
-            if (reader.check_limiter('}') > 0) {
+            if (reader.check_limiter(end_limiter) > 0) {
                 // Exit the cycle, because the next token marks the end of a block
                 break;
             }
@@ -519,7 +582,6 @@ void ninx::parser::Parser::generate_exception(const std::string &message) {
     auto error_token{reader.get_token()};
     throw ParserException(error_token, this->origin, message);
 }
-
 
 /*
 void ninx::parser::Parser::generate() {

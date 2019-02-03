@@ -27,6 +27,7 @@ SOFTWARE.
 #define NINX_EVALUATOR_H
 
 // Forward declaration of classes
+
 namespace ninx {
     namespace parser {
         namespace element{
@@ -38,6 +39,7 @@ namespace ninx {
             class FunctionDefinition;
             class FunctionArgument;
             class FunctionCallArgument;
+            class NoopStatement;
             class IfCase;
             class IfStatement;
             class ForStatement;
@@ -66,6 +68,7 @@ namespace ninx {
             virtual void visit(ninx::parser::element::FunctionDefinition * e) = 0;
             virtual void visit(ninx::parser::element::FunctionArgument * e) = 0;
             virtual void visit(ninx::parser::element::FunctionCallArgument * e) = 0;
+            virtual void visit(ninx::parser::element::NoopStatement * e) = 0;
             virtual void visit(ninx::parser::element::IfStatement * e) = 0;
             virtual void visit(ninx::parser::element::IfCase * e) = 0;
             virtual void visit(ninx::parser::element::ForStatement * e) = 0;

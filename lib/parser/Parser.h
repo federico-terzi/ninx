@@ -39,6 +39,7 @@ SOFTWARE.
 #include "element/FunctionDefinition.h"
 #include "element/FunctionCallArgument.h"
 #include "element/FunctionCall.h"
+#include "element/NoopStatement.h"
 #include "parser/element/IfStatement.h"
 #include "parser/element/ForStatement.h"
 #include "parser/element/expression/Expression.h"
@@ -59,6 +60,7 @@ namespace ninx {
 
             std::unique_ptr<Statement> parse_statement();
             std::unique_ptr<Block> parse_implicit_block();
+            std::unique_ptr<Block> parse_implicit_block_until(char end_limiter);
             std::unique_ptr<Block> parse_block();
 
             // Conditions
@@ -72,6 +74,11 @@ namespace ninx {
             std::unique_ptr<FunctionCallArgument> parse_function_call_argument();
             std::unique_ptr<FunctionArgument> parse_function_argument();
             std::unique_ptr<FunctionDefinition> parse_function_definition();
+
+            // Operators
+            std::unordered_map<char, std::string> operators;
+            std::unique_ptr<NoopStatement> parse_operator_definition();
+            std::unique_ptr<FunctionCall> parse_operator_call(char end_limiter);
 
             // Expression parsing
             std::unique_ptr<Expression> parse_value();
