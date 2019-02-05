@@ -150,7 +150,7 @@ int ninx::lexer::Reader::get_next_limiter() {
                     this->ignore_spaces_and_newline();
                 }else if (next_char == '}') {
                     this->ignore_spaces_and_newline(1);
-                }else{
+                }else if (next_char == '='){
                     this->ignore_spaces();
                 }
 

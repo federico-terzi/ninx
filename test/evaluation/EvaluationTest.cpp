@@ -36,7 +36,7 @@ std::string eval(const std::string &command) {
     );
     std::string origin{"test"};
     ninx::lexer::Lexer lexer{ss, "tests"};
-    //lexer.set_verbose(true);
+    lexer.set_verbose(true);
     auto tokens = lexer.generate();
     ninx::parser::Parser parser{tokens, "tests"};
     auto ast{parser.parse()};
@@ -293,6 +293,56 @@ Second @i.size?
         boost::trim(output);
 
         BOOST_CHECK_EQUAL(output, "First 1\nSecond 2");
+    }
+
+    // Operators
+
+    BOOST_AUTO_TEST_CASE(test_simple_operator) {
+        auto output{eval(
+                R"NINX(
+@func bold($body) {\<b\>$body\<\/b\>}
+@operator bold *
+
+This text can be *bold*
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "This text can be <b>bold</b>");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_multiple_operators) {
+        auto output{eval(
+                R"NINX(
+@func bold($body) {\<b\>$body\<\/b\>}
+@func italic($body) {\<i\>$body\<\/i\>}
+@operator bold *
+@operator italic _
+why _not *together*_
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "why <i>not <b>together</b></i>");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_operator_spacing) {
+        auto output{eval(
+                R"NINX(
+@func bold($body) {\<b\>$body\<\/b\> }
+@operator bold *
+
+First *test* second
+)NINX"
+        )};
+
+        boost::trim(output);
+
+
+
+        BOOST_CHECK_EQUAL(output, "First <b>test</b> second");
     }
 
     // Comments

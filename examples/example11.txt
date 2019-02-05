@@ -1,7 +1,8 @@
+@func bold($body) {\<b\>$body\<\/b\>}
+
+@func italic($body) {\<i\>$body\<\/i\>}
+
 @operator bold *
+@operator italic _
 
-@func bold($body) {
-    \<b\>$body\<\/b\>
-}
-
-This text can be *bold*
+This text can be *bold* and _italic_ and why _not *together*_

@@ -72,6 +72,6 @@ bool ninx::lexer::token::Text::is_empty() {
         return false;
     }
 
-    static const boost::regex emptyValidation("^[\\n\\t\\r]$");
+    static const boost::regex emptyValidation("^[\\s]+$");
     return regex_match(this->get_text(), emptyValidation);
 }
