@@ -1,0 +1,32 @@
+@func title($body) {\<h1\>$body\<\/h1\>}
+
+$chapters = {}
+
+@func chapter($title) {
+    @chapters.add($title)
+    \<h1\>$title\<\/h1\>
+}
+
+@func italic($body) {\<i\>$body\<\/i\>}
+@operator italic _
+
+@func toc() {
+    \<ul\>
+    @for $chapter : $chapters {
+        \<li\>$chapter\<\/li\>
+    }
+    \<\/ul\>
+}
+
+@title {Introduzione a NINX}
+
+
+@title {Sommario}
+
+
+@toc?
+
+@chapter {Introduzione}
+
+Questa è una demo di _ninx_, un linguaggio nato per scrivere documentazione,
+con l'obiettivo di essere semplice ma molto flessibile.

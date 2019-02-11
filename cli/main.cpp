@@ -14,7 +14,7 @@ using namespace std;
 
 int main() {
     //std::ifstream source{R"(/Users/freddy/Documents/GitHub/ninx/examples/example11.txt)", std::ios_base::binary};
-    std::ifstream source{R"(C:\Users\Freddy\Documents\GitHub\ninx\examples\example11.txt)", std::ios_base::binary};
+    std::ifstream source{R"(C:\Users\Freddy\Documents\GitHub\ninx\examples\example12.txt)", std::ios_base::binary};
 
     Lexer lexer {source, "tests"};
     lexer.set_verbose(true);
