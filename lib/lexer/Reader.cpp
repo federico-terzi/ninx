@@ -149,7 +149,7 @@ int ninx::lexer::Reader::get_next_limiter() {
                 if (next_char == '{') {
                     this->ignore_spaces_and_newline();
                 }else if (next_char == '}') {
-                    this->ignore_spaces_and_newline(1);
+                    this->ignore_spaces();
                 }else if (next_char == '='){
                     this->ignore_spaces();
                 }
@@ -167,7 +167,7 @@ int ninx::lexer::Reader::get_next_limiter() {
 std::string ninx::lexer::Reader::read_until_limiter() {
     this->buffer.clear();
 
-    bool line_started {true};  // Used to discard indentations
+    bool line_started {false};  // Used to discard indentations
 
     while (stream) {
         // Check if the next char is one of the limiting ones

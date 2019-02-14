@@ -137,6 +137,24 @@ $x
         BOOST_CHECK_EQUAL(output, "4");
     }
 
+    // LIMITERS
+
+    BOOST_AUTO_TEST_CASE(test_space_after_limiter) {
+        auto output{eval(
+                R"NINX(A space after, a comma)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "A space after, a comma");
+    }
+
+    BOOST_AUTO_TEST_CASE(test_space_after_equal) {
+        auto output{eval(
+                R"NINX(A space after = an equal)NINX"
+        )};
+
+        BOOST_CHECK_EQUAL(output, "A space after =an equal");
+    }
+
     // FUNCTIONS
 
     BOOST_AUTO_TEST_CASE(test_basic_function) {
@@ -258,7 +276,6 @@ $x = {1}
 	$x
 
 	@name?
-
 	$x = {2}
 	Second
 }
@@ -276,6 +293,7 @@ First
 3
 Third 2
 Second
+
 End)");
     }
 
@@ -331,7 +349,7 @@ why _not *together*_
     BOOST_AUTO_TEST_CASE(test_operator_spacing) {
         auto output{eval(
                 R"NINX(
-@func bold($body) {\<b\>$body\<\/b\> }
+@func bold($body) {\<b\>$body\<\/b\>}
 @operator bold *
 
 First *test* second
