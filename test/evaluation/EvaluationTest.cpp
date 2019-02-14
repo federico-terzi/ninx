@@ -168,6 +168,26 @@ $x
         BOOST_CHECK_EQUAL(output, "Hello");
     }
 
+    BOOST_AUTO_TEST_CASE(test_recursive_function) {
+        auto output{eval(R"NINX(
+@func count($n) {
+    @if $n == {0} {
+        0
+    }
+    @else{
+        $x = $n - {1}
+        @count($x)
+    }
+}
+@count({3})
+)NINX"
+        )};
+
+        boost::trim(output);
+
+        BOOST_CHECK_EQUAL(output, "0");
+    }
+
     BOOST_AUTO_TEST_CASE(test_function_indent_removing_spaces) {
         auto output{eval(
                 R"NINX(
